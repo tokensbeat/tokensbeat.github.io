@@ -248,7 +248,7 @@ describe("the water", () => {
       if (i % 2 === 0) water.render(w, 1 / 30);
     }
     expect((h >>> 0).toString(16)).toBe("75750db0");
-  });
+  }, 60_000); // 20 s of frames: seconds on a laptop, more on a 2-core CI runner (5 s default timed out there)
 
   it("draws the sharks' blocks as strongly as blockAlpha says: none at 0 (Aha's first frame), the homepage's at 1", () => {
     const w = new World();
