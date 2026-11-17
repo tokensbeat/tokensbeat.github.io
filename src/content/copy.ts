@@ -346,7 +346,7 @@ export const C = {
       lead: "Projects share nothing they do not have to. These guards are built and tested with the rest of the backend.",
       network: "Each project has a private network; traffic between projects is dropped.",
       egress: "Projects cannot reach the host, the cloud metadata service or the internet.",
-      secrets: "Project secrets are sealed with envelope encryption under a key held in Azure Key Vault.",
+      secrets: "Project secrets are sealed with envelope encryption.",
       limits: "Each project runs with its own CPU and memory limits.",
     },
     support: {

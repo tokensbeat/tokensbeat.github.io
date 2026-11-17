@@ -240,7 +240,7 @@ export const ZH_SITE: Readonly<Record<string, string>> = {
   "Projects share nothing they do not have to. These guards are built and tested with the rest of the backend.": "能不共享的，项目之间都不共享。这些防护和后端的其他部分一起建成并通过测试。",
   "Each project has a private network; traffic between projects is dropped.": "每个项目有自己的私有网络，项目之间的流量会被丢弃。",
   "Projects cannot reach the host, the cloud metadata service or the internet.": "项目不能访问宿主机、云元数据服务和互联网。",
-  "Project secrets are sealed with envelope encryption under a key held in Azure Key Vault.": "项目密钥使用信封加密，主密钥保存在 Azure Key Vault。",
+  "Project secrets are sealed with envelope encryption.": "项目密钥使用信封加密。",
   "Each project runs with its own CPU and memory limits.": "每个项目有各自的 CPU 和内存限额。",
   "We tell you plainly which Supabase features are here and which are not yet.": "哪些 Supabase 功能已经有、哪些还没有，我们如实告诉你。",
   "Questions about your schema, sign-in and row-level security answered in a ticket.": "schema、登录和行级安全方面的问题，在工单里解答。",

@@ -24,6 +24,11 @@ describe("the legal documents' text (legal/)", () => {
     expect(source).not.toMatch(/\baha\b/i);
   });
 
+  // Production left Microsoft Azure on 2026-11-17: a document naming it would tell users their data is somewhere it is not.
+  it.each(FILES)("%s names no Azure service", (name) => {
+    expect(readFileSync(path.join(LEGAL, name), "utf8")).not.toMatch(/Azure/);
+  });
+
   it.each(FILES.filter((name) => !name.startsWith("admin-compliance.")))("%s fills every placeholder for this site", (name) => {
     const source = readFileSync(path.join(LEGAL, name), "utf8");
     expect(source).toMatch(/\{\{\s*site_name\s*\}\}/);

@@ -49,6 +49,11 @@ describe("the Chinese pages", () => {
     expect([...missingZh]).toEqual([]);
   });
 
+  // Production left Microsoft Azure on 2026-11-17: no page may still say a part of the service runs or keeps a key there.
+  it.each(BUILT_PAGES)("%s names no Azure service, in either language", (page) => {
+    for (const lang of ["en", "zh"] as const) expect(renderToString(createElement(App, { lang, page })), lang).not.toMatch(/Azure/);
+  });
+
   it("writes the brand TokensBeat, never Tokensbeat", () => {
     for (const [en, zh] of Object.entries(ZH)) {
       expect(en, en).not.toMatch(/Tokensbeat/);
