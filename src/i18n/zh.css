@@ -1,0 +1,44 @@
+/*
+ * Chinese typography (the pages under /zh/ are lang="zh-CN"; the 404 page has Chinese lines in an English page), as
+ * the console's: mono caps labels are tracked for Latin letters; in Chinese, tracking pulls
+ * characters apart, uppercase does nothing and at 10–11 px the strokes blur. So in Chinese: no tracking anywhere,
+ * small labels at least 12 px, the display serif falls back to a Chinese serif, and no italics (Chinese has none: the
+ * browser would slant the characters). `:lang(zh)` on the element itself matches what it inherits too.
+ */
+body:lang(zh),
+body:lang(zh) * {
+  letter-spacing: 0 !important;
+}
+:is(
+    .h-eyebrow, .h-chip, .h-head__link, .h-more, .h-slab__bar, .h-group__title span, .h-orbit__legend b, .h-orbit__list-tag span,
+    .h-orbit__core-note, .h-rail__tag, .h-foot__head, .h-foot__meta, .h-steps__n, .h-table thead th, .h-table__group th, .h-guides__head,
+    .h-endpoint__label, .h-status__label, .s1-tabs__tab, .h-fig__credit, .h-fig__no, .h-fig__pending-label, .h-news__label, .h-news__date, .h-fig__when,
+    .h-feat__h3
+  ):lang(zh) {
+  font-size: 12px;
+}
+.h-table td[data-label]:lang(zh)::before { font-size: 12px; }
+.s1-btn:lang(zh) { font-family: var(--s1-font-sans); font-size: 13px; font-weight: 600; }
+:is(
+    .h-h1, .h-h2, .h-h3, .h-faq__q, .h-cta__title, .h-rail__title, .h-notyet__title, .h-orbit__core-name, .h-apis__name,
+    .h-status__title, .h-story__title, .h-story--lead .h-story__body, .h-spread__title, .h-h1 *, .h-home-claim, .h-news__name, .h-wakes th
+  ):lang(zh) {
+  font-family: var(--s1-font-display), "Songti SC", "Noto Serif SC", "Source Han Serif SC", "Noto Serif CJK SC", "Microsoft YaHei", serif;
+}
+.h-h1:lang(zh) { line-height: 1.12; }
+/* Ten characters a sentence: one line each from a 390 px phone up (each clause stays whole: .h-clause). */
+.h-home-title:lang(zh) { line-height: 1.1; font-size: clamp(2.05rem, 0.6rem + 5vw, 5.2rem); }
+.h-h2:lang(zh), .h-cta__title:lang(zh) { line-height: 1.2; }
+/* The closing headline, a clause a line (踏上基石， over 构建你的宇宙。): a line never breaks inside, and the title is no
+   larger than lets its longest line (seven characters) fit the words' column, down to a 320 px phone. */
+.h-cta__line:lang(zh) { word-break: keep-all; white-space: nowrap; }
+.h-cta--aside .h-cta__title:lang(zh) { font-size: min(clamp(2.1rem, 1.3rem + 2.6vw, 3.9rem), 100cqi / 7.4); line-height: 1.16; }
+/* The homepage's headings are two clauses: a line breaks at the comma, never inside a word (机 | 器人), and anywhere
+   rather than overflow on a phone. */
+:is(.h-feat .h-h2, .h-lean-rail__title, .h-lean-price .h-h2, .h-news__name, .h-spread__title):lang(zh) { word-break: keep-all; overflow-wrap: anywhere; }
+/* A clause of up to ten characters stays one line down to a 320 px phone, so its 。 never stands on a line alone. */
+@media (max-width: 479px) { .h-feat .h-h2:lang(zh) { font-size: min(2.15rem, 8vw); } }
+.h-h3:lang(zh), .h-faq__q:lang(zh) { line-height: 1.3; }
+em:lang(zh) { font-style: normal; }
+.h-home-claim:lang(zh) { line-height: 1.35; }
+.h-news__name:lang(zh), .h-wakes th:lang(zh) { line-height: 1.3; }

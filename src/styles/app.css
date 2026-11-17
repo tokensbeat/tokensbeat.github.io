@@ -1,0 +1,53 @@
+/*
+ * The homepage's base, first on the page (main.tsx imports it before anything else), as the console's.
+ *
+ * Cascade: the @s1lin parts put their tokens in `base` and their styles in `components`; element defaults go in `base`
+ * too (under the parts); the page (home.css) is unlayered, so it wins over a part where the two meet.
+ *
+ * Colour: only through tokens, never a hex in home.css. Ink, papers, greys and rules are the kit's --s1- tokens; the
+ * hues are the console's (theme.css, copied from the console's theme): --c-primary (rules, rings, fills),
+ * --c-primary-strong (jade words), --c-primary-tint, --c-money, --c-vendor-<id>, the status hues.
+ */
+@layer base, components;
+
+/* The typefaces the tokens name, served from this site (Fontsource), under the names Fontsource gives them. */
+:root {
+  --s1-font-sans: "Inter Tight Variable", "Inter Tight", system-ui, -apple-system, "Segoe UI", "Microsoft YaHei", sans-serif;
+  --s1-font-mono: "JetBrains Mono Variable", "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, "Microsoft YaHei", monospace;
+
+  --h-gutter: clamp(16px, 4vw, 48px);
+  --h-max: 1320px;
+  --h-head-h: 52px;
+  /* The page frame: a hairline either side of the text column, halfway into the gutter. */
+  --h-frame: calc(max(0px, (100% - var(--h-max)) / 2) + var(--h-gutter) / 2);
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) { color-scheme: dark; }
+}
+:root[data-theme="dark"] { color-scheme: dark; }
+
+@layer base {
+  *, *::before, *::after { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; scroll-padding-top: calc(var(--h-head-h) + 16px); }
+  @media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
+  body {
+    margin: 0; min-width: 320px;
+    background: var(--s1-paper); color: var(--s1-ink);
+    font: 400 16px/1.55 var(--s1-font-sans);
+    font-feature-settings: "ss01", "cv11";
+    -webkit-font-smoothing: antialiased;
+  }
+  h1, h2, h3, h4, p, ul, ol, dl, dd, figure { margin: 0; }
+  ul, ol { padding: 0; list-style: none; }
+  a { color: inherit; text-underline-offset: 3px; }
+  a:hover { color: var(--c-primary-strong, var(--s1-ink-2)); }
+  button { font: inherit; color: inherit; }
+  :focus-visible { outline: 2px solid var(--c-primary, var(--s1-ink)); outline-offset: 2px; }
+  ::selection { background: var(--s1-ink); color: var(--s1-paper); }
+  [hidden] { display: none !important; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}

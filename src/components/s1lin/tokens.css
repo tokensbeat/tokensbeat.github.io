@@ -1,0 +1,122 @@
+/*
+ * The tokens every part of the library is drawn in: one ink on plain stock, a
+ * second paper for plates and wells, two greys, two hairline strengths, one
+ * accent (the go button's offset shadow), one light blue for "here" (the dot
+ * under the language in force), five typefaces and the Chinese faces they end
+ * in, the "+" marks, and the scheme native controls are drawn in (a select's
+ * list, a number's arrows). Set any of them on :root, or on an element for its
+ * part of the page.
+ *
+ * Status hues and the chosen fill are left unset: an app's theme may set them
+ * (see the end of the :root block), and until it does every status is drawn in
+ * the ink and a chosen option in reverse.
+ *
+ * Night: the system's dark scheme, unless the root says light (data-theme,
+ * class or Kumo's data-mode); or data-theme="dark", class="dark" or
+ * data-mode="dark" on any element, and "light" to come back inside one.
+ */
+@layer base {
+  :root {
+    --s1-paper: #f6f6f4;
+    --s1-paper-2: #ececea;
+    --s1-ink: #111;
+    --s1-ink-2: #4d4d4d;
+    --s1-ink-3: #8a8a8a;
+    --s1-rule: rgb(17 17 17 / 0.14);
+    --s1-rule-strong: rgb(17 17 17 / 0.8);
+    --s1-accent: #d62d20;
+    /* "Here": the dot under the language in force. The status blue's hue (215°): at night it is that blue
+       (#7fb2ff, the apps' --s1-info); by day a lighter step than their #1f5fb8, which reads as navy at 4px
+       (3.6:1 on paper, 3.3 on paper-2: a mark, beside the ink and the weight that also say it). */
+    --s1-here: #3780e6;
+    --s1-scheme: light;
+
+    /* Chinese: every stack ends in these before its generic family, after its Latin faces, so Latin
+       text is set as before and Chinese never falls to the browser's own pick: on Windows that is
+       SimSun, a thin bitmap-hinted serif, for "monospace" and "serif" alike. The sans faces come
+       before anything serif; a heading in Chinese takes a Chinese serif, else the sans, never SimSun.
+       An app that sets its own sans or mono ends it in var(--s1-font-cjk) too (set on :root). */
+    --s1-font-cjk: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans SC", "Noto Sans CJK SC", "Source Han Sans SC";
+    --s1-font-cjk-serif: "Noto Serif SC", "Noto Serif CJK SC", "Source Han Serif SC", "Songti SC";
+
+    --s1-font-display: "Instrument Serif", "Shippori Mincho B1", "Times New Roman", var(--s1-font-cjk-serif), var(--s1-font-cjk), serif;
+    --s1-font-sans: "Inter Tight", "Zen Kaku Gothic New", system-ui, -apple-system, "Segoe UI", var(--s1-font-cjk), sans-serif;
+    --s1-font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, var(--s1-font-cjk), monospace;
+    --s1-font-mincho: "Shippori Mincho B1", "Hiragino Mincho ProN", "Yu Mincho", "Noto Serif JP", "Noto Serif CJK JP", "Source Han Serif JP", serif;
+    --s1-font-gothic: "Zen Kaku Gothic New", "Hiragino Sans", "Yu Gothic", "Noto Sans JP", "Noto Sans CJK JP", "Source Han Sans JP", "Meiryo", sans-serif;
+
+    /* A "+" registration mark at each corner of a box, in its text colour. The
+       box should be 11px larger than the one it marks, 5.5px on every side. */
+    --s1-corners:
+      linear-gradient(currentColor 0 0) left 5px top 0 / 1px 11px no-repeat,
+      linear-gradient(currentColor 0 0) left 0 top 5px / 11px 1px no-repeat,
+      linear-gradient(currentColor 0 0) right 5px top 0 / 1px 11px no-repeat,
+      linear-gradient(currentColor 0 0) right 0 top 5px / 11px 1px no-repeat,
+      linear-gradient(currentColor 0 0) left 5px bottom 0 / 1px 11px no-repeat,
+      linear-gradient(currentColor 0 0) left 0 bottom 5px / 11px 1px no-repeat,
+      linear-gradient(currentColor 0 0) right 5px bottom 0 / 1px 11px no-repeat,
+      linear-gradient(currentColor 0 0) right 0 bottom 5px / 11px 1px no-repeat;
+
+    /* Status hues, unset on purpose. A part that shows a status reads each one
+       with a fallback, var(--s1-ok, var(--s1-ink)), so it stays in the ink
+       around it, whatever that ink is set to on the element, until an app's
+       theme sets them on :root or on an element (and for night, as above):
+         --s1-ok:   unset, the ink    --s1-ok-tint:   unset, the paper
+         --s1-warn: unset, the ink    --s1-warn-tint: unset, the paper
+         --s1-bad:  unset, the ink    --s1-bad-tint:  unset, the paper
+         --s1-info: unset, the ink    --s1-info-tint: unset, the paper
+         --s1-on-status: unset, the paper (the words on a solid status fill)
+       The hue is the line, the shape and a meter's fill; the tint is a badge's
+       ground; the shapes stay, so a status never rests on colour alone.
+
+       The chosen option of a filled switcher (a segmented row, a card, a
+       pressed ghost button or chip), unset on purpose too, so it stays in
+       reverse until a theme gives it its brand:
+         --s1-chosen:    unset, the ink   (the fill under the chosen option)
+         --s1-on-chosen: unset, the paper (its words: AA on that fill)
+       A switcher never has a line round it; the fill and the weight say
+       which one is chosen (owner, 2026-11-02). */
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"], .light, [data-mode="light"]) {
+      --s1-paper: #0f0f0f;
+      --s1-paper-2: #191919;
+      --s1-ink: #ededed;
+      --s1-ink-2: #b3b3b3;
+      --s1-ink-3: #7a7a7a;
+      --s1-rule: rgb(237 237 237 / 0.14);
+      --s1-rule-strong: rgb(237 237 237 / 0.8);
+      --s1-accent: #f0574b;
+      --s1-here: #7fb2ff;
+      --s1-scheme: dark;
+    }
+  }
+
+  [data-theme="dark"], .dark, [data-mode="dark"] {
+    --s1-paper: #0f0f0f;
+    --s1-paper-2: #191919;
+    --s1-ink: #ededed;
+    --s1-ink-2: #b3b3b3;
+    --s1-ink-3: #7a7a7a;
+    --s1-rule: rgb(237 237 237 / 0.14);
+    --s1-rule-strong: rgb(237 237 237 / 0.8);
+    --s1-accent: #f0574b;
+    --s1-here: #7fb2ff;
+    --s1-scheme: dark;
+  }
+
+  /* back to paper inside a dark page */
+  :root [data-theme="light"], :root .light, :root [data-mode="light"] {
+    --s1-paper: #f6f6f4;
+    --s1-paper-2: #ececea;
+    --s1-ink: #111;
+    --s1-ink-2: #4d4d4d;
+    --s1-ink-3: #8a8a8a;
+    --s1-rule: rgb(17 17 17 / 0.14);
+    --s1-rule-strong: rgb(17 17 17 / 0.8);
+    --s1-accent: #d62d20;
+    --s1-here: #3780e6;
+    --s1-scheme: light;
+  }
+}

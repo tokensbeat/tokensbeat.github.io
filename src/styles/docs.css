@@ -1,0 +1,137 @@
+/*
+ * The content pages (src/docs/ContentPage.tsx): a guide of the docs and a legal document, in the site's look (the kit's
+ * serif display face for titles, mono caps for labels, hairline rules, jade for where you are). Colours only through
+ * tokens. The guides: the list of guides on the left from 1024 px (a "Browse guides" fold above the article below
+ * that), the article, its sections on the right from 1280 px. Long text keeps a reading measure (68ch).
+ */
+
+/* ------------------------------------------------------------------ frame */
+
+.h-docs { padding-block: clamp(32px, 5vw, 72px) clamp(56px, 7vw, 104px); }
+.h-docs__grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 40px; align-items: start; }
+@media (min-width: 1024px) { .h-docs__grid { grid-template-columns: 220px minmax(0, 1fr); gap: 56px; } }
+@media (min-width: 1280px) { .h-docs__grid { grid-template-columns: 220px minmax(0, 1fr) 180px; } }
+
+.h-docs__side, .h-docs__toc { position: sticky; top: calc(var(--h-head-h, 64px) + 24px); max-height: calc(100vh - var(--h-head-h, 64px) - 48px); overflow: auto; }
+.h-docs__side { display: none; }
+.h-docs__toc { display: none; }
+@media (min-width: 1024px) { .h-docs__side { display: block; } .h-docs__browse { display: none; } }
+@media (min-width: 1280px) { .h-docs__toc { display: block; } }
+
+/* ------------------------------------------------------------------ the list of guides */
+
+.h-docnav { display: grid; gap: 22px; }
+.h-docnav__search { position: relative; display: block; }
+.h-docnav__icon { position: absolute; left: 0; top: 50%; width: 14px; height: 14px; transform: translateY(-50%); color: var(--s1-ink-3); pointer-events: none; }
+.h-docnav__search input {
+  box-sizing: border-box; width: 100%; height: 36px; padding: 0 0 0 22px; border: 0; border-bottom: 1px solid var(--s1-rule-strong);
+  background: transparent; color: var(--s1-ink); font: 14px/1.4 var(--s1-font-sans); border-radius: 0; outline: none;
+}
+.h-docnav__search input::placeholder { color: var(--s1-ink-3); }
+.h-docnav__search input:focus-visible { border-bottom-color: var(--c-primary); box-shadow: 0 1px 0 var(--c-primary); }
+.h-docnav__search input::-webkit-search-cancel-button { appearance: none; }
+.h-docnav nav { display: grid; gap: 20px; }
+.h-docnav__group { display: grid; gap: 6px; }
+.h-docnav__head { font: 500 11px/1.3 var(--s1-font-mono); letter-spacing: 0.14em; text-transform: uppercase; color: var(--c-primary-strong); margin-bottom: 4px; }
+.h-docnav ul { display: grid; gap: 1px; }
+.h-docnav a, .h-docs__toc a {
+  display: block; padding: 5px 0 5px 12px; border-left: 1px solid var(--s1-rule); color: var(--s1-ink-2);
+  font-size: 14px; line-height: 1.4; text-decoration: none;
+}
+.h-docnav a:hover, .h-docs__toc a:hover { color: var(--s1-ink); border-left-color: var(--s1-ink-3); }
+.h-docnav a[aria-current="page"] { color: var(--s1-ink); font-weight: 600; border-left: 2px solid var(--c-primary); padding-left: 11px; }
+.h-docnav__none { font-size: 14px; color: var(--s1-ink-2); }
+
+.h-docs__browse { border-block: 1px solid var(--s1-rule-strong); margin-block: 8px 12px; }
+.h-docs__browse > summary {
+  display: flex; align-items: center; justify-content: space-between; padding: 14px 0; cursor: pointer; list-style: none;
+  font: 500 11.5px/1.3 var(--s1-font-mono); letter-spacing: 0.12em; text-transform: uppercase; color: var(--s1-ink);
+}
+.h-docs__browse > summary::-webkit-details-marker { display: none; }
+.h-docs__browse > summary::after { content: "+"; font-size: 16px; color: var(--c-primary-strong); }
+.h-docs__browse[open] > summary::after { content: "−"; }
+.h-docs__browse > .h-docnav { padding-bottom: 20px; }
+
+.h-docs__toc nav { display: grid; gap: 8px; }
+.h-docs__toc ul { display: grid; gap: 1px; }
+.h-docs__toc a { font-size: 13px; }
+
+/* ------------------------------------------------------------------ the article */
+
+.h-docs__article { min-width: 0; max-width: 760px; }
+.h-docs__head { display: grid; gap: 14px; padding-bottom: 28px; margin-bottom: 8px; border-bottom: 1px solid var(--s1-rule-strong); }
+.h-docs__head .h-eyebrow { margin-bottom: 0; }
+.h-docs__title { font: 400 clamp(2.3rem, 1.6rem + 2.4vw, 3.6rem)/1.02 var(--s1-font-display); letter-spacing: -0.012em; color: var(--s1-ink); text-wrap: balance; overflow-wrap: break-word; }
+.h-docs__section { padding-top: 36px; scroll-margin-top: calc(var(--h-head-h, 64px) + 16px); }
+.h-docs__h2 { font: 400 clamp(1.55rem, 1.3rem + 0.8vw, 2rem)/1.12 var(--s1-font-display); letter-spacing: -0.006em; margin-bottom: 14px; }
+.h-docs__h2 a { color: inherit; text-decoration: none; }
+.h-docs__h2 a::after { content: " #"; content: " #" / ""; color: var(--s1-ink-3); opacity: 0; transition: opacity 0.15s ease; }
+.h-docs__h2 a:hover::after, .h-docs__h2 a:focus-visible::after { opacity: 1; }
+
+.h-docs__p, .h-docs__steps, .h-docs__list, .h-docs__note { max-width: 68ch; font-size: 16px; line-height: 1.65; color: var(--s1-ink-2); text-wrap: pretty; }
+.h-docs__section > * + * { margin-top: 14px; }
+.h-docs__steps { counter-reset: h-step; display: grid; gap: 10px; }
+.h-docs__steps > li { counter-increment: h-step; position: relative; padding-left: 38px; }
+.h-docs__steps > li::before {
+  content: counter(h-step, decimal-leading-zero); position: absolute; left: 0; top: 2px;
+  font: 500 12px/1.6 var(--s1-font-mono); color: var(--c-primary-strong);
+}
+.h-docs__list { display: grid; gap: 8px; }
+.h-docs__list > li { position: relative; padding-left: 20px; }
+.h-docs__list > li::before { content: ""; position: absolute; left: 2px; top: 0.72em; width: 7px; height: 1px; background: var(--s1-ink-3); }
+.h-docs__note { padding: 12px 16px; border-left: 2px solid var(--c-primary); background: var(--c-primary-tint); color: var(--s1-ink); }
+.h-docs__code { max-width: 100%; }
+.h-docs__links { display: flex; flex-wrap: wrap; gap: 12px 26px; }
+
+.h-docs__pager { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; margin-top: 56px; padding-top: 24px; border-top: 1px solid var(--s1-rule-strong); }
+@media (min-width: 640px) { .h-docs__pager { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.h-docs__pager a {
+  display: grid; gap: 6px; padding: 16px 18px; border: 1px solid var(--s1-rule-strong); color: var(--s1-ink); text-decoration: none;
+  font: 400 1.2rem/1.2 var(--s1-font-display);
+}
+.h-docs__pager a:hover { border-color: var(--s1-ink); box-shadow: 3px 3px 0 var(--c-primary); }
+.h-docs__pager a > span { display: inline-flex; align-items: center; gap: 6px; font: 500 11px/1.3 var(--s1-font-mono); letter-spacing: 0.12em; text-transform: uppercase; color: var(--s1-ink-3); }
+.h-docs__pager svg { width: 13px; height: 13px; }
+.h-docs__next { text-align: right; justify-items: end; grid-column: -2 / -1; }
+
+/* ------------------------------------------------------------------ tables (the guides' and the legal documents') */
+
+.h-prose__table { max-width: 100%; overflow-x: auto; border-top: 1px solid var(--s1-rule-strong); }
+.h-prose__table:focus-visible { outline: 2px solid var(--c-primary); outline-offset: 2px; }
+.h-prose__table table { width: 100%; border-collapse: collapse; font-size: 14.5px; line-height: 1.5; }
+.h-prose__table th {
+  text-align: left; vertical-align: bottom; padding: 10px 14px 10px 0; border-bottom: 1px solid var(--s1-rule-strong);
+  font: 500 11px/1.3 var(--s1-font-mono); letter-spacing: 0.1em; text-transform: uppercase; color: var(--s1-ink-3);
+}
+.h-prose__table td { vertical-align: top; padding: 10px 14px 10px 0; border-bottom: 0.5px solid var(--s1-rule); color: var(--s1-ink-2); min-width: 9ch; }
+.h-prose__table td:first-child { color: var(--s1-ink); }
+
+/* ------------------------------------------------------------------ a legal document */
+
+.h-legaldoc__in { max-width: 860px; }
+.h-legaldoc__date { color: var(--s1-ink-3); font-family: var(--s1-font-mono); font-size: 12.5px; }
+.h-prose { max-width: 68ch; padding-top: 12px; font-size: 16px; line-height: 1.7; color: var(--s1-ink-2); overflow-wrap: anywhere; }
+.h-prose > * + * { margin-top: 14px; }
+.h-prose h2 { margin-top: 38px; font: 400 clamp(1.45rem, 1.25rem + 0.6vw, 1.8rem)/1.15 var(--s1-font-display); color: var(--s1-ink); }
+.h-prose h3, .h-prose h4 { margin-top: 26px; font: 600 16px/1.4 var(--s1-font-sans); color: var(--s1-ink); }
+.h-prose strong { color: var(--s1-ink); font-weight: 600; }
+.h-prose a { color: var(--c-primary-strong); text-decoration: underline; text-underline-offset: 3px; }
+.h-prose a:hover { text-decoration-thickness: 2px; }
+.h-prose ul, .h-prose ol { display: grid; gap: 8px; padding-left: 22px; }
+.h-prose ul { list-style: square; }
+.h-prose ol { list-style: decimal; }
+.h-prose li::marker { color: var(--s1-ink-3); }
+.h-prose code { font: 0.9em var(--s1-font-mono); }
+.h-prose .h-prose__table { margin-top: 18px; }
+.h-prose--zh em { font-style: normal; font-weight: 600; }
+.h-legaldoc__also { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 26px; margin-top: 48px; padding-top: 22px; border-top: 1px solid var(--s1-rule-strong); }
+.h-legaldoc__also > span { font: 500 11px/1.3 var(--s1-font-mono); letter-spacing: 0.12em; text-transform: uppercase; color: var(--s1-ink-3); }
+
+/* Chinese: no tracking, labels at 12 px, the Chinese serif for titles (src/i18n/zh.css's rules, for these classes). */
+:is(.h-docnav__head, .h-docs__browse > summary, .h-docs__pager a > span, .h-prose__table th, .h-legaldoc__also > span):lang(zh) { font-size: 12px; }
+:is(.h-docs__title, .h-docs__h2, .h-docs__pager a, .h-prose h2):lang(zh) {
+  font-family: var(--s1-font-display), "Songti SC", "Noto Serif SC", "Source Han Serif SC", "Noto Serif CJK SC", "Microsoft YaHei", serif;
+}
+.h-docs__title:lang(zh) { line-height: 1.15; }
+
+@media (prefers-reduced-motion: reduce) { .h-docs__h2 a::after { transition: none; } }

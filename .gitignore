@@ -1,0 +1,5 @@
+node_modules/
+# Build outputs (dist/ is the site GitHub Pages serves; dist-ssr/ is the prerender's server build, removed after it)
+dist/
+dist-ssr/
+coverage/

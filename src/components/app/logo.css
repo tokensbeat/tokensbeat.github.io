@@ -1,0 +1,19 @@
+/*
+ * The TokensBeat mark (Logo.tsx) in one colour: the brand jade on paper (--c-primary, 4.83:1 on the paper; the
+ * brand's own light jade is too pale there), the light ink at night, as the newspaper prints it. Night follows
+ * theme.css's selectors: the system's dark scheme unless the root says light; data-theme="dark" (and the kit's
+ * other dark markers) on any element.
+ */
+.c-logo { display: block; flex: none; overflow: visible; }
+.c-logo:not(.c-logo--mono) { color: var(--c-primary, var(--s1-ink)); }
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"], .light, [data-mode="light"]) .c-logo:not(.c-logo--mono) { color: var(--s1-ink); }
+}
+:is([data-theme="dark"], .dark, [data-mode="dark"]) .c-logo:not(.c-logo--mono) { color: var(--s1-ink); }
+/* mono: one colour, the text's (an empty state's mark). */
+.c-logo--mono { color: inherit; }
+
+@media (forced-colors: active) {
+  .c-logo { color: CanvasText; }
+}

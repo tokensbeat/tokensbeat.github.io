@@ -1,0 +1,1205 @@
+/*
+ * The site's pages (src/page). The @s1lin kit's editorial character, as the console has it: a serif display face, mono
+ * caps for labels, hairline rules, "+" marks where frames meet; the console's colours: jade for the brand, the status
+ * hues for Live / Beta / Early access / Coming, vendor hues for model makers. Classes are `h-`. Colours only through
+ * tokens (app.css, theme.css). A "night" slab is the kit's night paper inside the page (data-theme="dark" on it).
+ * Checked at 320, 390, 1024 and 1440 wide, light and dark, English and Chinese.
+ */
+
+/* ------------------------------------------------------------------ frame */
+
+.h-app { position: relative; min-height: 100vh; min-height: 100dvh; display: flex; flex-direction: column; }
+/* A hairline either side of the text column, halfway into the gutter, the length of the page. */
+.h-app::before {
+  content: ""; position: absolute; inset: 0 var(--h-frame); pointer-events: none; z-index: 0;
+  border-inline: 0.5px solid var(--s1-rule);
+}
+
+.h-skip {
+  position: absolute; left: 12px; top: -60px; z-index: 200;
+  background: var(--s1-ink); color: var(--s1-paper); padding: 8px 12px; font: 500 13px var(--s1-font-mono);
+}
+.h-skip:focus { top: 8px; color: var(--s1-paper); }
+
+.h-main { position: relative; z-index: 1; flex: 1; width: 100%; outline: none; }
+.h-wrap { box-sizing: border-box; width: 100%; max-width: var(--h-max); margin-inline: auto; padding-inline: var(--h-gutter); }
+
+/* ------------------------------------------------------------------ type */
+
+.h-h1 {
+  font: 400 clamp(2.6rem, 1.5rem + 3.6vw, 4.9rem)/0.98 var(--s1-font-display); letter-spacing: -0.015em; color: var(--s1-ink);
+  text-wrap: balance; overflow-wrap: break-word;
+}
+.h-h1 em { font-style: italic; color: var(--c-primary-strong); }
+.h-h2 { font: 400 clamp(2.15rem, 1.45rem + 2.1vw, 3.5rem)/1.03 var(--s1-font-display); letter-spacing: -0.012em; text-wrap: balance; }
+.h-h3 { font: 400 1.5rem/1.12 var(--s1-font-display); letter-spacing: -0.005em; color: var(--s1-ink); }
+.h-lead { font-size: clamp(16.5px, 15.6px + 0.3vw, 18.5px); line-height: 1.58; color: var(--s1-ink-2); max-width: 40em; text-wrap: pretty; }
+.h-body { font-size: 15.5px; line-height: 1.6; color: var(--s1-ink-2); text-wrap: pretty; }
+.h-small { font-size: 14px; line-height: 1.55; color: var(--s1-ink-2); }
+
+/* The line over a heading: mono caps in jade, then the status. */
+.h-eyebrow {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; margin-bottom: 18px;
+  font: 500 11.5px/1.4 var(--s1-font-mono); letter-spacing: 0.14em; text-transform: uppercase; color: var(--c-primary-strong);
+}
+/* The "+" is drawn, not said (the alternative text after the slash is empty). */
+.h-eyebrow > span:first-child::before { content: "+ "; content: "+ " / ""; color: var(--s1-ink-3); letter-spacing: 0; }
+
+.h-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 14px 18px; }
+.h-after { margin-top: 30px; }
+.h-after--row { display: flex; flex-wrap: wrap; gap: 12px 32px; }
+
+.h-btn { gap: 9px; }
+.h-btn__icon { width: 14px; height: 14px; flex: none; }
+
+.h-more {
+  display: inline-flex; align-items: center; gap: 7px; width: fit-content; color: var(--s1-ink);
+  font: 500 11.5px/1.3 var(--s1-font-mono); letter-spacing: 0.08em; text-transform: uppercase;
+  text-decoration: underline; text-decoration-thickness: 1px; text-decoration-color: var(--s1-ink-3); text-underline-offset: 5px;
+}
+.h-more:hover { color: var(--c-primary-strong); text-decoration-color: var(--c-primary); text-decoration-thickness: 2px; }
+.h-more__icon { width: 14px; height: 14px; flex: none; transition: transform 0.15s ease; }
+.h-more:hover .h-more__icon { transform: translateX(2px); }
+
+/* ------------------------------------------------------------------ status chips */
+
+/* Live, Beta, Early access, Coming: the word in mono caps, the status's hue on its tint, and a shape that says it
+   without colour: a dot (live), a half dot (beta), a ring (early), a dashed ring in a dashed box (coming). */
+.h-chip {
+  display: inline-flex; align-items: center; gap: 7px; flex: none; box-sizing: border-box; padding: 3px 8px 3px 7px;
+  border: 1px solid; border-radius: 2px; vertical-align: middle;
+  font: 500 10.5px/1.25 var(--s1-font-mono); letter-spacing: 0.08em; text-transform: uppercase; white-space: nowrap;
+}
+.h-chip--sm { padding: 2px 6px 2px 5px; gap: 6px; font-size: 10px; }
+.h-chip__dot { width: 7px; height: 7px; flex: none; box-sizing: border-box; border-radius: 50%; background: currentColor; }
+.h-chip--live { color: var(--s1-ok); background: var(--s1-ok-tint); border-color: color-mix(in srgb, var(--s1-ok) 50%, transparent); }
+.h-chip--live .h-chip__dot { box-shadow: 0 0 0 2.5px color-mix(in srgb, var(--s1-ok) 24%, transparent); }
+.h-chip--beta { color: var(--s1-warn); background: var(--s1-warn-tint); border-color: color-mix(in srgb, var(--s1-warn) 50%, transparent); }
+.h-chip--beta .h-chip__dot { background: linear-gradient(90deg, currentColor 50%, transparent 50%); border: 1.5px solid currentColor; }
+.h-chip--early { color: var(--s1-info); background: var(--s1-info-tint); border-color: color-mix(in srgb, var(--s1-info) 50%, transparent); }
+.h-chip--early .h-chip__dot { background: transparent; border: 1.5px solid currentColor; }
+.h-chip--coming { color: var(--s1-ink-2); background: transparent; border-style: dashed; border-color: var(--s1-ink-3); }
+.h-chip--coming .h-chip__dot { background: transparent; border: 1.5px dashed currentColor; }
+@media (forced-colors: active) { .h-chip { border-color: CanvasText; } }
+
+/* ------------------------------------------------------------------ the beat */
+
+.h-beat { display: block; width: 100%; height: 40px; overflow: visible; color: var(--s1-ink); }
+.h-beat path { fill: none; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; vector-effect: non-scaling-stroke; }
+.h-beat__base { stroke: currentColor; opacity: 0.3; }
+.h-beat__pulse { stroke: var(--c-primary); stroke-width: 2px; stroke-dasharray: 14 86; stroke-dashoffset: 100; opacity: 0; }
+.h-beat.is-animated .h-beat__pulse { opacity: 1; animation: h-beat-run 3.6s cubic-bezier(0.45, 0, 0.2, 1) infinite; }
+@keyframes h-beat-run { to { stroke-dashoffset: 0; } }
+@media (prefers-reduced-motion: reduce) {
+  .h-beat.is-animated .h-beat__pulse { animation: none; stroke-dasharray: none; opacity: 0.9; }
+}
+
+/* ------------------------------------------------------------------ running head */
+
+.h-head {
+  position: sticky; top: 0; z-index: 50;
+  background: color-mix(in srgb, var(--s1-paper) 94%, transparent);
+  backdrop-filter: blur(8px) saturate(1.1); -webkit-backdrop-filter: blur(8px) saturate(1.1);
+  border-bottom: 0.5px solid var(--s1-rule);
+}
+.h-head.is-open { background: var(--s1-paper); }
+/* "+" where the frame meets the head's rule. */
+.h-head::after {
+  content: ""; position: absolute; z-index: 1; bottom: -6px; height: 11px; pointer-events: none;
+  left: calc(var(--h-frame) - 5.5px); right: calc(var(--h-frame) - 5.5px);
+  color: var(--s1-ink); background: var(--s1-corners);
+}
+.h-head__bar { height: var(--h-head-h); display: flex; align-items: center; gap: 18px; }
+.h-head__links { display: flex; align-items: center; gap: 2px; min-width: 0; }
+.h-head__link {
+  display: inline-flex; align-items: center; gap: 6px; min-height: 36px; padding: 6px 10px; border: 0; background: none;
+  color: var(--s1-ink-2); text-decoration: none; white-space: nowrap; cursor: pointer;
+  font: 500 11px/1 var(--s1-font-mono); letter-spacing: 0.1em; text-transform: uppercase;
+}
+.h-head__link:hover, .h-head__link[aria-expanded="true"], .h-head__link[aria-current="page"] {
+  color: var(--s1-ink); text-decoration: underline; text-decoration-color: var(--c-primary); text-decoration-thickness: 2px; text-underline-offset: 7px;
+}
+.h-head__chevron { width: 13px; height: 13px; transition: transform 0.15s ease; }
+.h-head__platform[aria-expanded="true"] .h-head__chevron { transform: rotate(180deg); }
+.h-head__end { display: flex; align-items: center; gap: 10px; margin-left: auto; flex: none; }
+.h-head__end .s1-btn { white-space: nowrap; }
+/* The bar's controls are one height, the kit's head controls' 30px, and none has a line round it (owner, 2026-11-02):
+   the language (LangSwitch), the theme and the menu (icons alone, tinted under the pointer and while open), Launch Aha
+   (words), and Get started, the one filled action. */
+.h-head__aha { min-height: 30px; padding-block: 0; }
+.h-head__cta { min-height: 30px; padding: 0 12px; font-size: 11.5px; border-color: transparent; }
+.h-head__menu {
+  display: none; place-items: center; width: 30px; height: 30px; padding: 0; flex: none;
+  border: 0; border-radius: 0; background: transparent; color: var(--s1-ink); cursor: pointer;
+}
+.h-head__menu svg { width: 18px; height: 18px; }
+/* Under the pointer the menu turns over, as the kit's ghost buttons do (owner, 2026-11-02); open, it rests tinted. */
+.h-head__menu[aria-expanded="true"] { background: var(--s1-paper-2); }
+.h-head__menu:hover { background: var(--s1-ink); color: var(--s1-paper); }
+
+.h-brand { display: inline-flex; align-items: center; gap: 8px; flex: none; text-decoration: none; white-space: nowrap; color: var(--s1-ink); }
+.h-brand:hover { color: var(--s1-ink); }
+.h-brand b { font: 800 16.5px/1 var(--s1-font-sans); letter-spacing: -0.01em; }
+/* The orbit is wide and flat: the square is larger than the type and tucked in where it is empty. */
+.h-brand__mark { width: 32px; height: 32px; margin: -4px -3px -4px -4px; }
+
+.h-theme {
+  appearance: none; display: inline-grid; place-items: center; flex: none; width: 30px; height: 30px; padding: 0;
+  border: 0; border-radius: 0; background: transparent; color: var(--s1-ink); cursor: pointer;
+}
+.h-theme:hover { background: var(--s1-ink); color: var(--s1-paper); }
+.h-theme__icon { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.3; stroke-linecap: round; stroke-linejoin: round; }
+
+
+/* The Platform panel and the menu sheet: under the head, the page's width. */
+.h-panel, .h-sheet {
+  position: absolute; inset: 100% 0 auto; z-index: 2;
+  background: var(--s1-paper); border-bottom: 1px solid var(--s1-rule-strong);
+  box-shadow: 0 18px 40px -24px color-mix(in srgb, var(--s1-ink) 40%, transparent);
+}
+.h-panel__grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 48px; padding-block: 28px 34px; }
+.h-sheet { max-height: calc(100dvh - var(--h-head-h)); overflow-y: auto; overscroll-behavior: contain; }
+.h-sheet__in { display: grid; gap: 22px; padding-block: 16px 24px; }
+/* The sheet opens with what to do: Get started and Launch Aha, side by side (on a phone; wider, the bar has them). */
+.h-sheet__account { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.h-sheet__account .s1-btn { width: 100%; justify-content: center; }
+.h-sheet__groups { display: grid; grid-template-columns: minmax(0, 1fr); gap: 22px 32px; }
+@media (min-width: 560px) { .h-sheet__groups { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.h-sheet__end {
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px 20px;
+  padding-top: 14px; border-top: 0.5px solid var(--s1-rule-strong);
+}
+.h-sheet__links { display: flex; flex-wrap: wrap; gap: 4px 22px; }
+.h-sheet__link { display: inline-block; padding-block: 8px; font-size: 15.5px; font-weight: 600; color: var(--s1-ink); text-decoration: none; }
+.h-sheet__link[aria-current="page"] { text-decoration: underline; text-decoration-color: var(--c-primary); text-decoration-thickness: 2px; text-underline-offset: 6px; }
+@media (min-width: 640px) { .h-sheet__account, .h-sheet__lang { display: none; } }
+
+/* Under the open panel or sheet, the page dims: the menu reads as a layer, and a click on the page closes it. */
+.h-scrim { position: absolute; top: 100%; left: 0; right: 0; height: 100vh; height: 100dvh; z-index: 1; background: color-mix(in srgb, var(--s1-ink) 18%, transparent); }
+/* At night the ink is light: the page dims towards the night paper instead. */
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .h-scrim { background: color-mix(in srgb, var(--s1-paper) 64%, transparent); } }
+:root[data-theme="dark"] .h-scrim { background: color-mix(in srgb, var(--s1-paper) 64%, transparent); }
+.h-group__title {
+  display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; margin-bottom: 10px; padding-bottom: 10px;
+  border-bottom: 0.5px solid var(--s1-rule-strong); font-size: 13.5px; color: var(--s1-ink-2);
+}
+.h-group__title span { font: 500 11.5px/1.3 var(--s1-font-mono); letter-spacing: 0.14em; text-transform: uppercase; color: var(--c-primary-strong); }
+.h-group ul { display: grid; gap: 2px; }
+.h-item {
+  display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; column-gap: 12px; row-gap: 2px;
+  padding: 9px 12px; margin-inline: -12px; text-decoration: none; color: var(--s1-ink);
+}
+/* The icon is a line drawing in the menu's accent (the group titles' jade), with no tile round it (owner, 2026-11-06),
+   centred on the item's name; the description runs under the name. */
+.h-item__icon { grid-row: 1; display: grid; place-items: center; width: 20px; height: 20px; color: var(--c-primary-strong); }
+.h-item__icon svg { width: 19px; height: 19px; stroke-width: 1.6; }
+.h-item__name, .h-item__blurb { grid-column: 2; }
+.h-item:hover { background: var(--s1-paper-2); color: var(--s1-ink); }
+.h-item[aria-current="page"] { background: var(--c-primary-tint); box-shadow: inset 2px 0 0 var(--c-primary); }
+.h-item__name { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; font-size: 15.5px; font-weight: 600; }
+.h-item__blurb { font-size: 13.5px; line-height: 1.45; color: var(--s1-ink-2); }
+
+@media (max-width: 1099px) {
+  .h-head__links { display: none; }
+  .h-head__menu { display: inline-grid; }
+}
+@media (min-width: 1100px) { .h-sheet { display: none !important; } }
+/* A phone: Get started stays in the bar (Launch Aha and the language pair are in the sheet). */
+@media (max-width: 639px) {
+  .h-head__bar { gap: 8px; }
+  .h-head__end { gap: 8px; }
+  .h-head__aha, .h-head__lang { display: none; }
+  .h-head__cta { padding: 0 10px; }
+  .h-panel__grid { grid-template-columns: minmax(0, 1fr); }
+}
+/* The narrowest phones: the mark alone (the link keeps its name), so the head stays one row. */
+@media (max-width: 359px) { .h-brand b { display: none; } }
+
+/* ------------------------------------------------------------------ page hero */
+
+.h-hero { padding-top: clamp(36px, 6vw, 88px); }
+.h-hero__grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 44px; }
+@media (min-width: 1024px) {
+  .h-hero__grid.has-visual { grid-template-columns: minmax(0, 1.06fr) minmax(0, 0.94fr); gap: 56px; align-items: center; }
+}
+.h-hero__copy { display: grid; justify-items: start; gap: 22px; min-width: 0; }
+.h-hero__copy .h-eyebrow { margin-bottom: 0; }
+.h-hero__copy > .h-actions { margin-top: 6px; }
+.h-hero__note { max-width: 58ch; padding-left: 14px; border-left: 2px solid var(--c-primary); }
+.h-hero__visual { min-width: 0; display: grid; gap: 16px; }
+.h-hero__beat { margin-top: clamp(40px, 6vw, 80px); }
+
+/* ------------------------------------------------------------------ sections */
+
+.h-section { position: relative; padding-block: clamp(64px, 8vw, 112px); }
+/* A band: the second paper, the page's width; the frame drawn again over it, "+" where its rules meet the frame. */
+.h-band { background: var(--s1-paper-2); border-block: 0.5px solid var(--s1-rule); }
+.h-band::before {
+  content: ""; position: absolute; inset: 0 var(--h-frame); pointer-events: none;
+  border-inline: 0.5px solid var(--s1-rule);
+}
+.h-band::after {
+  content: ""; position: absolute; pointer-events: none; color: var(--s1-ink-3);
+  inset: -6px calc(var(--h-frame) - 5.5px); background: var(--s1-corners);
+}
+.h-band > .h-wrap { position: relative; z-index: 1; }
+
+.h-section-head { display: grid; grid-template-columns: minmax(0, 1fr); gap: 18px 64px; margin-bottom: clamp(32px, 4vw, 48px); }
+@media (min-width: 900px) {
+  .h-section-head:not(.is-stacked, .is-bare) { grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); align-items: end; }
+}
+.h-section-head.is-stacked .h-lead { max-width: 62ch; }
+
+/* ------------------------------------------------------------------ cells */
+
+/* A grid of framed cells, hairlines between them, "+" at the frame's corners. */
+.h-cells {
+  position: relative; display: grid; grid-template-columns: minmax(0, 1fr);
+  border: 0.5px solid var(--s1-rule-strong); background: var(--c-surface-raised);
+}
+.h-cells::after { content: ""; position: absolute; inset: -6px; pointer-events: none; background: var(--s1-corners); color: var(--s1-ink); }
+.h-cells { overflow: visible; }
+.h-cell {
+  display: flex; flex-direction: column; gap: 12px; min-width: 0; padding: clamp(20px, 2.2vw, 28px);
+  box-shadow: -1px 0 0 var(--s1-rule), 0 -1px 0 var(--s1-rule);
+}
+@media (min-width: 640px) {
+  .h-cells[data-cols="2"], .h-cells[data-cols="3"], .h-cells[data-cols="4"] { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (min-width: 1024px) { .h-cells[data-cols="3"] { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (min-width: 1200px) { .h-cells[data-cols="4"] { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+.h-cell__top { display: flex; flex-wrap: wrap; align-items: flex-start; justify-content: space-between; gap: 8px 14px; }
+.h-cell__top .h-h3 { min-width: 0; }
+.h-cell__more { margin-top: auto; padding-top: 6px; }
+.h-cell__art { display: flex; flex-wrap: wrap; gap: 6px; }
+
+.h-points { display: grid; gap: 6px; }
+.h-points li { position: relative; padding-left: 20px; font-size: 14.5px; line-height: 1.5; color: var(--s1-ink); }
+.h-points li::before { content: ""; position: absolute; left: 0; top: 0.75em; width: 10px; height: 1.5px; background: var(--c-primary); }
+
+/* ------------------------------------------------------------------ lines, steps, not yet */
+
+.h-lines { display: grid; grid-template-columns: minmax(0, 1fr); column-gap: 48px; border-top: 1px solid var(--s1-rule-strong); }
+@media (min-width: 768px) { .h-lines:not(.h-lines--one) { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.h-lines li {
+  display: grid; grid-template-columns: 20px minmax(0, 1fr); gap: 14px; align-items: start; padding-block: 16px;
+  border-bottom: 0.5px solid var(--s1-rule); font-size: 15.5px; line-height: 1.55; color: var(--s1-ink);
+}
+.h-lines__icon { width: 18px; height: 18px; margin-top: 2px; color: var(--c-primary-strong); }
+
+.h-steps { display: grid; grid-template-columns: minmax(0, 1fr); gap: 0 32px; counter-reset: step; }
+@media (min-width: 900px) { .h-steps { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+.h-steps li { display: grid; align-content: start; gap: 10px; padding-block: 20px 26px; border-top: 1px solid var(--s1-rule-strong); }
+.h-steps__n { font: 500 12px/1 var(--s1-font-mono); letter-spacing: 0.1em; color: var(--c-primary-strong); }
+@media (min-width: 640px) { .h-steps--5 { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (min-width: 1280px) { .h-steps--5 { grid-template-columns: repeat(5, minmax(0, 1fr)); } }
+
+.h-notyet {
+  display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px 40px; margin-top: 28px;
+  padding: 22px clamp(20px, 2.4vw, 30px); border: 1px dashed var(--s1-ink-3);
+}
+@media (min-width: 768px) { .h-notyet { grid-template-columns: minmax(0, 220px) minmax(0, 1fr); } }
+.h-notyet__title { display: grid; justify-items: start; align-content: start; gap: 10px; font: 400 1.35rem/1.15 var(--s1-font-display); }
+.h-notyet ul { display: grid; grid-template-columns: minmax(0, 1fr); gap: 10px 32px; }
+@media (min-width: 768px) { .h-notyet ul { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.h-notyet li { position: relative; padding-left: 20px; font-size: 14.5px; line-height: 1.55; color: var(--s1-ink-2); }
+.h-notyet li::before { content: ""; position: absolute; left: 0; top: 0.75em; width: 10px; border-top: 1.5px dashed var(--s1-ink-3); }
+
+/* ------------------------------------------------------------------ night slabs */
+
+.h-night { background: var(--s1-paper-2); color: var(--s1-ink); border: 0.5px solid var(--s1-rule-strong); }
+.h-slab { position: relative; margin: 0; min-width: 0; }
+.h-slab__bar {
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 6px 16px; padding: 11px 16px;
+  border-bottom: 0.5px solid var(--s1-rule); font: 500 10.5px/1.3 var(--s1-font-mono); letter-spacing: 0.12em; text-transform: uppercase;
+}
+.h-slab__title { color: var(--s1-ink-2); }
+.h-slab__note { color: var(--c-primary); }
+.h-slab__action { margin-left: auto; letter-spacing: 0; text-transform: none; }
+.h-code pre {
+  margin: 0; padding: 16px 18px 18px; overflow-x: auto; scrollbar-width: thin; color-scheme: dark; max-height: 460px;
+  font: 400 13px/1.65 var(--s1-font-mono); color: var(--s1-ink); tab-size: 2; font-variant-ligatures: none;
+}
+.h-code pre code { font: inherit; white-space: pre; }
+.h-code pre:focus-visible { outline: 2px solid var(--c-primary); outline-offset: -2px; }
+@media (max-width: 479px) { .h-code pre { font-size: 12px; } }
+
+/* Two columns, copy and a picture (agents). */
+.h-split { display: grid; grid-template-columns: minmax(0, 1fr); gap: 44px 72px; align-items: center; }
+@media (min-width: 1024px) { .h-split { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } }
+.h-split__copy { display: grid; justify-items: start; gap: 20px; min-width: 0; }
+.h-split__copy .h-eyebrow { margin-bottom: 0; }
+/* Under a picture's caption, "Not there yet" keeps its distance from it. */
+.h-split + .h-notyet { margin-top: 52px; }
+/* ------------------------------------------------------------------ teaser (workspace) */
+
+.h-teaser { display: grid; grid-template-columns: minmax(0, 1fr); gap: 28px 64px; align-items: end; }
+@media (min-width: 1024px) { .h-teaser { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } }
+.h-teaser__body { display: grid; justify-items: start; gap: 22px; }
+
+/* ------------------------------------------------------------------ the orbit (home) */
+
+/* No frame and no "+" marks: the figure stands in the hero, on the night sky (.h-cosmos), its key under it. */
+.h-orbit { position: relative; margin: 0; container: orbit / inline-size; }
+/* The key: the two rings, then the four states as the moons draw them, centred under the orbit. */
+.h-orbit__bar {
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 8px 28px; min-height: 30px; margin-top: 10px;
+  font-size: 13px; color: var(--s1-ink-2);
+}
+.h-orbit__legend { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; }
+.h-orbit__legend b { font: 500 11.5px/1.3 var(--s1-font-mono); letter-spacing: 0.14em; text-transform: uppercase; color: var(--c-primary-strong); }
+.h-orbit__key { display: inline-block; width: 26px; height: 0; }
+.h-orbit__key--serve { border-top: 3px solid var(--c-primary); }
+.h-orbit__key--support { border-top: 2px dashed var(--s1-ink-3); }
+.h-orbit__states {
+  display: inline-flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 4px 16px;
+  font: 500 10.5px/1.3 var(--s1-font-mono); letter-spacing: 0.08em; text-transform: uppercase;
+}
+.h-orbit__state { display: inline-flex; align-items: center; gap: 7px; white-space: nowrap; }
+
+/* A state as a shape, as the chips draw it: dot (live), half dot (beta), ring (early access), dashed ring (coming). */
+.h-orbit__pip { display: inline-block; flex: none; box-sizing: border-box; width: 9px; height: 9px; border-radius: 50%; }
+.h-orbit__pip--live { background: var(--s1-ok); }
+.h-orbit__pip--beta { border: 1.5px solid var(--s1-warn); background: linear-gradient(90deg, var(--s1-warn) 50%, transparent 50%); }
+.h-orbit__pip--early { border: 2px solid var(--s1-info); }
+.h-orbit__pip--coming { border: 1.5px dashed var(--s1-ink-2); }
+
+/* Pause / play: the moons, the planet and the hero's stars stop (WCAG 2.2.2); nothing to pause under reduced motion. */
+.h-orbit__pause {
+  position: absolute; z-index: 8; top: 0; right: 0;
+  display: grid; place-items: center; width: 30px; height: 30px; padding: 0; cursor: pointer;
+  border: 0.5px solid var(--s1-rule-strong); border-radius: 2px; background: var(--c-surface-raised); color: var(--s1-ink);
+}
+.h-orbit__pause svg { width: 14px; height: 14px; }
+.h-orbit__pause:hover { background: var(--s1-ink); color: var(--s1-paper); }
+.h-orbit__pause[hidden] { display: none; }
+@media (prefers-reduced-motion: reduce) { .h-orbit__pause { display: none; } }
+.h-orbit[data-paused] .h-beat__pulse { animation-play-state: paused; }
+
+/* The stage: its own stacking order. Planet text, the rings, the far moons, the core, the near moons, the labels.
+   On a phone it is a little wider than the column (the hero clips it at the screen's edges), so the planet reads. */
+.h-orbit__stage { position: relative; isolation: isolate; width: 100%; aspect-ratio: 20 / 11; container-type: inline-size; }
+@media (max-width: 559px) { .h-orbit__stage { width: 118%; margin-inline: -9%; } }
+/* v4's ASCII planet (orbitScene.ts): the scene covers 80 % of the stage width (1600 of 2000) and 1040 of 1100 high. */
+.h-orbit__ascii { position: absolute; inset: 0; pointer-events: none; contain: strict; }
+.h-orbit__planet-text {
+  position: absolute; left: 10%; top: 2.7273%; margin: 0;
+  color: color-mix(in srgb, var(--c-primary) 72%, transparent);
+  font: 500 10px/1.2 var(--s1-font-mono); letter-spacing: 0 !important; font-variant-ligatures: none; white-space: pre;
+  transform: scale(var(--so-scale, 0.7)); transform-origin: 0 0; user-select: none;
+}
+/* Before it is measured (the prerendered first frame, or no script): 140 columns at a 0.6em advance fill 80 %. */
+.h-orbit__stage:not([data-measured]) .h-orbit__planet-text { font-size: calc(80cqw / 84); transform: none; }
+.h-orbit__art { position: absolute; z-index: 1; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
+.h-orbit__support { fill: none; stroke: var(--s1-ink-3); stroke-width: 1.5px; stroke-dasharray: 2 7; stroke-linecap: round; vector-effect: non-scaling-stroke; }
+.h-orbit__serve { fill: none; stroke: var(--c-primary); stroke-width: 3px; stroke-linecap: round; vector-effect: non-scaling-stroke; }
+@media (forced-colors: active) {
+  .h-orbit__planet-text { color: CanvasText; }
+  .h-orbit__serve, .h-orbit__support { stroke: CanvasText; }
+}
+
+/* The moons: ASCII bodies (orbitMoonArt.ts) in the planet's character cell, placed by transform alone (orbitMotion.ts,
+   in container units), so moving them never lays out. The text is set as the planet's is (10px, scaled to the stage
+   once measured; before that, sized by the stage's width) but bolder, so a moon reads as a body of its own over the
+   planet's lighter glyphs, on a disc of the night a glyph wider than the moon all round (--moon-d, in the text's em)
+   that hides the planet, the ring and the stars behind it and fades out at its edge. The status is the body's shape
+   and its hue. */
+.h-orbit__moons { position: absolute; inset: 0; pointer-events: none; }
+.h-orbit__moon { position: absolute; left: 0; top: 0; z-index: 2; will-change: transform, opacity; }
+.h-orbit__moon[data-side="front"] { z-index: 4; }
+.h-orbit__moon-art {
+  position: relative; z-index: 0; display: block; margin: 0;
+  font: 700 10px/1.2 var(--s1-font-mono); letter-spacing: 0 !important; font-variant-ligatures: none; white-space: pre;
+  transform: scale(calc(var(--so-scale, 0.7) * var(--moon-k, 1))); transform-origin: 50% 50%; user-select: none;
+}
+.h-orbit__stage:not([data-measured]) .h-orbit__moon-art { font-size: calc(80cqw / 84); transform: scale(var(--moon-k, 1)); }
+/* On a small figure (a phone) the moons are drawn larger than the planet's cell, so each still reads as a body. */
+@container orbit (max-width: 559px) { .h-orbit__moon-art { --moon-k: 1.35; } }
+.h-orbit__moon-art::before, .h-orbit__moon-art::after {
+  content: ""; position: absolute; left: 50%; top: 50%; border-radius: 50%; translate: -50% -50%; pointer-events: none;
+}
+.h-orbit__moon-art::before {
+  z-index: -1; width: calc(var(--moon-d) + 2.6em); height: calc(var(--moon-d) + 2.6em);
+  background: radial-gradient(closest-side, var(--c-cosmos) calc(100% - 0.7em), transparent);
+}
+.h-orbit__moon--live { color: var(--s1-ok); }
+.h-orbit__moon--beta { color: var(--s1-warn); }
+.h-orbit__moon--early { color: var(--s1-info); }
+.h-orbit__moon--coming { color: var(--s1-ink-2); }
+/* The moon of the label or list item pointed at (or focused): a jade ring round it. */
+.h-orbit__moon[data-active] .h-orbit__moon-art::after {
+  width: calc(var(--moon-d) + 1.1em); height: calc(var(--moon-d) + 1.1em); border: 0.2em solid var(--c-primary);
+}
+@media (forced-colors: active) { .h-orbit__moon-art { color: CanvasText; } }
+
+/* "Your app" in its own box over the ASCII core, as v4's .so-core (a paper box ringed in the brand colour). */
+.h-orbit__core {
+  position: absolute; z-index: 3; left: 50%; top: 50%; transform: translate(-50%, -50%); display: grid; justify-items: center; gap: 4px;
+  padding: clamp(4px, 0.8cqw, 10px) clamp(8px, 1.4cqw, 16px); background: var(--c-cosmos, var(--s1-paper));
+  border: 1px solid var(--c-primary); color: var(--s1-ink); text-align: center; white-space: nowrap; pointer-events: none;
+}
+.h-orbit__core-name { font: 400 clamp(15px, 2.4cqw, 30px)/1 var(--s1-font-display); }
+.h-orbit__core-note { font: 500 clamp(9px, 1cqw, 11px)/1.2 var(--s1-font-mono); letter-spacing: 0.12em; text-transform: uppercase; color: var(--s1-ink-2); }
+.h-orbit__core-beat { width: clamp(56px, 8cqw, 112px); height: clamp(10px, 1.4cqw, 18px); margin-top: 2px; color: var(--c-primary); }
+.h-orbit__core-beat .h-beat__pulse { stroke: var(--c-primary); }
+
+/* The labels ride beside their moons (only on a figure 720 px wide or more; narrower, the cards under the figure name
+   the parts). One that would overlap a nearer label fades out until they part; focused, it comes back on top. */
+.h-orbit__labels { display: none; }
+.h-orbit__labels li { position: absolute; left: 0; top: 0; z-index: 5; will-change: transform; transition: opacity 0.35s ease; }
+.h-orbit__labels li[data-side="front"] { z-index: 6; }
+.h-orbit__labels li[data-hidden] { opacity: 0; pointer-events: none; }
+.h-orbit__labels li:hover, .h-orbit__labels li:focus-within { z-index: 7; opacity: 1; }
+.h-orbit__pill {
+  display: inline-flex; align-items: center; gap: 7px; padding: 5px 10px 5px 8px; white-space: nowrap; text-decoration: none;
+  background: var(--c-surface-raised); border: 0.5px solid var(--s1-rule-strong); color: var(--s1-ink);
+  font-size: clamp(12px, 1.1cqw, 13.5px); font-weight: 600;
+}
+.h-orbit__labels li.is-support .h-orbit__pill { border-style: dashed; }
+.h-orbit__pill:hover, .h-orbit__pill:focus-visible { color: var(--s1-ink); border-color: var(--c-primary); box-shadow: 2px 2px 0 var(--c-primary); }
+
+@container orbit (min-width: 720px) { .h-orbit__labels { display: block; } }
+@container orbit (max-width: 559px) {
+  .h-orbit__core-note, .h-orbit__core-beat, .h-orbit__states { display: none; }
+  .h-orbit__bar { gap: 6px 18px; font-size: 12px; }
+}
+/* No container units: the moons and labels cannot be placed; the planet and its rings stay. */
+@supports not (width: 1cqw) {
+  .h-orbit__moons, .h-orbit__labels { display: none !important; }
+}
+
+/* ------------------------------------------------------------------ rails: support / serve */
+
+.h-rails { display: grid; grid-template-columns: minmax(0, 1fr); border: 0.5px solid var(--s1-rule-strong); position: relative; }
+.h-rails::after { content: ""; position: absolute; inset: -6px; pointer-events: none; background: var(--s1-corners); color: var(--s1-ink); }
+@media (min-width: 768px) { .h-rails { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.h-rail { display: grid; align-content: start; gap: 18px; min-width: 0; padding: clamp(24px, 3.4vw, 44px); background: var(--c-surface-raised); }
+.h-rail--serve { border: 0; }
+.h-rail__tag { display: flex; align-items: center; gap: 10px; font: 500 11.5px/1.3 var(--s1-font-mono); letter-spacing: 0.14em; text-transform: uppercase; color: var(--c-primary-strong); }
+.h-rail--serve .h-rail__tag { color: var(--c-primary); }
+.h-rail__tag span { color: var(--s1-ink-3); }
+.h-rail__title { font: 400 clamp(1.7rem, 1.3rem + 1.1vw, 2.35rem)/1.08 var(--s1-font-display); }
+.h-rail .h-lines { border-top-width: 0.5px; }
+.h-rail--serve .h-lines__icon { color: var(--c-primary); }
+.h-rail__beat { height: 34px; }
+
+/* ------------------------------------------------------------------ questions */
+
+.h-faq { display: grid; grid-template-columns: minmax(0, 1fr); gap: 28px 64px; align-items: start; }
+@media (min-width: 1024px) { .h-faq { grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr); } }
+.h-faq__list { border-top: 1px solid var(--s1-rule-strong); }
+.h-faq__item { border-bottom: 0.5px solid var(--s1-rule); }
+.h-faq__item summary { display: flex; justify-content: space-between; align-items: center; gap: 20px; padding: 18px 0; cursor: pointer; list-style: none; }
+.h-faq__item summary::-webkit-details-marker { display: none; }
+.h-faq__q { font: 400 1.45rem/1.2 var(--s1-font-display); }
+.h-faq__icon { width: 20px; height: 20px; flex: none; color: var(--c-primary-strong); transition: transform 0.16s ease; }
+.h-faq__item[open] .h-faq__icon { transform: rotate(45deg); }
+.h-faq__item summary:hover .h-faq__q { color: var(--c-primary-strong); }
+.h-faq__item > p { max-width: 64ch; padding-bottom: 22px; }
+/* In a column of another section (home): the title over the list. */
+.h-faq.h-faq--embedded { grid-template-columns: minmax(0, 1fr); gap: 20px; }
+.h-faq--embedded .h-faq__title { font-size: clamp(1.75rem, 1.35rem + 1vw, 2.3rem); }
+.h-faq--embedded .h-faq__q { font-size: 1.3rem; }
+
+/* ------------------------------------------------------------------ the closing band */
+
+.h-cta { padding-block: clamp(56px, 8vw, 112px); }
+.h-cta__plate {
+  --h-cta-pad: clamp(28px, 5vw, 68px);
+  position: relative; padding: var(--h-cta-pad); background: var(--c-primary-strong); color: var(--s1-paper);
+}
+.h-cta__plate::after { content: ""; position: absolute; inset: -6px; pointer-events: none; background: var(--s1-corners); color: var(--s1-ink); }
+.h-cta__words { display: grid; justify-items: start; gap: 22px; }
+.h-cta__beat { width: min(420px, 100%); color: var(--s1-paper); }
+.h-cta__beat .h-beat__base { opacity: 0.45; }
+.h-cta__beat .h-beat__pulse { stroke: var(--s1-paper); }
+.h-cta__title { max-width: 20ch; font: 400 clamp(2.1rem, 1.3rem + 2.6vw, 3.9rem)/1.02 var(--s1-font-display); letter-spacing: -0.012em; text-wrap: balance; }
+.h-cta__lead { max-width: 56ch; font-size: 17px; line-height: 1.6; }
+.h-cta .h-actions { margin-top: 6px; }
+/*
+ * With a column of its own (home): the words, then the water (the sharks) under a rule on a phone; from 900 px the
+ * water beside the words behind a column rule, as a broadsheet sets a picture. The water runs to the plate's edges and
+ * its canvas is laid over it, so it never moves the words. The headline is each sentence a line (Home.tsx), in the
+ * page's language alone.
+ */
+.h-cta--aside .h-cta__plate { --h-cta-rule: color-mix(in srgb, var(--h-cta-words) 32%, transparent); display: grid; padding: 0; }
+.h-cta--aside .h-cta__words { container-type: inline-size; padding: var(--h-cta-pad); }
+.h-cta--aside .h-cta__title { max-width: none; }
+.h-cta__line { display: block; }
+.h-cta__aside { position: relative; overflow: hidden; background: var(--c-cta-art-ground); min-height: clamp(210px, 58vw, 320px); border-top: 1px solid var(--h-cta-rule); }
+@media (min-width: 900px) {
+  .h-cta--aside .h-cta__plate { grid-template-columns: minmax(0, 1.08fr) minmax(0, 1fr); }
+  .h-cta__aside { min-height: 0; border-top: 0; border-left: 1px solid var(--h-cta-rule); }
+}
+.h-sharks {
+  position: absolute; inset: 0; display: block; width: 100%; height: 100%;
+  color: var(--c-cta-art); font-family: var(--s1-font-mono); opacity: 0; transition: opacity 0.9s ease;
+}
+.h-sharks[data-drawn] { opacity: 1; }
+/* The product pages' art (CtaArt.tsx, a variation of the sharks, the stars or the moons per page) in a colour of its
+   own beside the band's words, on a ground of its own (--c-cta-art-ground on .h-cta__aside): bright jade on deep
+   ink-jade by day, mint on deep jade at night, so the two halves read as two colours (the homepage's sharks too). The words, the line and the buttons keep the band's own colours. */
+.h-cta-art {
+  position: absolute; inset: 0; display: block; width: 100%; height: 100%;
+  color: var(--c-cta-art); font-family: var(--s1-font-mono); opacity: 0; transition: opacity 0.9s ease;
+}
+.h-cta-art[data-drawn] { opacity: 1; }
+/* The plate's buttons in its colours, through the kit's tokens (never by painting .s1-btn, which would beat the kit's
+   turn under the pointer; lint rule kit-button-tokens): the plate's words for the ink, its ground for the paper, the
+   page's ink for the go's shadow. So go is a paper box with the plate's jade words and plain is the paper's line round
+   the plate's ground; under the pointer each turns over, go to the plate's ground and plain to a paper box. */
+.h-cta__plate { --h-cta-words: var(--s1-paper); --h-cta-ground: var(--c-primary-strong); --h-cta-shadow: var(--s1-ink); }
+.h-cta .h-actions { --s1-ink: var(--h-cta-words); --s1-paper: var(--h-cta-ground); --s1-rule-strong: var(--h-cta-words); --s1-accent: var(--h-cta-shadow); }
+/* A link in the plate's words keeps their colour; a kit button keeps its own turn. */
+.h-cta a:not(.s1-btn):hover { color: inherit; }
+
+/* ------------------------------------------------------------------ home (the lean page) */
+
+/* The hero: the headline, its line and the two buttons, centred over the orbit, all on the night sky. */
+.h-lean-hero { padding-top: clamp(40px, 5.5vw, 84px); }
+.h-lean-hero__copy { display: grid; justify-items: center; gap: clamp(18px, 2vw, 26px); text-align: center; }
+.h-home-title { font-size: clamp(2.8rem, 0.8rem + 5.6vw, 6.2rem); line-height: 0.96; }
+/* Under the poem, the claim in plain words: the display face, a step over the line that follows it. */
+.h-home-claim {
+  max-width: 100%; color: var(--s1-ink);
+  font: 400 clamp(1.3rem, 1.05rem + 1vw, 1.95rem)/1.2 var(--s1-font-display); letter-spacing: -0.005em; text-wrap: balance;
+}
+.h-home-title > span, .h-home-title > em { display: block; }
+.h-lean-hero__line { max-width: 34em; margin-inline: auto; text-wrap: balance; }
+.h-clause { display: inline-block; }
+.h-lean-hero__actions { justify-content: center; margin-top: 2px; }
+.h-lean-hero__figure { margin-top: clamp(28px, 3.6vw, 52px); }
+
+/* The night sky: a band the width of the page, night in both themes (data-theme="dark" on it, the words in the night's
+   tokens); a haze at the top, a jade glow round the planet, the stars on a canvas (StarField.tsx) that fades in once
+   drawn. It clips what leaves the screen's edge (a phone's wider orbit), never the words. */
+.h-cosmos {
+  position: relative; isolation: isolate; overflow: clip; padding-bottom: clamp(22px, 3.4vw, 48px);
+  background:
+    radial-gradient(42% 46% at 50% 70%, var(--c-cosmos-glow), transparent 72%),
+    radial-gradient(90% 60% at 50% 0%, var(--c-cosmos-haze), transparent 72%),
+    var(--c-cosmos);
+  color: var(--s1-ink);
+}
+.h-cosmos > .h-wrap { position: relative; z-index: 1; }
+/* A halo of the night round the words, so no star sits against a letter. */
+.h-cosmos .h-home-title, .h-cosmos .h-lean-hero__line, .h-cosmos .h-home-claim { text-shadow: 0 0 3px var(--c-cosmos), 0 0 14px var(--c-cosmos); }
+.h-cosmos__stars { position: absolute; inset: 0; z-index: 0; width: 100%; height: 100%; pointer-events: none; opacity: 0; transition: opacity 0.9s ease; }
+.h-cosmos__stars[data-drawn] { opacity: 1; }
+/* A short screen (a 1280 x 720 laptop): a smaller headline and less air, so the planet shows on the first screen. */
+@media (min-width: 1024px) and (max-height: 820px) {
+  .h-cosmos.h-lean-hero { padding-top: 36px; }
+  .h-cosmos .h-home-title { font-size: min(clamp(2.8rem, 0.8rem + 5.6vw, 6.2rem), 10.4svh); }
+  .h-cosmos .h-lean-hero__copy { gap: 16px; }
+}
+/* The head's "+" marks would sit on the sky's edge: the homepage's head has none. */
+.h-head--cosmos::after { display: none; }
+
+/* New this month: a paper's index under the hero. A rule in the ink, then three dated lines side by side from 860 px,
+   a column rule between them; each line's name is the link, over the whole of its column. */
+.h-news { position: relative; padding-top: clamp(30px, 3.6vw, 48px); }
+.h-news__wrap { display: grid; gap: 12px; }
+.h-news__label { font: 500 11.5px/1.4 var(--s1-font-mono); letter-spacing: 0.14em; text-transform: uppercase; color: var(--c-primary-strong); }
+.h-news__label::before { content: "+ "; content: "+ " / ""; color: var(--s1-ink-3); letter-spacing: 0; }
+.h-news__list { display: grid; grid-template-columns: minmax(0, 1fr); border-top: 1px solid var(--s1-ink); border-bottom: 0.5px solid var(--s1-rule-strong); }
+.h-news__item {
+  position: relative; display: grid; align-content: start; gap: 8px; min-width: 0; padding-block: 18px 20px;
+  transition: background-color 0.15s ease;
+}
+.h-news__item + .h-news__item { border-top: 0.5px solid var(--s1-rule-strong); }
+.h-news__item:hover { background: color-mix(in srgb, var(--c-primary) 7%, transparent); }
+.h-news__item:has(a:focus-visible) { outline: 2px solid var(--c-primary); outline-offset: -2px; }
+.h-news__meta { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; }
+.h-news__date { font: 500 11px/1.3 var(--s1-font-mono); letter-spacing: 0.1em; text-transform: uppercase; color: var(--s1-ink-2); }
+.h-news__name { font: 400 clamp(1.55rem, 1.3rem + 0.7vw, 2rem)/1.08 var(--s1-font-display); letter-spacing: -0.008em; }
+.h-news__name a { color: var(--s1-ink); text-decoration: none; }
+.h-news__name a::after { content: ""; position: absolute; inset: 0; }
+.h-news__name a:focus-visible { outline: none; }
+.h-news__item:hover .h-news__name a { text-decoration: underline; text-decoration-color: var(--c-primary); text-decoration-thickness: 1.5px; text-underline-offset: 4px; }
+.h-news__line { max-width: 40ch; font-size: 14.5px; line-height: 1.5; color: var(--s1-ink-2); text-wrap: pretty; }
+/* A phone: three short rows, the name beside its date and status. */
+@media (max-width: 859px) {
+  .h-news__item { grid-template-columns: minmax(0, 1fr) auto; align-items: baseline; gap: 4px 12px; padding-block: 13px 14px; }
+  .h-news__meta { grid-column: 2; grid-row: 1; justify-content: flex-end; }
+  .h-news__name { grid-column: 1; grid-row: 1; font-size: 1.45rem; }
+  .h-news__line { grid-column: 1 / -1; max-width: none; }
+}
+@media (min-width: 860px) {
+  .h-news__list { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .h-news__item { padding: 20px 28px 24px; }
+  .h-news__item:first-child { padding-left: 0; }
+  .h-news__item:last-child { padding-right: 0; }
+  .h-news__item + .h-news__item { border-top: 0; border-left: 0.5px solid var(--s1-rule-strong); }
+}
+
+/* A product told as a feature (Bots, Aha Code, the models): its head, its picture beside its points, then its notes.
+   A link from New this month lands on the title with the line over it in view (the page's scroll-padding clears the
+   running head). */
+.h-feat .h-section-head .h-h2 { scroll-margin-top: 44px; }
+.h-feat .h-section-head .h-h2 { max-width: 16em; }
+/* Two notes under the picture and its points, in the spread's own columns: a ruled table, then lines. */
+.h-feat__notes { display: grid; grid-template-columns: minmax(0, 1fr); gap: 36px 64px; margin-top: clamp(40px, 5vw, 64px); }
+@media (min-width: 1024px) { .h-feat__notes { grid-template-columns: minmax(0, 1.32fr) minmax(0, 1fr); } }
+/* With today's picture before them: three columns from 1100 px (the picture, then the two notes); narrower, the
+   picture beside the two notes, one over the other; on a phone one column. */
+@media (min-width: 640px) {
+  .h-feat__notes--today { grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 48px; align-items: start; }
+  .h-feat__today { grid-row: span 2; }
+}
+@media (min-width: 1100px) {
+  .h-feat__notes--today { grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr) minmax(0, 1fr); }
+  .h-feat__today { grid-row: auto; }
+}
+/* A phone: today's picture straight after the coming one, before the points, so what is open today is seen at once.
+   The spread and the notes row give their children to the section's column, which sets the order. */
+@media (max-width: 639px) {
+  .h-feat--bots > .h-wrap { display: flex; flex-direction: column; }
+  .h-feat--bots :is(.h-spread, .h-feat__notes) { display: contents; }
+  .h-feat--bots .h-spread > .h-fig { order: 1; }
+  .h-feat--bots .h-feat__today { order: 2; margin-top: 36px; }
+  .h-feat--bots .h-spread__copy { order: 3; margin-top: 40px; }
+  .h-feat--bots .h-feat__note { order: 4; margin-top: 32px; }
+}
+.h-feat__note { min-width: 0; }
+/* A note is a disclosure, open as the page is written: its title is the row that opens and closes it, with the sign
+   the questions use. On a phone it closes once the page is live (Home.tsx) and stands as one row over a rule. */
+.h-feat__sum { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 12px; list-style: none; cursor: pointer; }
+.h-feat__sum::-webkit-details-marker { display: none; }
+.h-feat__sum::after { content: "+"; flex: none; font: 400 17px/1 var(--s1-font-mono); color: var(--c-primary-strong); }
+.h-feat__note[open] > .h-feat__sum::after { content: "\2212"; }
+.h-feat__sum:focus-visible { outline: 2px solid var(--c-primary); outline-offset: 4px; }
+.h-feat__note:not([open]) { border-bottom: 1px solid var(--s1-ink); }
+.h-feat__h3 { font: 500 11.5px/1.4 var(--s1-font-mono); letter-spacing: 0.14em; text-transform: uppercase; color: var(--s1-ink); }
+.h-feat__note .h-lines { border-top: 1px solid var(--s1-ink); }
+.h-feat__note .h-lines li { border-bottom-color: var(--s1-rule-strong); }
+/* What wakes a bot: what, in the display face, then how, under a rule in the ink; a hairline under each row. */
+.h-wakes { width: 100%; border-collapse: collapse; border-top: 1px solid var(--s1-ink); }
+.h-wakes th, .h-wakes td { padding-block: 14px 15px; text-align: left; vertical-align: baseline; border-bottom: 0.5px solid var(--s1-rule-strong); }
+.h-wakes th { width: 40%; padding-right: 20px; font: 400 1.22rem/1.2 var(--s1-font-display); letter-spacing: -0.005em; color: var(--s1-ink); }
+.h-wakes td { font-size: 15.5px; line-height: 1.5; color: var(--s1-ink-2); text-wrap: pretty; }
+@media (max-width: 479px) {
+  .h-wakes, .h-wakes tbody, .h-wakes tr, .h-wakes th, .h-wakes td { display: block; width: auto; }
+  .h-wakes tr { padding-block: 13px 14px; border-bottom: 0.5px solid var(--s1-rule-strong); }
+  .h-wakes th, .h-wakes td { padding: 0; border: 0; }
+  .h-wakes td { margin-top: 4px; }
+}
+/* Where to get it, under the points: the download and the ticket, then who sees it. */
+.h-feat__get { display: grid; gap: 16px; }
+.h-feat__small { max-width: 48ch; }
+/* The models: four lines and what to do, beside the call on its night slab; the price map follows at once. */
+.h-feat--models { padding-bottom: clamp(28px, 4vw, 56px); }
+.h-models { display: grid; grid-template-columns: minmax(0, 1fr); gap: 36px 64px; align-items: start; }
+@media (min-width: 1024px) { .h-models { grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); } }
+.h-models__words { display: grid; gap: 30px; min-width: 0; }
+.h-models__words .h-lines { border-top-color: var(--s1-ink); }
+/* A phone: the call wraps inside its slab instead of running off its edge (Copy gives the call as written), and
+   Copy stays beside its name, the note under them. */
+@media (max-width: 479px) {
+  .h-models .h-code pre code { white-space: pre-wrap; overflow-wrap: anywhere; }
+  .h-models .h-slab__note { order: 3; flex-basis: 100%; }
+}
+
+/* Serve and Support: two rails of cards, side by side from 960 px; Serve on a night slab. */
+.h-lean-rails-section { padding-block: clamp(56px, 7vw, 104px); }
+.h-lean-rails { display: grid; grid-template-columns: minmax(0, 1fr); gap: 28px; }
+@media (min-width: 960px) { .h-lean-rails { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 32px; } }
+.h-lean-rail {
+  position: relative; display: grid; align-content: start; min-width: 0; padding: clamp(22px, 3vw, 40px);
+  border: 0.5px solid var(--s1-rule-strong); background: var(--c-surface-raised); container: rail / inline-size;
+}
+/* The night rail with a breath of jade, so it stands apart from the paper rail in either theme. */
+.h-lean-rail.h-night { background: color-mix(in srgb, var(--c-primary) 7%, var(--s1-paper-2)); }
+.h-lean-rail::after { content: ""; position: absolute; inset: -6px; pointer-events: none; background: var(--s1-corners); color: var(--s1-ink); }
+/* The night rail's "+" marks sit on the page's paper, outside its night scope: a grey that shows on both. */
+.h-lean-rail.h-night::after { color: var(--s1-ink-3); }
+.h-lean-rail .h-eyebrow { margin-bottom: 12px; }
+.h-lean-rail.h-night .h-eyebrow { color: var(--c-primary); }
+.h-lean-rail__title { font-size: clamp(1.9rem, 1.3rem + 1.5vw, 2.7rem); margin-bottom: clamp(20px, 2.4vw, 30px); }
+/* Also in Aha: across both columns, its cards in two columns from 960 px; under them, the way to the whole of it. */
+.h-lean-rail__more { margin-top: 26px; }
+.h-lean-rail--wide { grid-column: 1 / -1; }
+@media (min-width: 960px) { .h-lean-rail--wide .h-lean-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 40px; } }
+
+/* A card: its picture, name and line, its status, an arrow; the name's link covers the card. */
+.h-lean-cards { display: grid; border-top: 1px solid var(--s1-rule-strong); }
+.h-lean-card {
+  position: relative; display: grid; grid-template-columns: 40px minmax(0, 1fr) auto 16px; grid-template-areas: "icon text chip arrow";
+  align-items: center; gap: 6px 16px; padding: 16px 6px 16px 0; border-bottom: 0.5px solid var(--s1-rule);
+  transition: background-color 0.15s ease;
+}
+.h-lean-card:hover { background: color-mix(in srgb, var(--c-primary) 7%, transparent); }
+.h-lean-card:has(a:focus-visible) { outline: 2px solid var(--c-primary); outline-offset: -2px; }
+.h-lean-card__icon {
+  grid-area: icon; display: grid; place-items: center; width: 40px; height: 40px; box-sizing: border-box;
+  border: 0.5px solid color-mix(in srgb, var(--c-primary) 45%, transparent); background: var(--c-primary-tint); color: var(--c-primary-strong);
+}
+.h-lean-card__icon svg { width: 19px; height: 19px; stroke-width: 1.6; }
+.h-lean-card__text { grid-area: text; display: grid; gap: 3px; min-width: 0; }
+.h-lean-card__name { font: 400 1.42rem/1.12 var(--s1-font-display); letter-spacing: -0.005em; }
+.h-lean-card__name a { color: var(--s1-ink); text-decoration: none; }
+.h-lean-card__name a::after { content: ""; position: absolute; inset: 0; }
+.h-lean-card__name a:focus-visible { outline: none; }
+.h-lean-card__line { font-size: 14.5px; line-height: 1.45; color: var(--s1-ink-2); text-wrap: pretty; }
+.h-lean-card__chip { grid-area: chip; justify-self: end; }
+.h-lean-card__arrow { grid-area: arrow; width: 16px; height: 16px; color: var(--s1-ink-3); transition: transform 0.15s ease, color 0.15s ease; }
+.h-lean-card:hover .h-lean-card__arrow { transform: translateX(3px); color: var(--c-primary); }
+.h-lean-card:hover .h-lean-card__name a { color: var(--s1-ink); text-decoration: underline; text-decoration-color: var(--c-primary); text-decoration-thickness: 1.5px; text-underline-offset: 4px; }
+/* A narrow rail: the status under the line. */
+@container rail (max-width: 459px) {
+  .h-lean-card {
+    grid-template-columns: 36px minmax(0, 1fr) 16px; grid-template-areas: "icon text arrow" "icon chip arrow"; align-items: start;
+    column-gap: 14px; padding-block: 14px;
+  }
+  .h-lean-card__icon { width: 36px; height: 36px; }
+  .h-lean-card__chip { justify-self: start; margin-top: 4px; }
+  .h-lean-card__arrow { align-self: center; }
+}
+
+/* Also in Aha with pictures: each card its screenshot, then its name, line and
+   status, the arrow beside the name; one column on a phone, two in a rail 560 px wide, four from 1000 px. */
+.h-lean-rail .h-lean-cards--shots { grid-template-columns: minmax(0, 1fr); gap: 34px 28px; border-top: 0; }
+@container rail (min-width: 560px) { .h-lean-rail .h-lean-cards--shots { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@container rail (min-width: 1000px) { .h-lean-rail .h-lean-cards--shots { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+.h-lean-card.h-shot-card,
+.h-lean-rail .h-lean-card.h-shot-card {
+  grid-template-columns: minmax(0, 1fr) 16px; grid-template-areas: "fig fig" "text arrow" "chip chip";
+  align-items: start; gap: 16px 12px; padding: 0 0 20px; border-bottom: 0.5px solid var(--s1-rule-strong);
+}
+.h-shot-card > .h-fig { grid-area: fig; }
+.h-shot-card .h-lean-card__chip { justify-self: start; margin-top: -4px; }
+.h-shot-card .h-lean-card__arrow { margin-top: 6px; }
+.h-shot-card:hover { background: none; }
+.h-shot-card:hover .h-fig__frame:not(.is-pending) { border-color: var(--c-primary); }
+.h-shot-card:has(a:focus-visible) { outline-offset: 6px; }
+/* A narrow rail (a phone): the picture small at the card's left, the words beside it, so the four stay a short list. */
+@container rail (width < 560px) {
+  .h-lean-card.h-shot-card,
+  .h-lean-rail .h-lean-card.h-shot-card {
+    grid-template-columns: 112px minmax(0, 1fr) 16px; grid-template-areas: "fig text arrow" "fig chip arrow"; column-gap: 16px; row-gap: 8px;
+    padding-bottom: 18px;
+  }
+  .h-lean-rail .h-lean-cards--shots { gap: 18px; }
+  .h-shot-card .h-lean-card__arrow { align-self: center; margin-top: 0; }
+  .h-shot-card .h-lean-card__chip { margin-top: 0; }
+  .h-shot-card .h-fig { --h-fig-plate: 4px; align-self: start; }
+  .h-shot-card .h-fig__bar { height: 12px; padding-inline: 5px; }
+  .h-shot-card .h-fig__host { display: none; }
+  .h-shot-card .h-fig__dots { width: 13px; height: 3px; background-size: 5px 3px; background-image: radial-gradient(circle 1.5px at 1.5px 1.5px, var(--s1-ink-3) 98%, transparent); }
+  .h-shot-card .h-fig__pending { padding: 4px 6px; gap: 2px; border: 0; background: transparent; }
+  .h-shot-card .h-fig__pending-ring, .h-shot-card .h-fig__pending-note { display: none; }
+  .h-shot-card .h-fig__pending-label { font-size: 9px; letter-spacing: 0.06em; }
+}
+
+/* Pricing beside the questions, on the second paper. */
+.h-lean-price-section { padding-block: clamp(56px, 7vw, 100px); }
+.h-lean-price-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 44px 80px; align-items: start; }
+@media (min-width: 960px) { .h-lean-price-grid { grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr); } }
+.h-lean-price { display: grid; justify-items: start; gap: 18px; min-width: 0; }
+.h-lean-price .h-eyebrow { margin-bottom: 0; }
+.h-lean-price .h-lead { max-width: 30em; }
+.h-lean-price__amount { font: 400 1.7em/1 var(--s1-font-display); color: var(--c-money); white-space: nowrap; }
+.h-lean-price__beat { width: min(300px, 100%); height: 26px; color: var(--c-money); }
+
+/* ------------------------------------------------------------------ get started (/start/) */
+
+/* The title, then the two choices side by side from 768 px: framed cards with "+" corners, the console on the night
+   slab (as the homepage's Serve rail), Aha on paper; the whole card is its link. */
+.h-start { padding-bottom: clamp(24px, 4vw, 48px); }
+.h-start__in { display: grid; gap: clamp(34px, 4.4vw, 56px); }
+.h-start__head { display: grid; justify-items: start; gap: 20px; }
+.h-start__head .h-eyebrow { margin-bottom: 0; }
+.h-start__title { font-size: clamp(2.5rem, 1.4rem + 3.2vw, 4.4rem); }
+.h-start__choices { display: grid; grid-template-columns: minmax(0, 1fr); gap: 28px; }
+@media (min-width: 768px) { .h-start__choices { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 32px; } }
+.h-start__choice {
+  position: relative; display: grid; grid-template-columns: minmax(0, 1fr); align-content: start; justify-items: start; gap: 12px;
+  min-width: 0; padding: clamp(24px, 3.2vw, 44px); border: 0.5px solid var(--s1-rule-strong); background: var(--c-surface-raised);
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+.h-start__choice.h-night { background: color-mix(in srgb, var(--c-primary) 7%, var(--s1-paper-2)); }
+.h-start__choice::after { content: ""; position: absolute; inset: -6px; pointer-events: none; background: var(--s1-corners); color: var(--s1-ink); }
+.h-start__choice.h-night::after { color: var(--s1-ink-3); }
+.h-start__choice:hover { border-color: var(--c-primary); background: color-mix(in srgb, var(--c-primary) 5%, var(--c-surface-raised)); }
+.h-start__choice.h-night:hover { background: color-mix(in srgb, var(--c-primary) 11%, var(--s1-paper-2)); }
+.h-start__choice:has(.h-start__go:focus-visible) { outline: 2px solid var(--c-primary); outline-offset: 4px; }
+.h-start__icon {
+  display: grid; place-items: center; width: 52px; height: 52px; box-sizing: border-box; margin-bottom: 8px;
+  border: 0.5px solid color-mix(in srgb, var(--c-primary) 45%, transparent); background: var(--c-primary-tint); color: var(--c-primary-strong);
+}
+.h-start__choice.h-night .h-start__icon { color: var(--c-primary); }
+.h-start__icon svg { width: 24px; height: 24px; stroke-width: 1.5; }
+.h-start__host { font: 500 12px/1.3 var(--s1-font-mono); letter-spacing: 0.04em; color: var(--s1-ink-2); overflow-wrap: anywhere; }
+.h-start__name { font: 400 clamp(2rem, 1.45rem + 1.5vw, 2.9rem)/1.04 var(--s1-font-display); letter-spacing: -0.012em; color: var(--s1-ink); text-wrap: balance; }
+.h-start__line { max-width: 32em; font-size: 16.5px; line-height: 1.55; color: var(--s1-ink-2); text-wrap: pretty; }
+.h-start__go { margin-top: 14px; }
+/* The button's box stretched over the card makes the card the link. A press must not move the button (its transform
+   would shrink the stretched box under the pointer, and the click would miss the link). */
+.h-start__go::after { content: ""; position: absolute; inset: 0; }
+.h-start__go:active:not(:disabled) { transform: none; }
+.h-start__go:focus-visible { outline: none; }
+.h-start__more { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 24px; font-size: 15px; color: var(--s1-ink-2); }
+
+/* ------------------------------------------------------------------ 404 */
+
+.h-404 { padding-bottom: clamp(48px, 9vw, 120px); }
+.h-404__in { display: grid; justify-items: start; gap: 18px; }
+.h-404 .h-h1 > span, .h-404 .h-h1 > em { display: block; }
+
+/* ------------------------------------------------------------------ foot */
+
+.h-foot { position: relative; z-index: 1; border-top: 1px solid var(--s1-rule-strong); }
+.h-foot__top { display: grid; grid-template-columns: minmax(0, 1fr); gap: 32px; padding-block: clamp(36px, 5vw, 52px) 30px; }
+@media (min-width: 1024px) { .h-foot__top { grid-template-columns: minmax(0, 1fr) minmax(0, 1.7fr); gap: 56px; } }
+.h-foot__brand { display: grid; align-content: start; justify-items: start; gap: 14px; max-width: 340px; }
+.h-foot__brand p { font-size: 14.5px; line-height: 1.6; color: var(--s1-ink-2); }
+.h-foot__beat { max-width: 260px; height: 28px; }
+.h-foot__cols { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 28px 20px; }
+@media (min-width: 640px) { .h-foot__cols { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+.h-foot__head { margin-bottom: 12px; font: 500 11.5px/1.3 var(--s1-font-mono); letter-spacing: 0.14em; text-transform: uppercase; color: var(--c-primary-strong); }
+.h-foot__col ul { display: grid; gap: 2px; }
+.h-foot__col a { display: inline-block; padding-block: 5px; font-size: 14.5px; text-decoration: none; color: var(--s1-ink); }
+.h-foot__col a:hover { text-decoration: underline; text-decoration-color: var(--c-primary); text-decoration-thickness: 2px; }
+/* What the labels mean, in one row: each chip and the few words after it. */
+.h-foot__legend {
+  display: grid; grid-template-columns: minmax(0, 1fr); gap: 10px 28px; padding-block: 18px; border-top: 0.5px solid var(--s1-rule);
+  font-size: 13px; line-height: 1.45; color: var(--s1-ink-2);
+}
+@media (min-width: 640px) { .h-foot__legend { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (min-width: 1100px) { .h-foot__legend { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+.h-foot__legend p { display: flex; align-items: baseline; gap: 10px; }
+.h-foot__legend .h-chip { flex: none; }
+.h-foot__meta {
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px 24px; padding-block: 16px 34px;
+  border-top: 0.5px solid var(--s1-rule); font: 500 11px/1.4 var(--s1-font-mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--s1-ink-2);
+}
+.h-foot__endpoint { overflow-wrap: anywhere; }
+.h-foot__endpoint code { margin-left: 6px; color: var(--s1-ink); text-transform: none; letter-spacing: 0; font-size: 12px; }
+
+/* ------------------------------------------------------------------ figures (src/page/figures.tsx) */
+
+/* A screenshot as a paper sets a photograph (after s1lin.tokensbeat.com's TokensBeat feature): a hairline browser frame
+   on an offset plate, the credit at the right under it, then the caption with its number. The plate is the ink at a
+   whisper, so it shows on the paper and on a band's second paper alike. */
+.h-fig { --h-fig-plate: 12px; display: grid; gap: 0; min-width: 0; margin: 0; }
+.h-fig__frame {
+  position: relative; min-width: 0; border: 0.5px solid var(--s1-rule-strong); background: var(--s1-paper);
+  box-shadow: 0 1px 0 var(--s1-rule), var(--h-fig-plate) var(--h-fig-plate) 0 -1px color-mix(in srgb, var(--s1-ink) 7%, transparent);
+}
+.h-fig__bar {
+  display: flex; align-items: center; gap: 10px; height: 28px; padding-inline: 10px; overflow: hidden;
+  border-bottom: 0.5px solid var(--s1-rule-strong); color: var(--s1-ink-2);
+  font: 400 10.5px/1 var(--s1-font-mono); letter-spacing: 0.04em; white-space: nowrap;
+}
+.h-fig__dots { width: 26px; height: 6px; flex: none; background: radial-gradient(circle 3px at 3px 3px, var(--s1-ink-3) 98%, transparent) 0 0 / 10px 6px repeat-x; }
+.h-fig__host { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+/* A capture's status and when, at the bar's right end: over the picture, where a reader looks first. */
+.h-fig__label { display: inline-flex; align-items: center; gap: 8px; flex: none; margin-left: auto; color: var(--s1-ink); }
+.h-fig__when { font: 500 10.5px/1 var(--s1-font-mono); letter-spacing: 0.1em; text-transform: uppercase; }
+/* The capture's shape is kept before it arrives (1600 x 1000), on the second paper. */
+.h-fig__view { position: relative; aspect-ratio: 16 / 10; overflow: hidden; background: var(--s1-paper-2); }
+.h-fig__img { display: block; width: 100%; height: 100%; object-fit: cover; }
+/* The reader's theme picks the capture; the other one is not displayed, so the browser never fetches it (both lazy). */
+.h-fig__img--dark { display: none; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .h-fig__img--light { display: none; }
+  :root:not([data-theme="light"]) .h-fig__img--dark { display: block; }
+}
+:root[data-theme="dark"] .h-fig__img--light { display: none; }
+:root[data-theme="dark"] .h-fig__img--dark { display: block; }
+
+/* The credit at the right edge under the plate, as a press photo's; the caption under it, its number in jade. */
+.h-fig__cap { display: grid; gap: 6px; margin-top: calc(var(--h-fig-plate) + 8px); }
+.h-fig__credit {
+  justify-self: end; max-width: 100%; color: var(--s1-ink-2); text-align: right; text-wrap: balance;
+  font: 500 10px/1.4 var(--s1-font-mono); letter-spacing: 0.1em; text-transform: uppercase;
+}
+.h-fig__credit-part { white-space: nowrap; }
+.h-fig__text { max-width: 62ch; font-size: 14px; line-height: 1.5; color: var(--s1-ink-2); text-wrap: pretty; }
+/* A capture's status on its caption (Coming: built, not released; Live: open today), before the figure's number. */
+.h-fig__status { margin-right: 10px; vertical-align: 1px; }
+.h-fig__no {
+  margin-right: 10px; color: var(--c-primary-strong); font: 500 11px/1 var(--s1-font-mono); letter-spacing: 0.12em; text-transform: uppercase;
+}
+@media (max-width: 639px) {
+  .h-fig { --h-fig-plate: 8px; }
+  /* A capture with a telling part (shots.ts `focus`) shows it larger on a phone: scaled about that part, clipped by
+     the frame, which keeps its shape. */
+  .h-fig[data-focus] .h-fig__img { transform: scale(var(--h-fig-zoom)); transform-origin: var(--h-fig-origin); }
+}
+/* A small figure (today's list under Bots) shows its telling part at every width. */
+.h-fig--close .h-fig__img { transform: scale(var(--h-fig-zoom)); transform-origin: var(--h-fig-origin); }
+
+/* What is not open yet: the frame dashed, the view hatched, no picture; a ring and the words in the middle. */
+.h-fig__frame.is-pending { border-style: dashed; border-color: var(--s1-ink-3); box-shadow: none; background: transparent; }
+.h-fig__frame.is-pending .h-fig__bar { border-bottom-style: dashed; border-bottom-color: var(--s1-ink-3); }
+.h-fig__frame.is-pending .h-fig__view {
+  display: grid; place-items: center; background: repeating-linear-gradient(-45deg, transparent 0 9px, color-mix(in srgb, var(--s1-ink) 9%, transparent) 9px 10px);
+}
+.h-fig__pending {
+  display: grid; justify-items: center; gap: 8px; padding: 12px 16px; background: var(--s1-paper); text-align: center;
+  border: 0.5px dashed var(--s1-ink-3);
+}
+.h-fig__pending-ring { width: 18px; height: 18px; border: 1.5px dashed var(--s1-ink-2); border-radius: 50%; }
+.h-fig__pending-label { font: 500 11px/1.3 var(--s1-font-mono); letter-spacing: 0.12em; text-transform: uppercase; color: var(--s1-ink); }
+.h-fig__pending-note { max-width: 24ch; font-size: 13px; line-height: 1.4; color: var(--s1-ink-2); }
+
+/* A figure beside its section's points: from 1024 px the picture takes the wider column, at the left or (flip) the
+   right; the points are numbered under a rule in the ink, as a feature's list runs beside its picture. */
+.h-spread { display: grid; grid-template-columns: minmax(0, 1fr); gap: 40px 64px; align-items: start; }
+@media (min-width: 1024px) {
+  .h-spread { grid-template-columns: minmax(0, 1.32fr) minmax(0, 1fr); }
+  .h-spread--flip { grid-template-columns: minmax(0, 1fr) minmax(0, 1.32fr); }
+  .h-spread--flip > .h-fig { order: 2; }
+  /* The lead picture of a section, a step wider than its points. */
+  .h-spread--lead { grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); column-gap: 44px; }
+}
+@media (min-width: 1200px) {
+  .h-spread--lead { grid-template-columns: minmax(0, 1.62fr) minmax(0, 1fr); column-gap: 56px; }
+}
+.h-spread__copy { display: grid; align-content: start; gap: 26px; min-width: 0; }
+.h-spread__points { border-top: 1px solid var(--s1-ink); }
+.h-spread__points li {
+  display: grid; grid-template-columns: 2.6em minmax(0, 1fr); column-gap: 6px; row-gap: 6px; padding-block: 16px 18px;
+  border-bottom: 0.5px solid var(--s1-rule-strong);
+}
+.h-spread__n { grid-row: span 2; padding-top: 6px; font: 500 11px/1.3 var(--s1-font-mono); letter-spacing: 0.1em; color: var(--c-primary-strong); }
+.h-spread__title { font: 400 1.4rem/1.15 var(--s1-font-display); letter-spacing: -0.005em; color: var(--s1-ink); }
+.h-spread__points .h-body { grid-column: 2; }
+/* A point that is a sentence alone, in the ink, a step larger. */
+.h-spread__line { grid-column: 2; font-size: 16.5px; line-height: 1.5; color: var(--s1-ink); text-wrap: pretty; }
+.h-spread__points li:has(> .h-spread__line) .h-spread__n { grid-row: auto; padding-top: 4px; }
+
+/* Aha's apps as a page of a paper. A rule in the ink over the page; the lead story across it, its picture at the left
+   and its words beside it in a larger hand, the first letter dropped; under it the others two by two, a column rule
+   between the two, a hairline under each row. One column on a phone, each story its picture then its words. */
+.h-stories { display: grid; grid-template-columns: minmax(0, 1fr); border-top: 1px solid var(--s1-ink); }
+.h-story { display: grid; align-content: start; gap: 22px; min-width: 0; padding-block: 30px 34px; border-bottom: 0.5px solid var(--s1-rule-strong); }
+.h-story__words { display: grid; justify-items: start; align-content: start; gap: 10px; min-width: 0; }
+.h-story__title { font: 400 clamp(1.6rem, 1.3rem + 0.8vw, 2rem)/1.08 var(--s1-font-display); letter-spacing: -0.008em; color: var(--s1-ink); }
+.h-story__body { max-width: 52ch; font-size: 15.5px; line-height: 1.6; color: var(--s1-ink-2); text-wrap: pretty; }
+.h-story__words .h-more { margin-top: 6px; }
+.h-story--lead .h-story__title { font-size: clamp(2.1rem, 1.5rem + 1.8vw, 3.2rem); line-height: 1; }
+.h-story--lead .h-story__body { font: 400 clamp(1.15rem, 1rem + 0.45vw, 1.4rem)/1.42 var(--s1-font-display); color: var(--s1-ink); }
+.h-story--lead .h-story__body::first-letter { float: left; margin: 0.05em 0.08em 0 0; font-size: 3.3em; line-height: 0.8; color: var(--c-primary-strong); }
+@media (min-width: 900px) {
+  .h-stories { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .h-story--lead { grid-column: 1 / -1; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); column-gap: 52px; padding-block: 36px 40px; }
+  .h-story--lead .h-story__words { padding-top: 34px; }
+  .h-story:not(.h-story--lead):nth-child(even) { padding-right: 36px; box-shadow: inset -0.5px 0 0 var(--s1-rule-strong); }
+  .h-story:not(.h-story--lead):nth-child(odd) { padding-left: 36px; }
+}
+
+/* ------------------------------------------------------------------ product pages */
+
+/* Two columns of a band (agents: built in, isolation). */
+.h-two { display: grid; grid-template-columns: minmax(0, 1fr); gap: 48px 72px; }
+@media (min-width: 1024px) { .h-two { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.h-two__col { display: grid; align-content: start; justify-items: start; gap: 18px; min-width: 0; }
+.h-two__col .h-eyebrow { margin-bottom: 0; }
+.h-two__col .h-lines { width: 100%; margin-top: 6px; }
+.h-two__title { font-size: clamp(1.9rem, 1.4rem + 1.4vw, 2.75rem); }
+
+
+/* Aha's tiles (the Aha page's picture). */
+.h-tiles__grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+@media (min-width: 480px) { .h-tiles__grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+.h-tiles__grid li {
+  display: grid; align-content: start; gap: 14px; min-height: 120px; padding: 18px;
+  box-shadow: inset -0.5px 0 0 var(--s1-rule), inset 0 -0.5px 0 var(--s1-rule); font-size: 14.5px; font-weight: 550; line-height: 1.35;
+}
+.h-tiles__icon { width: 22px; height: 22px; color: var(--c-primary); }
+
+/* The base URL with Copy (AI models). */
+.h-endpoint {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; padding: 10px 10px 10px 16px;
+  border: 0.5px solid var(--s1-rule-strong); background: var(--c-surface-raised);
+}
+.h-endpoint__label { font: 500 10.5px/1.3 var(--s1-font-mono); letter-spacing: 0.12em; text-transform: uppercase; color: var(--s1-ink-2); }
+.h-endpoint__url { min-width: 0; margin-right: auto; font: 600 14px/1.4 var(--s1-font-mono); color: var(--c-primary-strong); overflow-wrap: anywhere; }
+
+/* The code examples (AI models): the kit's tabs on a night slab. */
+.h-snippets .s1-tabs__list { padding-inline: 6px; border-bottom-width: 0.5px; border-bottom-color: var(--s1-rule); }
+.h-snippets .s1-tabs__tab[aria-selected="true"] { box-shadow: inset 0 -3px 0 var(--c-primary); }
+.h-snippets .s1-tabs__panel { padding-top: 0; }
+.h-snippets__file {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 10px 0 18px;
+  font: 400 12px/1.4 var(--s1-font-mono); color: var(--s1-ink-2);
+}
+.h-snippets pre { margin: 0; padding: 12px 0 14px; overflow-x: auto; scrollbar-width: thin; color-scheme: dark; font: 400 13px/1.75 var(--s1-font-mono); color: var(--s1-ink); }
+.h-snippets pre:focus-visible { outline: 2px solid var(--c-primary); outline-offset: -3px; }
+.h-snippets pre code { display: block; width: max-content; min-width: 100%; }
+.h-snippets__line { display: block; padding-inline: 18px; white-space: pre; }
+.h-snippets__line.is-key { background: color-mix(in srgb, var(--c-primary) 14%, transparent); box-shadow: inset 2px 0 0 var(--c-primary); }
+.h-snippets mark { background: none; color: var(--c-primary); font-weight: 600; }
+.h-snippets__note { padding: 12px 18px 16px; border-top: 0.5px dashed var(--s1-rule-strong); font-size: 13.5px; line-height: 1.55; color: var(--s1-ink-2); }
+@media (max-width: 479px) { .h-snippets pre { font-size: 12px; } .h-snippets__line { padding-inline: 14px; } }
+
+/* The API styles (AI models). */
+.h-apis { position: relative; display: grid; grid-template-columns: minmax(0, 1fr); border: 0.5px solid var(--s1-rule-strong); background: var(--c-surface-raised); }
+.h-apis::after { content: ""; position: absolute; inset: -6px; pointer-events: none; background: var(--s1-corners); color: var(--s1-ink); }
+@media (min-width: 640px) { .h-apis { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (min-width: 1024px) { .h-apis { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+.h-apis li { display: grid; gap: 8px; min-width: 0; padding: 22px 24px; box-shadow: -1px 0 0 var(--s1-rule), 0 -1px 0 var(--s1-rule); }
+.h-apis__name { font: 400 1.45rem/1.15 var(--s1-font-display); }
+.h-apis code { font: 500 13px/1.4 var(--s1-font-mono); color: var(--c-primary-strong); overflow-wrap: anywhere; }
+/* Proper names (cURL, Node.js) keep their case. */
+.h-snippets .s1-tabs__tab { text-transform: none; letter-spacing: 0.02em; font-size: 12.5px; }
+
+/* ------------------------------------------------------------------ supabase, pricing, help, build, status */
+
+.h-visually-hidden {
+  position: absolute !important; width: 1px; height: 1px; overflow: hidden;
+  clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap;
+}
+
+/* The same paths, and what comes on top (Supabase's picture). */
+.h-paths__list { padding: 6px 18px; }
+.h-paths__list li {
+  display: flex; flex-wrap: wrap; justify-content: space-between; gap: 6px 16px; padding-block: 11px;
+  border-bottom: 0.5px solid var(--s1-rule);
+}
+.h-paths__list code { font: 500 14px/1.4 var(--s1-font-mono); color: var(--c-primary); }
+.h-paths__list span { font-size: 13.5px; color: var(--s1-ink-2); }
+.h-paths__plus { padding: 8px 18px 18px; }
+.h-paths__plus > p { margin-bottom: 4px; font: 500 11px/1.4 var(--s1-font-mono); letter-spacing: 0.12em; text-transform: uppercase; color: var(--s1-ink-2); }
+.h-paths__plus li { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 6px 16px; padding-block: 9px; font-size: 14.5px; }
+
+/* Tables (the comparison, the price units): a framed table; under 768 px each row is a card, cells labelled. */
+.h-table {
+  position: relative; width: 100%; border-collapse: collapse; border: 0.5px solid var(--s1-rule-strong); background: var(--c-surface-raised);
+  font-size: 15px; line-height: 1.5;
+}
+.h-table th, .h-table td { padding: 15px 22px; text-align: left; vertical-align: top; border-bottom: 0.5px solid var(--s1-rule); }
+.h-table thead th {
+  background: var(--s1-paper-2); border-bottom: 1px solid var(--s1-rule-strong); color: var(--s1-ink-2);
+  font: 500 11px/1.3 var(--s1-font-mono); letter-spacing: 0.12em; text-transform: uppercase;
+}
+.h-table tbody th { font-weight: 600; color: var(--s1-ink); }
+.h-table td { color: var(--s1-ink-2); }
+.h-table__group th {
+  padding-top: 22px; padding-bottom: 10px; color: var(--c-primary-strong);
+  font: 500 11.5px/1.3 var(--s1-font-mono); letter-spacing: 0.14em; text-transform: uppercase;
+}
+.h-table__us { display: grid; justify-items: start; gap: 6px; color: var(--s1-ink); }
+.h-table--compare th[scope="row"] { width: 30%; }
+.h-table--compare .h-table__them { width: 28%; }
+.h-table--price th[scope="row"] { width: 24%; }
+.h-table--price td:last-child { width: 16%; }
+@media (max-width: 767px) {
+  .h-table, .h-table tbody, .h-table tr, .h-table th, .h-table td { display: block; width: auto !important; }
+  .h-table thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+  .h-table tr { padding: 14px 18px; border-bottom: 0.5px solid var(--s1-rule); }
+  .h-table tr.h-table__group { padding: 20px 18px 6px; }
+  .h-table th, .h-table td { padding: 0; border: 0; }
+  .h-table td { margin-top: 8px; }
+  .h-table td[data-label]::before {
+    content: attr(data-label); display: block; margin-bottom: 3px; color: var(--s1-ink-2);
+    font: 500 10.5px/1.3 var(--s1-font-mono); letter-spacing: 0.12em; text-transform: uppercase;
+  }
+}
+
+.h-client { max-width: 640px; margin-top: 32px; }
+
+/* A project's layers (the build page's picture). */
+.h-layers__list { display: grid; gap: 8px; padding: 16px; }
+.h-layers__list li {
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 16px; padding: 12px 14px;
+  border: 0.5px solid var(--s1-rule-strong); background: var(--s1-paper); font-size: 14.5px; font-weight: 550;
+}
+.h-layers__list li.is-coming { border-style: dashed; border-color: var(--s1-ink-3); background: transparent; }
+.h-layers__list li.is-live { border-color: var(--c-primary); box-shadow: inset 3px 0 0 var(--c-primary); }
+
+/* A ticket's way (the help page's picture). */
+.h-flow__list { padding: 10px 20px 4px; }
+.h-flow__list li { position: relative; display: grid; grid-template-columns: 18px minmax(0, 1fr); gap: 14px; padding-block: 14px; font-size: 14.5px; line-height: 1.5; }
+.h-flow__list li:not(:last-child)::after { content: ""; position: absolute; left: 5px; top: 34px; bottom: -8px; border-left: 1px dashed var(--s1-rule-strong); }
+.h-flow__dot { width: 12px; height: 12px; margin-top: 5px; border: 2px solid var(--c-primary); border-radius: 50%; box-sizing: border-box; }
+.h-flow__beat { padding: 0 20px 16px; height: 48px; }
+
+/* The guides (help). */
+.h-guides { display: grid; grid-template-columns: minmax(0, 1fr); gap: 32px; }
+@media (min-width: 640px) { .h-guides { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (min-width: 1024px) { .h-guides { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+.h-guides__group { display: grid; align-content: start; gap: 12px; min-width: 0; }
+.h-guides__head { font: 500 11.5px/1.3 var(--s1-font-mono); letter-spacing: 0.14em; text-transform: uppercase; color: var(--c-primary-strong); }
+.h-guides__group ul { border-top: 1px solid var(--s1-rule-strong); }
+.h-guides__link {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-block: 12px;
+  border-bottom: 0.5px solid var(--s1-rule); text-decoration: none; color: var(--s1-ink); font-size: 15.5px; font-weight: 550;
+}
+.h-guides__link:hover { color: var(--c-primary-strong); }
+.h-guides__arrow { width: 15px; height: 15px; flex: none; color: var(--s1-ink-3); }
+.h-guides__link:hover .h-guides__arrow { color: var(--c-primary); }
+.h-legal { display: flex; flex-wrap: wrap; gap: 14px 28px; }
+
+/* One balance (the pricing page's picture). */
+.h-balance__body { display: grid; gap: 16px; padding: 20px 20px 24px; }
+.h-balance__figure { font: 400 clamp(4rem, 2.6rem + 4vw, 6.5rem)/0.9 var(--s1-font-display); color: var(--c-money); }
+.h-balance__figure span { color: var(--s1-ink-2); }
+.h-balance__body ul { display: grid; gap: 4px; }
+.h-balance__body li { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: center; gap: 16px; font-size: 14px; }
+.h-balance__beat { height: 22px; }
+.h-paused {
+  margin-top: 20px; padding: 10px 14px; border-left: 3px solid var(--s1-warn); background: var(--s1-warn-tint);
+  font-size: 14.5px; color: var(--s1-ink);
+}
+
+/* The status board: a night slab, each part with its state in words, a shape and its hue. */
+.h-status-section { padding-top: clamp(40px, 5vw, 64px); }
+.h-status { padding: clamp(18px, 3vw, 34px); }
+.h-status__head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px 24px; }
+.h-status__title { font: 400 clamp(1.8rem, 1.4rem + 1.2vw, 2.5rem)/1.05 var(--s1-font-display); }
+.h-status__overall { display: inline-flex; align-items: center; gap: 10px; font-size: 15px; font-weight: 600; }
+.h-status__dot { width: 10px; height: 10px; flex: none; border-radius: 50%; background: var(--s1-ink-3); }
+.h-status__overall.is-ok .h-status__dot { background: var(--s1-ok); box-shadow: 0 0 0 4px color-mix(in srgb, var(--s1-ok) 22%, transparent); }
+.h-status__overall.is-problem .h-status__dot { background: var(--s1-bad); box-shadow: 0 0 0 4px color-mix(in srgb, var(--s1-bad) 22%, transparent); }
+.h-status__overall.is-unknown .h-status__dot { background: var(--s1-warn); }
+.h-status__beat { margin-block: 14px 6px; height: 36px; }
+.h-status__row {
+  display: grid; grid-template-columns: minmax(0, 1fr); gap: 10px 32px; align-items: start; padding-block: 18px;
+  border-top: 0.5px solid var(--s1-rule);
+}
+@media (min-width: 768px) { .h-status__row { grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); } }
+.h-status__name { display: grid; grid-template-columns: 14px minmax(0, 1fr); gap: 14px; align-items: start; }
+.h-status__name h3 { font: 400 1.4rem/1.15 var(--s1-font-display); }
+.h-status__name p { margin-top: 4px; font-size: 14px; line-height: 1.5; color: var(--s1-ink-2); }
+.h-status__state-dot { width: 12px; height: 12px; margin-top: 7px; box-sizing: border-box; border-radius: 50%; background: var(--s1-ink-3); }
+.h-status__state-dot.is-operational { background: var(--s1-ok); }
+.h-status__state-dot.is-problem { background: var(--s1-bad); }
+.h-status__state-dot.is-unknown { background: var(--s1-warn); }
+.h-status__state-dot.is-checking { background: transparent; border: 2px solid var(--s1-ink-3); }
+.h-status__state-dot.is-unchecked { background: transparent; border: 1.5px dashed var(--s1-ink-2); }
+.h-status__state { display: grid; justify-items: start; gap: 6px; }
+@media (max-width: 767px) { .h-status__state { padding-left: 28px; } }
+.h-status__label {
+  padding: 3px 9px; border: 1px solid var(--s1-rule-strong); border-radius: 2px; color: var(--s1-ink);
+  font: 500 11px/1.3 var(--s1-font-mono); letter-spacing: 0.08em; text-transform: uppercase;
+}
+.h-status__label.is-operational { color: var(--s1-ok); background: var(--s1-ok-tint); border-color: color-mix(in srgb, var(--s1-ok) 50%, transparent); }
+.h-status__label.is-problem { color: var(--s1-bad); background: var(--s1-bad-tint); border-color: color-mix(in srgb, var(--s1-bad) 50%, transparent); }
+.h-status__label.is-unknown { color: var(--s1-warn); background: var(--s1-warn-tint); border-color: color-mix(in srgb, var(--s1-warn) 50%, transparent); }
+.h-status__label.is-unchecked { border-style: dashed; color: var(--s1-ink-2); }
+.h-status__source { font-size: 13.5px; line-height: 1.5; color: var(--s1-ink-2); }
+
+/* ------------------------------------------------------------------ the price map (/ and /pricing/, page/PriceMap.tsx) */
+
+/* The @s1lin MetroMaps: by the token (zones, interchanges), then by the piece; ghost lines while the prices come. */
+/* On the homepage, straight after the models' section (its bottom air is the gap above the map) and before the
+   backend's rails (their top air is the gap under it). */
+.h-pricemap--home { padding-block: clamp(8px, 2vw, 24px) clamp(8px, 2vw, 24px); }
+/* On a phone the map runs down the page and the names and prices stand in one column across the fare zones: a zone's
+   dashed edge would strike through a price, which then reads as an old one (2026-11-03, the homepage at 390 px). There
+   the shading alone marks the zones. */
+.h-pricemap__map[data-layout="down"] .s1-metro__zone-edge { display: none; }
+/* There a zone's name runs up its band, placed by the kit's width estimate, which leaves out letter-spacing: spaced,
+   "ZONE 1 · UNDER $0.50" overran its band and lost its last characters (2026-11-03). Unspaced, as in Chinese. */
+.h-pricemap__map[data-layout="down"] .s1-metro__zone-name { letter-spacing: 0; }
+/* Chinese breaks the title at its spaces and its comma, never inside 一团乱 (and anywhere rather than overflow). */
+.h-pricemap .h-h2:lang(zh) { word-break: keep-all; overflow-wrap: anywhere; }
+.h-pricemap__map { margin-top: 4px; }
+.h-pricemap__map .s1-metro__caption { font-size: 14px; }
+.h-pricemap__map .s1-empty { min-height: 360px; align-content: center; }
+.h-pricemap__more { margin: 16px 0 0; }
+.h-pricemap__piece { margin-top: clamp(36px, 5vw, 56px); }
+.h-pricemap__lede { margin: 6px 0 0; max-width: 62ch; }
+.h-pricemap__piece .h-pricemap__map { margin-top: 18px; }

@@ -1,0 +1,38 @@
+/* VendorMark: a logo in the vendor's hue on a 12 % tile of it. Hues come from --c-vendor-* (src/styles/theme.css). */
+.c-vendor {
+  --vm-hue: var(--s1-ink-2);
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  width: var(--vm-size, 22px);
+  height: var(--vm-size, 22px);
+  border-radius: 5px;
+  color: var(--vm-hue);
+  background: color-mix(in srgb, var(--vm-hue) 12%, var(--s1-paper));
+  font: 600 calc(var(--vm-size, 22px) * 0.55) / 1 var(--s1-font-display);
+  vertical-align: middle;
+}
+.c-vendor svg { width: 70%; height: 70%; fill: currentColor; display: block; }
+.c-vendor[data-vendor="composite"] svg { fill: none; }
+.c-vendor--bare { background: none; width: auto; height: auto; }
+.c-vendor--bare svg { width: var(--vm-size, 22px); height: var(--vm-size, 22px); }
+.c-vendor[data-letter] { background: var(--s1-paper-2); color: var(--s1-ink-2); }
+
+.c-vendor[data-vendor="anthropic"] { --vm-hue: var(--c-vendor-anthropic, var(--s1-ink-2)); }
+.c-vendor[data-vendor="openai"] { --vm-hue: var(--c-vendor-openai, var(--s1-ink-2)); }
+.c-vendor[data-vendor="google"] { --vm-hue: var(--c-vendor-google, var(--s1-ink-2)); }
+.c-vendor[data-vendor="qwen"] { --vm-hue: var(--c-vendor-qwen, var(--s1-ink-2)); }
+.c-vendor[data-vendor="deepseek"] { --vm-hue: var(--c-vendor-deepseek, var(--s1-ink-2)); }
+.c-vendor[data-vendor="zhipu"] { --vm-hue: var(--c-vendor-zhipu, var(--s1-ink-2)); }
+.c-vendor[data-vendor="kimi"] { --vm-hue: var(--c-vendor-kimi, var(--s1-ink-2)); }
+.c-vendor[data-vendor="minimax"] { --vm-hue: var(--c-vendor-minimax, var(--s1-ink-2)); }
+.c-vendor[data-vendor="xai"] { --vm-hue: var(--c-vendor-xai, var(--s1-ink-2)); }
+.c-vendor[data-vendor="mistral"] { --vm-hue: var(--c-vendor-mistral, var(--s1-ink-2)); }
+.c-vendor[data-vendor="meta"] { --vm-hue: var(--c-vendor-meta, var(--s1-ink-2)); }
+.c-vendor[data-vendor="doubao"] { --vm-hue: var(--c-vendor-doubao, var(--s1-ink-2)); }
+.c-vendor[data-vendor="cohere"] { --vm-hue: var(--c-vendor-cohere, var(--s1-ink-2)); }
+.c-vendor[data-vendor="composite"] { --vm-hue: var(--c-primary, var(--s1-ink-2)); }
+
+@media (forced-colors: active) {
+  .c-vendor { color: CanvasText; background: Canvas; border: 1px solid CanvasText; }
+}

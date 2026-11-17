@@ -1,0 +1,627 @@
+{
+  "hero": {
+    "titleA": {
+      "en": "Galaxies of Intelligence.",
+      "zh": "星汉灿烂，"
+    },
+    "titleB": {
+      "en": "Born from Within.",
+      "zh": "若出其里。"
+    },
+    "claim": {
+      "en": "One key for the models. A team of bots for the work.",
+      "zh": "一把密钥通模型，一队机器人干活。"
+    },
+    "line": {
+      "en": "One kind of key reaches the models. In Aha, bots run your routines while you are away, and Aha Code, now in early access, works in the folder on your own Windows computer.",
+      "zh": "一种密钥接通各家模型。在 Aha 里，机器人在你不在时按例行任务干活；抢先体验中的 Aha 代码，在你自己 Windows 电脑的文件夹里写代码。"
+    },
+    "primary": {
+      "label": {
+        "en": "Open Aha",
+        "zh": "打开 Aha"
+      },
+      "href": "https://aha.tokensbeat.com"
+    },
+    "secondary": {
+      "label": {
+        "en": "Get an API key",
+        "zh": "获取 API 密钥"
+      },
+      "href": "https://console.tokensbeat.com/keys"
+    }
+  },
+  "news": {
+    "label": {
+      "en": "New this month",
+      "zh": "本月新增"
+    },
+    "items": [
+      {
+        "id": "bots",
+        "date": {
+          "en": "15 Nov",
+          "zh": "11 月 15 日"
+        },
+        "name": {
+          "en": "Bots",
+          "zh": "机器人"
+        },
+        "line": {
+          "en": "Working bots in Aha, on for every account.",
+          "zh": "Aha 里干活的机器人，已对所有账户开放。"
+        },
+        "status": "live",
+        "href": "#home-bots"
+      },
+      {
+        "id": "code",
+        "date": {
+          "en": "16 Nov",
+          "zh": "11 月 16 日"
+        },
+        "name": {
+          "en": "Aha Code",
+          "zh": "Aha 代码"
+        },
+        "line": {
+          "en": "A coding agent on your own computer, inside Aha for Windows 0.4.1.",
+          "zh": "在你自己电脑上写代码的 Agent，随 Aha Windows 版 0.4.1 提供。"
+        },
+        "status": "early",
+        "href": "#home-code"
+      },
+      {
+        "id": "keys",
+        "date": {
+          "en": "16 Nov",
+          "zh": "11 月 16 日"
+        },
+        "name": {
+          "en": "One kind of key",
+          "zh": "只有一种密钥"
+        },
+        "line": {
+          "en": "Every key works the same way. Nobody picks a plan or a route.",
+          "zh": "每把密钥都一样用，不用再选方案和线路。"
+        },
+        "status": "live",
+        "href": "#home-models"
+      }
+    ]
+  },
+  "bots": {
+    "eyebrow": {
+      "en": "Aha · Bots",
+      "zh": "Aha · 机器人"
+    },
+    "status": "live",
+    "title": {
+      "en": "Bots that work while you are away.",
+      "zh": "你不在的时候，机器人照常干活。"
+    },
+    "line": {
+      "en": "A bot is a job, not a character: a name, one line of what it does, the tools it may use and a share of your Aha key. Up to eight in an account.",
+      "zh": "一个机器人就是一份差事，不是一个角色：名字、一句话的分工、能用的工具，以及分给它的 Aha 密钥额度。每个账户最多八个。"
+    },
+    "points": [
+      {
+        "id": "sentence",
+        "title": {
+          "en": "Made from one sentence",
+          "zh": "一句话建一个"
+        },
+        "body": {
+          "en": "Say what you need done and Aha proposes the bot. Nothing exists until you press Start. Or take one of five starters, from Researcher to Chief of staff.",
+          "zh": "说出要办的事，Aha 给出方案；你确认之前，什么都不会建出来。也可以从五个现成的里挑一个，从研究员到统筹。"
+        }
+      },
+      {
+        "id": "routines",
+        "title": {
+          "en": "Routines",
+          "zh": "例行任务"
+        },
+        "body": {
+          "en": "A bot runs by itself on a schedule, in your time zone. A run that finds nothing new stays quiet. At most 24 such runs in any 24 hours, across all your bots.",
+          "zh": "机器人按日程自己运行，用你的时区。没有新东西的一次运行不会打扰你。所有机器人合计，每 24 小时最多这样运行 24 次。"
+        }
+      },
+      {
+        "id": "asks",
+        "title": {
+          "en": "It asks, then waits",
+          "zh": "先问你，再等你"
+        },
+        "body": {
+          "en": "When a step is yours to decide, the run parks and waits. Answer from any device. What you approved runs once, exactly as asked.",
+          "zh": "轮到你拿主意时，这次运行会停下来等你。在任何设备上都能回复；你同意的事只做一次，照原样做。"
+        }
+      },
+      {
+        "id": "team",
+        "title": {
+          "en": "One room for the team",
+          "zh": "一间屋子，全队都在"
+        },
+        "body": {
+          "en": "Team is one chat with you and your bots. Name a bot, or leave it to Aha to pick who answers.",
+          "zh": "「团队」是你和所有机器人的同一个对话。点名让谁来答，或者交给 Aha 挑。"
+        }
+      }
+    ],
+    "wakes": {
+      "title": {
+        "en": "What wakes a bot",
+        "zh": "什么能叫醒机器人"
+      },
+      "rows": [
+        {
+          "id": "routine",
+          "what": {
+            "en": "A routine",
+            "zh": "例行任务"
+          },
+          "how": {
+            "en": "Daily, monthly, every 30 minutes to 7 days, or once",
+            "zh": "每天、每月、每 30 分钟到 7 天一次，或只一次"
+          }
+        },
+        {
+          "id": "feed",
+          "what": {
+            "en": "A feed or a page",
+            "zh": "订阅源或网页"
+          },
+          "how": {
+            "en": "Looked at every 30 minutes at most",
+            "zh": "最多每 30 分钟查看一次"
+          }
+        },
+        {
+          "id": "address",
+          "what": {
+            "en": "A request to its address",
+            "zh": "发到它地址的请求"
+          },
+          "how": {
+            "en": "A private address with a secret, for your own scripts",
+            "zh": "带密钥的专属地址，给你自己的脚本用"
+          }
+        },
+        {
+          "id": "you",
+          "what": {
+            "en": "You",
+            "zh": "你"
+          },
+          "how": {
+            "en": "A message in its chat, or Run now",
+            "zh": "在它的对话里说一句，或点「现在运行」"
+          }
+        }
+      ]
+    },
+    "bounds": {
+      "title": {
+        "en": "What keeps it in bounds",
+        "zh": "它越不了的界"
+      },
+      "lines": [
+        {
+          "en": "Each bot gets a share of your key's 30-day allowance. When it reaches that share, it pauses and asks you.",
+          "zh": "每个机器人占你密钥 30 天额度的一份，用到份额就暂停，来问你。"
+        },
+        {
+          "en": "It uses only the tools on its list. Commands run in a sandbox with no network.",
+          "zh": "它只用清单上的工具。命令在没有网络的沙盒里运行。"
+        },
+        {
+          "en": "Memory has a switch on every bot. What you tell Aha to forget, every bot forgets.",
+          "zh": "每个机器人都有记忆开关。你让 Aha 忘掉的事，所有机器人一起忘。"
+        }
+      ]
+    },
+    "link": {
+      "label": {
+        "en": "Open Bots in Aha",
+        "zh": "在 Aha 里打开机器人"
+      },
+      "href": "https://aha.tokensbeat.com/#/bots"
+    }
+  },
+  "code": {
+    "eyebrow": {
+      "en": "Aha · Aha Code",
+      "zh": "Aha · Aha 代码"
+    },
+    "status": "early",
+    "title": {
+      "en": "Aha Code works in the folder on your own computer.",
+      "zh": "Aha 代码，在你的电脑上写代码。"
+    },
+    "line": {
+      "en": "A coding agent inside Aha for Windows. Open a folder, say what should change, and read the work as it happens.",
+      "zh": "Aha Windows 版里写代码的 Agent。打开一个文件夹，说清要改什么，边做边看。"
+    },
+    "points": [
+      {
+        "id": "local",
+        "body": {
+          "en": "Your repo stays on your computer. Aha Code runs in a sandbox that the app starts.",
+          "zh": "代码库留在你的电脑上。Aha 代码运行在应用启动的沙盒里。"
+        }
+      },
+      {
+        "id": "asks",
+        "body": {
+          "en": "It asks before a command runs: allow it once, or always in that project. Switch to Auto when you want.",
+          "zh": "运行命令前先问你：只允许这一次，或在这个项目里一直允许。想省事时切到自动。"
+        }
+      },
+      {
+        "id": "rewind",
+        "body": {
+          "en": "Every message is a checkpoint. Rewind takes the conversation and the files back to before it, and never touches your Git history.",
+          "zh": "每条消息都是一个存档点。回退会把对话和文件带回那条消息之前，不碰你的 Git 历史。"
+        }
+      },
+      {
+        "id": "models",
+        "body": {
+          "en": "Qwen 3.8 is the default. You can switch to another model your TokensBeat keys reach.",
+          "zh": "默认用 Qwen 3.8，也可以换成你的 TokensBeat 密钥能用的其他模型。"
+        }
+      }
+    ],
+    "note": {
+      "en": "Early access: Aha Code shows for the accounts TokensBeat has turned it on for. Aha for Windows 0.4.1 runs on Windows 10 and 11 (x64).",
+      "zh": "抢先体验：只有 TokensBeat 已为其开启的账户能看到 Aha 代码。Aha Windows 版 0.4.1 支持 Windows 10 和 11（x64）。"
+    },
+    "primary": {
+      "label": {
+        "en": "Download Aha for Windows",
+        "zh": "下载 Aha Windows 版"
+      },
+      "href": "https://aha.tokensbeat.com/desktop/download/windows"
+    },
+    "secondary": {
+      "label": {
+        "en": "Ask for early access",
+        "zh": "申请抢先体验"
+      },
+      "href": "ticket:Aha Code early access"
+    }
+  },
+  "models": {
+    "eyebrow": {
+      "en": "AI models",
+      "zh": "AI 模型"
+    },
+    "status": "live",
+    "title": {
+      "en": "One kind of key reaches the models.",
+      "zh": "一种密钥，接通各家模型。"
+    },
+    "lines": [
+      {
+        "en": "Every key works the same way. Nobody picks a plan or a route.",
+        "zh": "每把密钥都一样用，不用选方案，也不用选线路。"
+      },
+      {
+        "en": "The gateway picks the route for each request. Where a discounted route serves the model, it goes there first.",
+        "zh": "网关为每个请求挑线路：有折扣线路能用这个模型时，先走折扣线路。"
+      },
+      {
+        "en": "The gateway answers in the OpenAI, Anthropic and Gemini API shapes, and makes images.",
+        "zh": "网关支持 OpenAI、Anthropic 和 Gemini 三种接口，也能生成图片。"
+      },
+      {
+        "en": "Prices are public. The map below is live.",
+        "zh": "价格公开，下面这张图是实时的。"
+      }
+    ],
+    "primary": {
+      "label": {
+        "en": "Get an API key",
+        "zh": "获取 API 密钥"
+      },
+      "href": "https://console.tokensbeat.com/keys"
+    },
+    "secondary": {
+      "label": {
+        "en": "Read the quickstart",
+        "zh": "看快速开始"
+      },
+      "href": "/docs"
+    },
+    "page": {
+      "label": {
+        "en": "How the gateway works",
+        "zh": "网关怎么工作"
+      },
+      "href": "/ai-models"
+    }
+  },
+  "sections": [
+    {
+      "id": "aha",
+      "eyebrow": {
+        "en": "Also in Aha",
+        "zh": "Aha 里还有"
+      },
+      "title": {
+        "en": "More that is open today.",
+        "zh": "今天就能用的，还有这些。"
+      },
+      "more": {
+        "label": {
+          "en": "Everything Aha does",
+          "zh": "Aha 能做的全部"
+        },
+        "href": "/aha"
+      },
+      "items": [
+        {
+          "id": "latex",
+          "name": {
+            "en": "LaTeX",
+            "zh": "LaTeX"
+          },
+          "line": {
+            "en": "Write LaTeX with the PDF beside your source, compiled on the server.",
+            "zh": "写 LaTeX，PDF 就在源码旁边，在服务器上编译。"
+          },
+          "status": "live",
+          "href": "/aha"
+        },
+        {
+          "id": "news",
+          "name": {
+            "en": "TokensBeat News",
+            "zh": "TokensBeat 时报"
+          },
+          "line": {
+            "en": "Today's front page, a daily email at 07:00 Beijing time, and Ask Aha.",
+            "zh": "每日头版，北京时间 07:00 送到邮箱，还能问 Aha。"
+          },
+          "status": "live",
+          "href": "https://news.tokensbeat.com"
+        },
+        {
+          "id": "metro",
+          "name": {
+            "en": "Metro2Line",
+            "zh": "地铁线路图"
+          },
+          "line": {
+            "en": "A metro map of any city, drawn from OpenStreetMap.",
+            "zh": "任意城市的地铁线路图，取自 OpenStreetMap。"
+          },
+          "status": "live",
+          "href": "/aha"
+        },
+        {
+          "id": "aha-storage",
+          "name": {
+            "en": "Aha Storage",
+            "zh": "Aha 存储空间"
+          },
+          "line": {
+            "en": "500 MB free in every Aha account: one quota for your files, chats and documents.",
+            "zh": "每个 Aha 账户免费 500 MB，文件、对话和文档共用一个配额。"
+          },
+          "status": "live",
+          "href": "https://console.tokensbeat.com/plaza/storage"
+        }
+      ]
+    },
+    {
+      "id": "serve",
+      "eyebrow": {
+        "en": "Bedrock",
+        "zh": "基座"
+      },
+      "title": {
+        "en": "A backend for your app, opening in stages.",
+        "zh": "给你应用的后端，正在分批开放。"
+      },
+      "items": [
+        {
+          "id": "database",
+          "name": {
+            "en": "Database & Auth",
+            "zh": "数据库与认证"
+          },
+          "line": {
+            "en": "Dedicated Postgres with REST and auth for each project.",
+            "zh": "每个项目独享 Postgres，带 REST 和认证。"
+          },
+          "status": "early",
+          "href": "/database"
+        },
+        {
+          "id": "storage",
+          "name": {
+            "en": "Storage & Functions",
+            "zh": "存储与函数"
+          },
+          "line": {
+            "en": "Private storage, realtime, and Files for large uploads your agents can read.",
+            "zh": "私有存储与实时更新，另有 Files 承载大文件，供 Agent 读取。"
+          },
+          "status": "early",
+          "href": "/storage"
+        },
+        {
+          "id": "agents",
+          "name": {
+            "en": "Agents",
+            "zh": "Agent"
+          },
+          "line": {
+            "en": "A runtime that hosts your own agents. Aha is the first app on it.",
+            "zh": "托管你自己的 Agent 的运行时。Aha 是它上面的第一个应用。"
+          },
+          "status": "early",
+          "href": "/agents"
+        },
+        {
+          "id": "supabase",
+          "name": {
+            "en": "Supabase Move",
+            "zh": "Supabase 迁徙"
+          },
+          "line": {
+            "en": "The same API paths as Supabase, with models and agents beside them.",
+            "zh": "API 路径与 Supabase 相同，旁边就是模型和 Agent。"
+          },
+          "status": "coming",
+          "href": "/supabase"
+        }
+      ]
+    },
+    {
+      "id": "support",
+      "eyebrow": {
+        "en": "Vanguard",
+        "zh": "护航"
+      },
+      "title": {
+        "en": "People and tools while you build.",
+        "zh": "构建路上，有人也有工具。"
+      },
+      "items": [
+        {
+          "id": "workspace",
+          "name": {
+            "en": "Workspace",
+            "zh": "云端工作区"
+          },
+          "line": {
+            "en": "A private dev container over SSH, with Claude Code and Codex installed.",
+            "zh": "一台用 SSH 连接的私有开发容器，装好了 Claude Code 和 Codex。"
+          },
+          "status": "beta",
+          "href": "/workspace"
+        },
+        {
+          "id": "docs",
+          "name": {
+            "en": "Guides & Docs",
+            "zh": "文档与指南"
+          },
+          "line": {
+            "en": "Guides from the first request to production.",
+            "zh": "从第一个请求到上线的指南。"
+          },
+          "status": "live",
+          "href": "/help"
+        },
+        {
+          "id": "people",
+          "name": {
+            "en": "Human Support",
+            "zh": "真人支持"
+          },
+          "line": {
+            "en": "A person answers your ticket.",
+            "zh": "你的工单由人来回复。"
+          },
+          "status": "live",
+          "href": "/help"
+        },
+        {
+          "id": "build",
+          "name": {
+            "en": "Build with Us",
+            "zh": "与我们共建"
+          },
+          "line": {
+            "en": "Tell us what you are building. Early access opens by ticket.",
+            "zh": "告诉我们你在做什么。抢先体验通过工单开通。"
+          },
+          "status": "early",
+          "href": "/build"
+        }
+      ]
+    },
+    {
+      "id": "pricing",
+      "eyebrow": {
+        "en": "Pricing",
+        "zh": "计费"
+      },
+      "title": {
+        "en": "One balance. Pay for what you use.",
+        "zh": "一份余额，用多少扣多少。"
+      },
+      "line": {
+        "en": "Start from $5. One prepaid balance pays for models, Aha and its hosted services as you use them. No subscription.",
+        "zh": "5 美元起充。一份预付余额，模型、Aha 和它的托管服务都从里面按用量扣，没有订阅。"
+      }
+    }
+  ],
+  "faq": [
+    {
+      "q": {
+        "en": "What can I use today?",
+        "zh": "现在能用的有哪些？"
+      },
+      "a": {
+        "en": "The model gateway and Aha, with its bots, are live. Aha Code is in early access inside Aha for Windows. Workspaces are in beta. The backend for your app is in early access.",
+        "zh": "模型网关和 Aha（包括机器人）已上线。Aha 代码在 Aha Windows 版里抢先体验。云端工作区是 Beta。给你应用的后端是抢先体验。"
+      }
+    },
+    {
+      "q": {
+        "en": "What is a bot?",
+        "zh": "机器人是什么？"
+      },
+      "a": {
+        "en": "A job you give Aha: a name, what it does, the tools it may use and a share of your key. It runs on a routine or when something wakes it, and reports back.",
+        "zh": "你交给 Aha 的一份差事：名字、分工、能用的工具，以及密钥的一份份额。它按例行任务运行，或被叫醒时运行，做完向你汇报。"
+      }
+    },
+    {
+      "q": {
+        "en": "Who can use Aha Code?",
+        "zh": "谁能用 Aha 代码？"
+      },
+      "a": {
+        "en": "It is inside Aha for Windows 0.4.1 and shows for the accounts TokensBeat has turned it on for. Ask in a support ticket.",
+        "zh": "它在 Aha Windows 版 0.4.1 里，只有 TokensBeat 已为其开启的账户能看到。可以提工单申请。"
+      }
+    },
+    {
+      "q": {
+        "en": "How does billing work?",
+        "zh": "怎么计费？"
+      },
+      "a": {
+        "en": "Prepay into one balance from $5 by card or crypto, paying only for what you use.",
+        "zh": "预付到一份余额，5 美元起，可用银行卡或加密货币，用多少扣多少。"
+      }
+    }
+  ],
+  "closing": {
+    "title": {
+      "en": "Step onto the Bedrock. Build Your Universe.",
+      "zh": "踏上基石，构建你的宇宙。"
+    },
+    "button": {
+      "label": {
+        "en": "Open Aha",
+        "zh": "打开 Aha"
+      },
+      "href": "https://aha.tokensbeat.com"
+    },
+    "second": {
+      "label": {
+        "en": "Get an API key",
+        "zh": "获取 API 密钥"
+      },
+      "href": "https://console.tokensbeat.com/keys"
+    }
+  }
+}

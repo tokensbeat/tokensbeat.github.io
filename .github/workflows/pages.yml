@@ -1,0 +1,76 @@
+# Builds the site and publishes it on GitHub Pages:
+#   - on a push to main, and by hand (a run by hand of another branch builds and checks it, never publishes it);
+#   - every six hours, to refresh the status page's snapshot (status.json: the API's and Aha's health, probed when the
+#     site is published; /status/ calls it Unknown once it is 13 hours old).
+# The build job checks (typecheck, lint, tests, the public-text check), builds for SITE_ORIGIN with the live checks on
+# API_ORIGIN and the status probe off, checks the build (scripts/check-dist.mjs and the built-site tests), then probes
+# the status into dist/ and uploads it. Only the deploy job may write to Pages. No secrets.
+name: Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+  schedule:
+    - cron: "17 */6 * * *"
+
+permissions: {}
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+env:
+  # The site's public origin and the API its pages call. Pages say noindex unless SITE_ORIGIN is https://tokensbeat.com.
+  SITE_ORIGIN: https://tokensbeat.github.io
+  API_ORIGIN: https://api.tokensbeat.com
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      pages: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - name: Check (typecheck, lint, tests, no reseller named)
+        run: npm run check
+      - name: Build
+        env:
+          VITE_HOME_SITE_URL: ${{ env.SITE_ORIGIN }}
+          VITE_HOME_API_ORIGIN: ${{ env.API_ORIGIN }}
+          HOME_STATUS_PROBE: "0"
+        run: npm run build
+      - name: Check the build
+        run: |
+          npm run check:dist
+          npx vitest run src/seo/prerender.test.ts
+      - name: Probe the status into the build (status.json)
+        run: node scripts/status-snapshot.mjs --dist dist
+      - uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d # v6.0.0
+      - uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5.0.1

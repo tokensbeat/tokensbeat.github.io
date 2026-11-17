@@ -1,0 +1,185 @@
+/*
+ * TokensBeat's colours on the @s1lin parts. The kit is drawn in one ink and leaves its status tokens unset
+ * (src/components/s1lin/tokens.css); this layer gives them hues, adds the console's own (brand, money, vendors,
+ * charts) and moves the go button's shadow from red to the brand jade, so red means only "bad".
+ *
+ * Loaded after app.css (main.tsx) and unlayered, so it wins over the kit's tokens (@layer base) wherever both set
+ * one. Night follows tokens.css's selectors exactly: the system's dark scheme unless the root says light
+ * (data-theme, class or Kumo's data-mode); data-theme="dark", class="dark" or data-mode="dark" on any element;
+ * "light" inside a dark page comes back to paper (the payment QR codes do this).
+ *
+ * The rule for pages: colour only through these tokens, never a hex in a page stylesheet.
+ *   --s1-ok / --s1-warn / --s1-bad / --s1-info (+ -tint, --s1-on-status)  status
+ *   --c-primary, --c-primary-strong, --c-primary-tint                    the brand: go shadow, active, focus, selected
+ *   --c-money                                                            every $ the user pays or holds
+ *   --c-vendor-<id>                                                      a model maker (VendorMark, vendorHue())
+ *   --c-chart-1..5                                                       chart series
+ *   --c-surface-raised                                                   plates and dialogs above paper-2
+ * Colour is never the only signal: the kit's shapes (tick, triangle, cross, ring, hatch) stay.
+ *
+ * Contrast (WCAG 2.x; every figure here was measured): "paper / paper-2 / tint" after each text hue,
+ * where tint is the token's own -tint (status) or the 12 % VendorMark tile (vendors). Every text hue clears
+ * 4.5:1 on paper, paper-2 and its tint in both themes, except --c-primary on light paper-2 (4.42) and on its
+ * tint (4.11): use it for rules, shadows, rings and fills, and --c-primary-strong for jade words.
+ * Tints are fills, 1.17–1.29:1 from paper; words on a tint stay in the ink (ink 14.4+, ink-2 6.4+).
+ */
+
+/* ------------------------------------------------------------------ paper (light) */
+
+:root,
+:root [data-theme="light"],
+:root .light,
+:root [data-mode="light"] {
+  --s1-ok: #1d733b;          /* 5.44 / 4.98 / 4.63 */
+  --s1-ok-tint: #dce7de;
+  --s1-warn: #925600;        /* 5.46 / 5.00 / 4.64 */
+  --s1-warn-tint: #ebe3d7;
+  --s1-bad: #c0261b;         /* 5.49 / 5.02 / 4.54 */
+  --s1-bad-tint: #f0ddda;
+  --s1-info: #1f5fb8;        /* 5.73 / 5.24 / 4.83 */
+  --s1-info-tint: #dce4ed;
+  --s1-on-status: #f6f6f4;   /* on solid ok 5.44, warn 5.46, bad 5.49, info 5.73 */
+
+  --c-primary: #0f7a6c;        /* jade 600: 4.83 / 4.42 / 4.11 (non-text, or words on paper only) */
+  --c-primary-strong: #0b6458; /* 6.52 / 5.96 / 5.43 */
+  --c-primary-tint: #dae7e4;
+  --c-money: #0e6b5e;          /* 5.91 / 5.41 / 4.96 */
+  --c-surface-raised: #fbfbfa; /* ink 18.24, ink-2 8.16 */
+  --c-cta-art: #3fd1b5;        /* the closing band's art: jade 400 on its own deep ground (below) 8.79 */
+  --c-cta-art-ground: #0c211d; /* the art half's ground by day: deep ink-jade, against the words half's jade 700 */
+
+  --c-vendor-anthropic: #732c04; /* 9.28 / 8.49 / 7.55 */
+  --c-vendor-openai: #156d8b;    /* 5.40 / 4.94 / 4.59 */
+  --c-vendor-google: #c21919;    /* 5.63 / 5.15 / 4.60 */
+  --c-vendor-qwen: #5b48d6;      /* 5.81 / 5.31 / 4.87 */
+  --c-vendor-deepseek: #0126ac;  /* 10.35 / 9.47 / 8.27 */
+  --c-vendor-zhipu: #1e7424;     /* 5.42 / 4.96 / 4.58 */
+  --c-vendor-kimi: #b0286c;      /* 5.77 / 5.27 / 4.78 */
+  --c-vendor-minimax: #6f0e74;   /* 9.75 / 8.92 / 7.80 */
+  --c-vendor-xai: #4d4d4d;       /* 7.81 / 7.15 / 6.52 */
+  --c-vendor-mistral: #7d5f00;   /* 5.53 / 5.06 / 4.70 */
+  --c-vendor-meta: #0a67b0;      /* 5.42 / 4.96 / 4.58 */
+  --c-vendor-doubao: #8a3fc4;    /* 5.41 / 4.95 / 4.56 */
+  --c-vendor-cohere: #39594d;    /* 7.16 / 6.55 / 5.98 */
+}
+
+/* ------------------------------------------------------------------ night (dark) */
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"], .light, [data-mode="light"]) {
+    --s1-paper-2: #1c1c1c;     /* the kit's #191919 is 1.09:1 from paper; panels need 1.12 to show (P1-11) */
+    --s1-ok: #5cc281;          /* 8.66 / 7.70 / 6.94 */
+    --s1-ok-tint: #1a281f;
+    --s1-warn: #f0b35a;        /* 10.32 / 9.17 / 8.00 */
+    --s1-warn-tint: #2f261a;
+    --s1-bad: #ff6b5e;         /* 6.86 / 6.10 / 5.73 */
+    --s1-bad-tint: #311c1a;
+    --s1-info: #7fb2ff;        /* 8.87 / 7.88 / 7.04 */
+    --s1-info-tint: #1f2631;
+    --s1-on-status: #111111;   /* on solid ok 8.53, warn 10.16, bad 6.76, info 8.74 */
+
+    --c-primary: #3fd1b5;        /* jade 400 (the logo): 10.04 / 8.93 / 7.83 */
+    --c-primary-strong: #7ad8c2; /* 11.34 / 10.09 / 9.11 */
+    --c-primary-tint: #132b28;
+    --c-money: #4fd1b5;          /* 10.15 / 9.02 / 8.31 */
+    --c-surface-raised: #222222; /* 1.20:1 from paper; ink 13.59, ink-2 7.59 */
+    --c-cta-art: #7ad8c2;        /* the art: mint on the night's deep jade ground 4.17 (3 needed) */
+    --c-cta-art-ground: #0b6458; /* the art half's ground at night: deep jade, against the words half's mint */
+
+    --c-vendor-anthropic: #f0a16a; /* 9.14 / 8.12 / 7.52 */
+    --c-vendor-openai: #4ec7dc;    /* 9.61 / 8.54 / 7.90 */
+    --c-vendor-google: #f44a37;    /* 5.37 / 4.77 / 4.81 */
+    --c-vendor-qwen: #b3a4ff;      /* 8.83 / 7.85 / 7.30 */
+    --c-vendor-deepseek: #2896f5;  /* 6.18 / 5.50 / 5.39 */
+    --c-vendor-zhipu: #6ece6f;     /* 9.79 / 8.70 / 8.02 */
+    --c-vendor-kimi: #f58fc2;      /* 8.75 / 7.78 / 7.30 */
+    --c-vendor-minimax: #f034a3;   /* 5.23 / 4.65 / 4.72 */
+    --c-vendor-xai: #d4d4d4;       /* 12.93 / 11.50 / 10.08 */
+    --c-vendor-mistral: #f0cd5c;   /* 12.41 / 11.03 / 9.79 */
+    --c-vendor-meta: #71b8f5;      /* 9.02 / 8.02 / 7.47 */
+    --c-vendor-doubao: #cda2f7;    /* 9.23 / 8.20 / 7.57 */
+    --c-vendor-cohere: #9fcbb8;    /* 10.69 / 9.50 / 8.59 */
+  }
+}
+
+[data-theme="dark"],
+.dark,
+[data-mode="dark"] {
+  --s1-paper-2: #1c1c1c;
+  --s1-ok: #5cc281;
+  --s1-ok-tint: #1a281f;
+  --s1-warn: #f0b35a;
+  --s1-warn-tint: #2f261a;
+  --s1-bad: #ff6b5e;
+  --s1-bad-tint: #311c1a;
+  --s1-info: #7fb2ff;
+  --s1-info-tint: #1f2631;
+  --s1-on-status: #111111;
+
+  --c-primary: #3fd1b5;
+  --c-primary-strong: #7ad8c2;
+  --c-primary-tint: #132b28;
+  --c-money: #4fd1b5;
+  --c-surface-raised: #222222;
+  --c-cta-art: #7ad8c2;
+  --c-cta-art-ground: #0b6458;
+
+  --c-vendor-anthropic: #f0a16a;
+  --c-vendor-openai: #4ec7dc;
+  --c-vendor-google: #f44a37;
+  --c-vendor-qwen: #b3a4ff;
+  --c-vendor-deepseek: #2896f5;
+  --c-vendor-zhipu: #6ece6f;
+  --c-vendor-kimi: #f58fc2;
+  --c-vendor-minimax: #f034a3;
+  --c-vendor-xai: #d4d4d4;
+  --c-vendor-mistral: #f0cd5c;
+  --c-vendor-meta: #71b8f5;
+  --c-vendor-doubao: #cda2f7;
+  --c-vendor-cohere: #9fcbb8;
+}
+
+/* "Paper again inside a dark page" is in the first block (:root [data-theme="light"] and the rest): its
+   specificity beats [data-theme="dark"], as the kit's own fourth block does. A dark page's --s1-paper-2 is not
+   reset there because the kit's own light block already sets #ececea, and this file sets no light paper-2. */
+
+/* ------------------------------------------------------------------ the night sky (both themes) */
+
+/* The homepage hero's ground (src/page/pages/Home.tsx, .h-cosmos): deep space with a haze at the top and a jade glow
+   round the planet, the same in both themes; the hero is night inside (data-theme="dark"), so its words are the night
+   tokens. Contrast on the darkest / the haze / the glow over the haze: ink 17.20 / 15.52 / 12.48, ink-2 9.61 / 8.67 /
+   6.97, primary-strong 11.92 / 10.75 / 8.65, the status hues 6.60+. The stars (src/page/starField.ts) are drawn in
+   the three star tokens on a canvas. */
+:root {
+  --c-cosmos: #05070d;
+  --c-cosmos-haze: #0c1624;
+  --c-cosmos-glow: rgb(63 209 181 / 0.12);
+  --c-star: #eef2fb;
+  --c-star-cool: #bcd0ff;
+  --c-star-warm: #ffe2bd;
+}
+
+/* ------------------------------------------------------------------ derived, in every scope */
+
+/* Tokens made of other tokens are declared again on every element that starts a scheme, so they resolve
+   against that scope's values (a custom property's var() is resolved where it is declared, then inherited). */
+:root,
+[data-theme],
+.dark,
+.light,
+[data-mode] {
+  --s1-accent: var(--c-primary);   /* the go button's offset shadow: jade, so red is free for "bad" */
+  /* The chosen option of a filled switcher (a segmented row, a card, a pressed toggle, a filter pill): jade, with
+     paper words, 4.83:1 by day and 10.04:1 at night. Switchers have no line round them (owner, 2026-11-02). */
+  --s1-chosen: var(--c-primary);
+  --s1-on-chosen: var(--s1-paper);
+  --c-vendor-composite: var(--c-primary);
+  --c-vendor-other: var(--s1-ink-2);
+
+  /* Chart series: ink, info, warn, ok, then ink-3 (3.19 light / 4.47 dark: only behind a rule, never alone). */
+  --c-chart-1: var(--s1-ink);
+  --c-chart-2: var(--s1-info);
+  --c-chart-3: var(--s1-warn);
+  --c-chart-4: var(--s1-ok);
+  --c-chart-5: var(--s1-ink-3);
+}

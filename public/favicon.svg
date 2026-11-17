@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- The TokensBeat mark in one colour, as the newspaper's favicon draws it: the core,
+       cut where the orbit crosses it; the orbit, cut around the moon; the moon. The console's jade by day, the
+       light ink at night (src/components/app/Logo.tsx draws the same in the page). -->
+  <style>:root { color: #0f7a6c; } @media (prefers-color-scheme: dark) { :root { color: #ededed; } }</style>
+  <defs>
+    <mask id="cut" maskUnits="userSpaceOnUse" x="-64" y="-64" width="640" height="640">
+      <rect x="-64" y="-64" width="640" height="640" fill="#fff"/>
+      <path d="M78 256A178 62 0 0 0 434 256" transform="rotate(-22 256 256)" fill="none" stroke="#000" stroke-width="54" stroke-linecap="round"/>
+    </mask>
+    <mask id="moon" maskUnits="userSpaceOnUse" x="-64" y="-64" width="640" height="640">
+      <rect x="-64" y="-64" width="640" height="640" fill="#fff"/>
+      <circle cx="421" cy="189" r="37" fill="#000"/>
+    </mask>
+  </defs>
+  <g transform="translate(256 256) scale(1.08) translate(-265 -254)" fill="currentColor">
+    <circle cx="256" cy="256" r="92" mask="url(#cut)"/>
+    <g mask="url(#moon)"><path d="M78 256A178 62 0 0 0 434 256" transform="rotate(-22 256 256)" fill="none" stroke="currentColor" stroke-width="26" stroke-linecap="round"/></g>
+    <circle cx="421" cy="189" r="30"/>
+  </g>
+</svg>
