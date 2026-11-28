@@ -6,9 +6,8 @@
  * console's Pro view is the table, and a link under the caption goes there. The maps' text alternative is a visually
  * hidden list of the same data (`aria-details`). Each stop links to the model in the console's plaza.
  *
- * Two places (owner 2026-11-03: "show the map in the home page, but no status"): /pricing/ has both maps; the homepage
- * (`where="home"`) has the token map under the same heading, then links to /pricing/'s maps and to the console's table.
- * Neither shows a status: a stop's card is its prices and where they come from.
+ * On /pricing/ (owner 2026-11-03: no status): a stop's card is its prices and where they come from. The homepage has
+ * had no map since the 2026-11-27 design; the AI models page links here.
  *
  * The prices are live: the prerender knows none, so the page is built with ghost lines in their place and the browser
  * fills them in after hydration (src/page/live.ts plazaPrices: GET /api/v1/model-plaza/prices, anonymous, on the API
@@ -22,19 +21,16 @@ import { MetroGlyph, MetroMap, type MetroLine } from "@/components/s1lin/metro-m
 import { Logo } from "@/components/app/Logo";
 import { C } from "@/content/copy";
 import { consoleUrl, links } from "@/content/links";
-import { pagePath } from "@/content/site";
 import { useI18n } from "@/i18n";
 import { interchange, pieceAxis, priceMaps, tokenAxis, zones, type PlazaGroup } from "@/lib/priceMap";
 import { plazaPrices } from "./live";
-import { LinkButton, More, Section, SectionHead } from "./parts";
+import { LinkButton, Section, SectionHead } from "./parts";
 
 type Phase = { phase: "loading" } | { phase: "open"; groups: PlazaGroup[] } | { phase: "closed" } | { phase: "failed" };
 
-/** Where the maps are: the section's id (its heading's, and the anchor other pages link to) and its text alternative's. */
-const PLACES = {
-  pricing: { id: "pricing-map", list: "pricing-map-list" },
-  home: { id: "home-price-map", list: "home-price-map-list" },
-} as const;
+/** The section's id (its heading's, and the anchor other pages link to) and its text alternative's. */
+const ID = "pricing-map";
+const LIST_ID = "pricing-map-list";
 
 /** The maps as nested lists: each line, then each stop as a screen reader hears it on the map. */
 function Listed({ lines, label }: { lines: MetroLine[]; label: string }) {
@@ -57,11 +53,9 @@ function Listed({ lines, label }: { lines: MetroLine[]; label: string }) {
   );
 }
 
-export function PriceMap({ where = "pricing" }: { where?: keyof typeof PLACES }) {
+export function PriceMap() {
   const { lang, t } = useI18n();
   const P = C.pricing.map;
-  const { id, list: listId } = PLACES[where];
-  const home = where === "home";
   const [state, setState] = useState<Phase>({ phase: "loading" });
 
   useEffect(() => {
@@ -84,8 +78,7 @@ export function PriceMap({ where = "pricing" }: { where?: keyof typeof PLACES })
   const axes = useMemo(() => ({ tokens: tokenAxis(t), pieces: pieceAxis(t) }), [t]);
   const meets = useMemo(() => ({ tokens: interchange(t, "tokens"), pieces: interchange(t, "pieces") }), [t]);
 
-  // The homepage draws the token map only; /pricing/ has the piece map too.
-  const pieces = home ? [] : maps.pieces;
+  const pieces = maps.pieces;
   const drawn = maps.tokens.length > 0 || pieces.length > 0;
   const [title, body] =
     state.phase === "closed" ? [P.closedTitle, P.closedBody] : state.phase === "failed" ? [P.failedTitle, P.failedBody] : [P.emptyTitle, P.closedBody];
@@ -102,8 +95,8 @@ export function PriceMap({ where = "pricing" }: { where?: keyof typeof PLACES })
   const unpriced = maps.unpriced === 0 ? "" : ` ${maps.unpriced === 1 ? t(P.unpricedOne) : t(P.unpriced, { n: maps.unpriced })}`;
 
   return (
-    <Section id={id} className={home ? "h-pricemap h-pricemap--home" : "h-pricemap"}>
-      <SectionHead id={id} eyebrow={t(P.eyebrow)} title={t(P.title)} lead={t(P.lead)} stacked />
+    <Section id={ID} className="h-pricemap">
+      <SectionHead id={ID} eyebrow={t(P.eyebrow)} title={t(P.title)} lead={t(P.lead)} stacked />
       {state.phase !== "open" || !drawn ? (
         // Loading, closed (prices not published), failed, or a list with nothing to draw: one map, its ghosts or its words.
         <MetroMap className="h-pricemap__map" lines={[]} loading={state.phase === "loading" ? 6 : false} empty={nothing} />
@@ -117,7 +110,7 @@ export function PriceMap({ where = "pricing" }: { where?: keyof typeof PLACES })
               zones={zoneList}
               interchange={meets.tokens}
               label={t(P.label)}
-              details={listId}
+              details={LIST_ID}
               caption={`${t(P.caption)}${unpriced}`}
               legend={
                 <>
@@ -129,18 +122,11 @@ export function PriceMap({ where = "pricing" }: { where?: keyof typeof PLACES })
               }
             />
           )}
-          {home ? (
-            <p className="h-after h-after--row">
-              <More href={`${pagePath("pricing", lang)}#${PLACES.pricing.id}`}>{t(P.all)}</More>
-              <More href={consoleUrl("/models?view=pricing", lang)}>{t(P.table)}</More>
-            </p>
-          ) : (
-            <p className="h-pricemap__more">
-              <LinkButton href={consoleUrl("/models?view=pricing", lang)} arrow>
-                {t(P.table)}
-              </LinkButton>
-            </p>
-          )}
+          <p className="h-pricemap__more">
+            <LinkButton href={consoleUrl("/models?view=pricing", lang)} arrow>
+              {t(P.table)}
+            </LinkButton>
+          </p>
           {pieces.length > 0 && (
             <div className="h-pricemap__piece">
               <h3 className="h-h3">{t(P.pieceTitle)}</h3>
@@ -151,13 +137,13 @@ export function PriceMap({ where = "pricing" }: { where?: keyof typeof PLACES })
                 axis={axes.pieces}
                 interchange={meets.pieces}
                 label={t(P.pieceLabel)}
-                details={listId}
+                details={LIST_ID}
                 caption={t(P.pieceCaption)}
                 legend={t(P.pieceLegend)}
               />
             </div>
           )}
-          <div id={listId} className="h-visually-hidden">
+          <div id={LIST_ID} className="h-visually-hidden">
             <p>{t(P.list)}</p>
             <Listed lines={maps.tokens} label={t(P.tokenList)} />
             <Listed lines={pieces} label={t(P.pieceList)} />

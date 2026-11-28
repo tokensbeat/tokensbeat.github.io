@@ -1,7 +1,7 @@
 /**
- * The homepage's closing band says its line in the page's language alone (owner, 2026-11-12: one language at a time;
- * until then the other language stood under it as a deck). These read the stylesheets: no rule is left for that deck,
- * and a Chinese line never breaks inside, nor grows wider than the words' column.
+ * The closing band says its line in the page's language alone (owner, 2026-11-12: one language at a time; until then
+ * the other language stood under it as a deck). These read the stylesheets: no rule is left for that deck, and a
+ * Chinese title beside the art grows no wider than the words' column.
  */
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
@@ -43,16 +43,12 @@ function columnAt(vw: number): number {
 
 const WIDTHS = [320, 360, 390, 600, 899, 900, 1024, 1280, 1440, 1600];
 
-describe("the homepage's closing band", () => {
+describe("the closing band", () => {
   it("has no rule left for a line in the other language", () => {
     expect(ALL.filter((r) => r.selector.includes("h-cta__deck"))).toEqual([]);
   });
 
-  it("keeps each Chinese line whole and its longest line (seven characters) inside the words' column", () => {
-    const line = rule(".h-cta__line:lang(zh)");
-    expect(prop(line, "word-break")).toBe("keep-all");
-    expect(prop(line, "white-space")).toBe("nowrap");
-    expect(prop(rule(".h-cta__line"), "display")).toBe("block");
+  it("keeps a Chinese title's line of seven characters inside the words' column beside the art", () => {
     expect(prop(rule(".h-cta--aside .h-cta__words"), "container-type")).toBe("inline-size");
     const titleZh = rule(".h-cta--aside .h-cta__title:lang(zh)");
     for (const vw of WIDTHS) {
@@ -61,13 +57,6 @@ describe("the homepage's closing band", () => {
     }
   });
 
-  it("draws the sharks in the art's colour on the art half's own ground, laid over their column so they never move the words", () => {
-    const sharks = rule(".h-sharks");
-    expect(prop(sharks, "color")).toBe("var(--c-cta-art)");
-    expect(prop(sharks, "position")).toBe("absolute");
-    expect(prop(sharks, "inset")).toBe("0");
-    expect(prop(rule(".h-cta__aside"), "overflow")).toBe("hidden");
-  });
 });
 
 describe("the product pages' closing art and the head's menu", () => {

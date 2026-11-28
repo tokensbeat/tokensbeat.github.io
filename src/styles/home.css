@@ -337,137 +337,6 @@
 @media (min-width: 1024px) { .h-teaser { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } }
 .h-teaser__body { display: grid; justify-items: start; gap: 22px; }
 
-/* ------------------------------------------------------------------ the orbit (home) */
-
-/* No frame and no "+" marks: the figure stands in the hero, on the night sky (.h-cosmos), its key under it. */
-.h-orbit { position: relative; margin: 0; container: orbit / inline-size; }
-/* The key: the two rings, then the four states as the moons draw them, centred under the orbit. */
-.h-orbit__bar {
-  display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 8px 28px; min-height: 30px; margin-top: 10px;
-  font-size: 13px; color: var(--s1-ink-2);
-}
-.h-orbit__legend { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; }
-.h-orbit__legend b { font: 500 11.5px/1.3 var(--s1-font-mono); letter-spacing: 0.14em; text-transform: uppercase; color: var(--c-primary-strong); }
-.h-orbit__key { display: inline-block; width: 26px; height: 0; }
-.h-orbit__key--serve { border-top: 3px solid var(--c-primary); }
-.h-orbit__key--support { border-top: 2px dashed var(--s1-ink-3); }
-.h-orbit__states {
-  display: inline-flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 4px 16px;
-  font: 500 10.5px/1.3 var(--s1-font-mono); letter-spacing: 0.08em; text-transform: uppercase;
-}
-.h-orbit__state { display: inline-flex; align-items: center; gap: 7px; white-space: nowrap; }
-
-/* A state as a shape, as the chips draw it: dot (live), half dot (beta), ring (early access), dashed ring (coming). */
-.h-orbit__pip { display: inline-block; flex: none; box-sizing: border-box; width: 9px; height: 9px; border-radius: 50%; }
-.h-orbit__pip--live { background: var(--s1-ok); }
-.h-orbit__pip--beta { border: 1.5px solid var(--s1-warn); background: linear-gradient(90deg, var(--s1-warn) 50%, transparent 50%); }
-.h-orbit__pip--early { border: 2px solid var(--s1-info); }
-.h-orbit__pip--coming { border: 1.5px dashed var(--s1-ink-2); }
-
-/* Pause / play: the moons, the planet and the hero's stars stop (WCAG 2.2.2); nothing to pause under reduced motion. */
-.h-orbit__pause {
-  position: absolute; z-index: 8; top: 0; right: 0;
-  display: grid; place-items: center; width: 30px; height: 30px; padding: 0; cursor: pointer;
-  border: 0.5px solid var(--s1-rule-strong); border-radius: 2px; background: var(--c-surface-raised); color: var(--s1-ink);
-}
-.h-orbit__pause svg { width: 14px; height: 14px; }
-.h-orbit__pause:hover { background: var(--s1-ink); color: var(--s1-paper); }
-.h-orbit__pause[hidden] { display: none; }
-@media (prefers-reduced-motion: reduce) { .h-orbit__pause { display: none; } }
-.h-orbit[data-paused] .h-beat__pulse { animation-play-state: paused; }
-
-/* The stage: its own stacking order. Planet text, the rings, the far moons, the core, the near moons, the labels.
-   On a phone it is a little wider than the column (the hero clips it at the screen's edges), so the planet reads. */
-.h-orbit__stage { position: relative; isolation: isolate; width: 100%; aspect-ratio: 20 / 11; container-type: inline-size; }
-@media (max-width: 559px) { .h-orbit__stage { width: 118%; margin-inline: -9%; } }
-/* v4's ASCII planet (orbitScene.ts): the scene covers 80 % of the stage width (1600 of 2000) and 1040 of 1100 high. */
-.h-orbit__ascii { position: absolute; inset: 0; pointer-events: none; contain: strict; }
-.h-orbit__planet-text {
-  position: absolute; left: 10%; top: 2.7273%; margin: 0;
-  color: color-mix(in srgb, var(--c-primary) 72%, transparent);
-  font: 500 10px/1.2 var(--s1-font-mono); letter-spacing: 0 !important; font-variant-ligatures: none; white-space: pre;
-  transform: scale(var(--so-scale, 0.7)); transform-origin: 0 0; user-select: none;
-}
-/* Before it is measured (the prerendered first frame, or no script): 140 columns at a 0.6em advance fill 80 %. */
-.h-orbit__stage:not([data-measured]) .h-orbit__planet-text { font-size: calc(80cqw / 84); transform: none; }
-.h-orbit__art { position: absolute; z-index: 1; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
-.h-orbit__support { fill: none; stroke: var(--s1-ink-3); stroke-width: 1.5px; stroke-dasharray: 2 7; stroke-linecap: round; vector-effect: non-scaling-stroke; }
-.h-orbit__serve { fill: none; stroke: var(--c-primary); stroke-width: 3px; stroke-linecap: round; vector-effect: non-scaling-stroke; }
-@media (forced-colors: active) {
-  .h-orbit__planet-text { color: CanvasText; }
-  .h-orbit__serve, .h-orbit__support { stroke: CanvasText; }
-}
-
-/* The moons: ASCII bodies (orbitMoonArt.ts) in the planet's character cell, placed by transform alone (orbitMotion.ts,
-   in container units), so moving them never lays out. The text is set as the planet's is (10px, scaled to the stage
-   once measured; before that, sized by the stage's width) but bolder, so a moon reads as a body of its own over the
-   planet's lighter glyphs, on a disc of the night a glyph wider than the moon all round (--moon-d, in the text's em)
-   that hides the planet, the ring and the stars behind it and fades out at its edge. The status is the body's shape
-   and its hue. */
-.h-orbit__moons { position: absolute; inset: 0; pointer-events: none; }
-.h-orbit__moon { position: absolute; left: 0; top: 0; z-index: 2; will-change: transform, opacity; }
-.h-orbit__moon[data-side="front"] { z-index: 4; }
-.h-orbit__moon-art {
-  position: relative; z-index: 0; display: block; margin: 0;
-  font: 700 10px/1.2 var(--s1-font-mono); letter-spacing: 0 !important; font-variant-ligatures: none; white-space: pre;
-  transform: scale(calc(var(--so-scale, 0.7) * var(--moon-k, 1))); transform-origin: 50% 50%; user-select: none;
-}
-.h-orbit__stage:not([data-measured]) .h-orbit__moon-art { font-size: calc(80cqw / 84); transform: scale(var(--moon-k, 1)); }
-/* On a small figure (a phone) the moons are drawn larger than the planet's cell, so each still reads as a body. */
-@container orbit (max-width: 559px) { .h-orbit__moon-art { --moon-k: 1.35; } }
-.h-orbit__moon-art::before, .h-orbit__moon-art::after {
-  content: ""; position: absolute; left: 50%; top: 50%; border-radius: 50%; translate: -50% -50%; pointer-events: none;
-}
-.h-orbit__moon-art::before {
-  z-index: -1; width: calc(var(--moon-d) + 2.6em); height: calc(var(--moon-d) + 2.6em);
-  background: radial-gradient(closest-side, var(--c-cosmos) calc(100% - 0.7em), transparent);
-}
-.h-orbit__moon--live { color: var(--s1-ok); }
-.h-orbit__moon--beta { color: var(--s1-warn); }
-.h-orbit__moon--early { color: var(--s1-info); }
-.h-orbit__moon--coming { color: var(--s1-ink-2); }
-/* The moon of the label or list item pointed at (or focused): a jade ring round it. */
-.h-orbit__moon[data-active] .h-orbit__moon-art::after {
-  width: calc(var(--moon-d) + 1.1em); height: calc(var(--moon-d) + 1.1em); border: 0.2em solid var(--c-primary);
-}
-@media (forced-colors: active) { .h-orbit__moon-art { color: CanvasText; } }
-
-/* "Your app" in its own box over the ASCII core, as v4's .so-core (a paper box ringed in the brand colour). */
-.h-orbit__core {
-  position: absolute; z-index: 3; left: 50%; top: 50%; transform: translate(-50%, -50%); display: grid; justify-items: center; gap: 4px;
-  padding: clamp(4px, 0.8cqw, 10px) clamp(8px, 1.4cqw, 16px); background: var(--c-cosmos, var(--s1-paper));
-  border: 1px solid var(--c-primary); color: var(--s1-ink); text-align: center; white-space: nowrap; pointer-events: none;
-}
-.h-orbit__core-name { font: 400 clamp(15px, 2.4cqw, 30px)/1 var(--s1-font-display); }
-.h-orbit__core-note { font: 500 clamp(9px, 1cqw, 11px)/1.2 var(--s1-font-mono); letter-spacing: 0.12em; text-transform: uppercase; color: var(--s1-ink-2); }
-.h-orbit__core-beat { width: clamp(56px, 8cqw, 112px); height: clamp(10px, 1.4cqw, 18px); margin-top: 2px; color: var(--c-primary); }
-.h-orbit__core-beat .h-beat__pulse { stroke: var(--c-primary); }
-
-/* The labels ride beside their moons (only on a figure 720 px wide or more; narrower, the cards under the figure name
-   the parts). One that would overlap a nearer label fades out until they part; focused, it comes back on top. */
-.h-orbit__labels { display: none; }
-.h-orbit__labels li { position: absolute; left: 0; top: 0; z-index: 5; will-change: transform; transition: opacity 0.35s ease; }
-.h-orbit__labels li[data-side="front"] { z-index: 6; }
-.h-orbit__labels li[data-hidden] { opacity: 0; pointer-events: none; }
-.h-orbit__labels li:hover, .h-orbit__labels li:focus-within { z-index: 7; opacity: 1; }
-.h-orbit__pill {
-  display: inline-flex; align-items: center; gap: 7px; padding: 5px 10px 5px 8px; white-space: nowrap; text-decoration: none;
-  background: var(--c-surface-raised); border: 0.5px solid var(--s1-rule-strong); color: var(--s1-ink);
-  font-size: clamp(12px, 1.1cqw, 13.5px); font-weight: 600;
-}
-.h-orbit__labels li.is-support .h-orbit__pill { border-style: dashed; }
-.h-orbit__pill:hover, .h-orbit__pill:focus-visible { color: var(--s1-ink); border-color: var(--c-primary); box-shadow: 2px 2px 0 var(--c-primary); }
-
-@container orbit (min-width: 720px) { .h-orbit__labels { display: block; } }
-@container orbit (max-width: 559px) {
-  .h-orbit__core-note, .h-orbit__core-beat, .h-orbit__states { display: none; }
-  .h-orbit__bar { gap: 6px 18px; font-size: 12px; }
-}
-/* No container units: the moons and labels cannot be placed; the planet and its rings stay. */
-@supports not (width: 1cqw) {
-  .h-orbit__moons, .h-orbit__labels { display: none !important; }
-}
-
 /* ------------------------------------------------------------------ rails: support / serve */
 
 .h-rails { display: grid; grid-template-columns: minmax(0, 1fr); border: 0.5px solid var(--s1-rule-strong); position: relative; }
@@ -517,28 +386,21 @@
 .h-cta__lead { max-width: 56ch; font-size: 17px; line-height: 1.6; }
 .h-cta .h-actions { margin-top: 6px; }
 /*
- * With a column of its own (home): the words, then the water (the sharks) under a rule on a phone; from 900 px the
- * water beside the words behind a column rule, as a broadsheet sets a picture. The water runs to the plate's edges and
- * its canvas is laid over it, so it never moves the words. The headline is each sentence a line (Home.tsx), in the
- * page's language alone.
+ * With a column of its own (a product page's art): the words, then the art under a rule on a phone; from 900 px the
+ * art beside the words behind a column rule, as a broadsheet sets a picture. The art runs to the plate's edges and its
+ * canvas is laid over it, so it never moves the words.
  */
 .h-cta--aside .h-cta__plate { --h-cta-rule: color-mix(in srgb, var(--h-cta-words) 32%, transparent); display: grid; padding: 0; }
 .h-cta--aside .h-cta__words { container-type: inline-size; padding: var(--h-cta-pad); }
 .h-cta--aside .h-cta__title { max-width: none; }
-.h-cta__line { display: block; }
 .h-cta__aside { position: relative; overflow: hidden; background: var(--c-cta-art-ground); min-height: clamp(210px, 58vw, 320px); border-top: 1px solid var(--h-cta-rule); }
 @media (min-width: 900px) {
   .h-cta--aside .h-cta__plate { grid-template-columns: minmax(0, 1.08fr) minmax(0, 1fr); }
   .h-cta__aside { min-height: 0; border-top: 0; border-left: 1px solid var(--h-cta-rule); }
 }
-.h-sharks {
-  position: absolute; inset: 0; display: block; width: 100%; height: 100%;
-  color: var(--c-cta-art); font-family: var(--s1-font-mono); opacity: 0; transition: opacity 0.9s ease;
-}
-.h-sharks[data-drawn] { opacity: 1; }
 /* The product pages' art (CtaArt.tsx, a variation of the sharks, the stars or the moons per page) in a colour of its
    own beside the band's words, on a ground of its own (--c-cta-art-ground on .h-cta__aside): bright jade on deep
-   ink-jade by day, mint on deep jade at night, so the two halves read as two colours (the homepage's sharks too). The words, the line and the buttons keep the band's own colours. */
+   ink-jade by day, mint on deep jade at night, so the two halves read as two colours. The words, the line and the buttons keep the band's own colours. */
 .h-cta-art {
   position: absolute; inset: 0; display: block; width: 100%; height: 100%;
   color: var(--c-cta-art); font-family: var(--s1-font-mono); opacity: 0; transition: opacity 0.9s ease;
@@ -553,252 +415,110 @@
 /* A link in the plate's words keeps their colour; a kit button keeps its own turn. */
 .h-cta a:not(.s1-btn):hover { color: inherit; }
 
-/* ------------------------------------------------------------------ home (the lean page) */
+/* ------------------------------------------------------------------ home: the journey (page/Journey.tsx) */
 
-/* The hero: the headline, its line and the two buttons, centred over the orbit, all on the night sky. */
-.h-lean-hero { padding-top: clamp(40px, 5.5vw, 84px); }
-.h-lean-hero__copy { display: grid; justify-items: center; gap: clamp(18px, 2vw, 26px); text-align: center; }
-.h-home-title { font-size: clamp(2.8rem, 0.8rem + 5.6vw, 6.2rem); line-height: 0.96; }
-/* Under the poem, the claim in plain words: the display face, a step over the line that follows it. */
-.h-home-claim {
-  max-width: 100%; color: var(--s1-ink);
-  font: 400 clamp(1.3rem, 1.05rem + 1vw, 1.95rem)/1.2 var(--s1-font-display); letter-spacing: -0.005em; text-wrap: balance;
-}
-.h-home-title > span, .h-home-title > em { display: block; }
-.h-lean-hero__line { max-width: 34em; margin-inline: auto; text-wrap: balance; }
-.h-clause { display: inline-block; }
-.h-lean-hero__actions { justify-content: center; margin-top: 2px; }
-.h-lean-hero__figure { margin-top: clamp(28px, 3.6vw, 52px); }
-
-/* The night sky: a band the width of the page, night in both themes (data-theme="dark" on it, the words in the night's
-   tokens); a haze at the top, a jade glow round the planet, the stars on a canvas (StarField.tsx) that fades in once
-   drawn. It clips what leaves the screen's edge (a phone's wider orbit), never the words. */
-.h-cosmos {
-  position: relative; isolation: isolate; overflow: clip; padding-bottom: clamp(22px, 3.4vw, 48px);
-  background:
-    radial-gradient(42% 46% at 50% 70%, var(--c-cosmos-glow), transparent 72%),
-    radial-gradient(90% 60% at 50% 0%, var(--c-cosmos-haze), transparent 72%),
-    var(--c-cosmos);
-  color: var(--s1-ink);
-}
-.h-cosmos > .h-wrap { position: relative; z-index: 1; }
-/* A halo of the night round the words, so no star sits against a letter. */
-.h-cosmos .h-home-title, .h-cosmos .h-lean-hero__line, .h-cosmos .h-home-claim { text-shadow: 0 0 3px var(--c-cosmos), 0 0 14px var(--c-cosmos); }
-.h-cosmos__stars { position: absolute; inset: 0; z-index: 0; width: 100%; height: 100%; pointer-events: none; opacity: 0; transition: opacity 0.9s ease; }
-.h-cosmos__stars[data-drawn] { opacity: 1; }
-/* A short screen (a 1280 x 720 laptop): a smaller headline and less air, so the planet shows on the first screen. */
-@media (min-width: 1024px) and (max-height: 820px) {
-  .h-cosmos.h-lean-hero { padding-top: 36px; }
-  .h-cosmos .h-home-title { font-size: min(clamp(2.8rem, 0.8rem + 5.6vw, 6.2rem), 10.4svh); }
-  .h-cosmos .h-lean-hero__copy { gap: 16px; }
-}
-/* The head's "+" marks would sit on the sky's edge: the homepage's head has none. */
+/* The head's "+" marks would sit on the night slab's edge: the homepage's head has none. */
 .h-head--cosmos::after { display: none; }
+/* A step at a time: each step snaps under the head (proximity, so the paper sections after the journey scroll freely). */
+html:has(.j__steps) { scroll-padding-top: var(--h-head-h); scroll-snap-type: y proximity; }
 
-/* New this month: a paper's index under the hero. A rule in the ink, then three dated lines side by side from 860 px,
-   a column rule between them; each line's name is the link, over the whole of its column. */
-.h-news { position: relative; padding-top: clamp(30px, 3.6vw, 48px); }
-.h-news__wrap { display: grid; gap: 12px; }
-.h-news__label { font: 500 11.5px/1.4 var(--s1-font-mono); letter-spacing: 0.14em; text-transform: uppercase; color: var(--c-primary-strong); }
-.h-news__label::before { content: "+ "; content: "+ " / ""; color: var(--s1-ink-3); letter-spacing: 0; }
-.h-news__list { display: grid; grid-template-columns: minmax(0, 1fr); border-top: 1px solid var(--s1-ink); border-bottom: 0.5px solid var(--s1-rule-strong); }
-.h-news__item {
-  position: relative; display: grid; align-content: start; gap: 8px; min-width: 0; padding-block: 18px 20px;
-  transition: background-color 0.15s ease;
+.j { position: relative; z-index: 2; }
+/* The night slab, sticky under the head and night in both themes (data-theme="dark" on it): the chart's ground. */
+.j__stage {
+  --s1-paper: var(--c-cosmos); --s1-paper-2: var(--c-cosmos-haze);
+  position: sticky; top: var(--h-head-h); height: calc(100svh - var(--h-head-h)); overflow: hidden;
+  background: linear-gradient(to bottom, var(--c-cosmos-haze), var(--c-cosmos) 55%); color: var(--s1-ink);
 }
-.h-news__item + .h-news__item { border-top: 0.5px solid var(--s1-rule-strong); }
-.h-news__item:hover { background: color-mix(in srgb, var(--c-primary) 7%, transparent); }
-.h-news__item:has(a:focus-visible) { outline: 2px solid var(--c-primary); outline-offset: -2px; }
-.h-news__meta { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; }
-.h-news__date { font: 500 11px/1.3 var(--s1-font-mono); letter-spacing: 0.1em; text-transform: uppercase; color: var(--s1-ink-2); }
-.h-news__name { font: 400 clamp(1.55rem, 1.3rem + 0.7vw, 2rem)/1.08 var(--s1-font-display); letter-spacing: -0.008em; }
-.h-news__name a { color: var(--s1-ink); text-decoration: none; }
-.h-news__name a::after { content: ""; position: absolute; inset: 0; }
-.h-news__name a:focus-visible { outline: none; }
-.h-news__item:hover .h-news__name a { text-decoration: underline; text-decoration-color: var(--c-primary); text-decoration-thickness: 1.5px; text-underline-offset: 4px; }
-.h-news__line { max-width: 40ch; font-size: 14.5px; line-height: 1.5; color: var(--s1-ink-2); text-wrap: pretty; }
-/* A phone: three short rows, the name beside its date and status. */
-@media (max-width: 859px) {
-  .h-news__item { grid-template-columns: minmax(0, 1fr) auto; align-items: baseline; gap: 4px 12px; padding-block: 13px 14px; }
-  .h-news__meta { grid-column: 2; grid-row: 1; justify-content: flex-end; }
-  .h-news__name { grid-column: 1; grid-row: 1; font-size: 1.45rem; }
-  .h-news__line { grid-column: 1 / -1; max-width: none; }
+.j__cv { position: absolute; inset: 0; display: block; width: 100%; height: 100%; }
+.j__notes { position: absolute; inset: 0; pointer-events: none; }
+/* A note on the chart, as an engraved plate annotates: mono caps over a line in the display face; milkyWay.ts sets
+   where it stands and how much it shows, each frame. */
+.j__note { position: absolute; left: 0; top: 0; display: grid; gap: 2px; width: max-content; max-width: 260px; opacity: 0; will-change: transform, opacity; }
+.j__note[data-side="l"] { text-align: right; }
+.j__note b {
+  font: 500 11px/1.25 var(--s1-font-mono); letter-spacing: 0.14em; text-transform: uppercase; color: var(--s1-ink);
+  text-shadow: 0 0 4px var(--c-cosmos), 0 0 10px var(--c-cosmos);
 }
-@media (min-width: 860px) {
-  .h-news__list { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-  .h-news__item { padding: 20px 28px 24px; }
-  .h-news__item:first-child { padding-left: 0; }
-  .h-news__item:last-child { padding-right: 0; }
-  .h-news__item + .h-news__item { border-top: 0; border-left: 0.5px solid var(--s1-rule-strong); }
-}
+.j__note i { font: italic 400 15.5px/1.2 var(--s1-font-display); color: var(--s1-ink-2); text-shadow: 0 0 4px var(--c-cosmos), 0 0 10px var(--c-cosmos); }
+@media (max-width: 599px) { .j__note i { display: none; } }
+/* Aha and TokensBeat keep their capitals inside the mono caps (home.ts keepsCase). */
+:is(.h-eyebrow span, .j__note b, .j__stop span).h-keep-case { text-transform: none; letter-spacing: 0.02em; }
 
-/* A product told as a feature (Bots, Aha Code, the models): its head, its picture beside its points, then its notes.
-   A link from New this month lands on the title with the line over it in view (the page's scroll-padding clears the
-   running head). */
-.h-feat .h-section-head .h-h2 { scroll-margin-top: 44px; }
-.h-feat .h-section-head .h-h2 { max-width: 16em; }
-/* Two notes under the picture and its points, in the spread's own columns: a ruled table, then lines. */
-.h-feat__notes { display: grid; grid-template-columns: minmax(0, 1fr); gap: 36px 64px; margin-top: clamp(40px, 5vw, 64px); }
-@media (min-width: 1024px) { .h-feat__notes { grid-template-columns: minmax(0, 1.32fr) minmax(0, 1fr); } }
-/* With today's picture before them: three columns from 1100 px (the picture, then the two notes); narrower, the
-   picture beside the two notes, one over the other; on a phone one column. */
-@media (min-width: 640px) {
-  .h-feat__notes--today { grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 48px; align-items: start; }
-  .h-feat__today { grid-row: span 2; }
+/* The slab's bar: what the chart is, which stop is in force, and Pause. */
+.j__bar {
+  position: absolute; inset: 0 0 auto; z-index: 3;
+  display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 40px; padding: 4px var(--h-gutter);
+  border-bottom: 0.5px solid var(--s1-rule); font: 500 10.5px/1.3 var(--s1-font-mono); letter-spacing: 0.12em; text-transform: uppercase; color: var(--s1-ink-2);
 }
-@media (min-width: 1100px) {
-  .h-feat__notes--today { grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr) minmax(0, 1fr); }
-  .h-feat__today { grid-row: auto; }
-}
-/* A phone: today's picture straight after the coming one, before the points, so what is open today is seen at once.
-   The spread and the notes row give their children to the section's column, which sets the order. */
-@media (max-width: 639px) {
-  .h-feat--bots > .h-wrap { display: flex; flex-direction: column; }
-  .h-feat--bots :is(.h-spread, .h-feat__notes) { display: contents; }
-  .h-feat--bots .h-spread > .h-fig { order: 1; }
-  .h-feat--bots .h-feat__today { order: 2; margin-top: 36px; }
-  .h-feat--bots .h-spread__copy { order: 3; margin-top: 40px; }
-  .h-feat--bots .h-feat__note { order: 4; margin-top: 32px; }
-}
-.h-feat__note { min-width: 0; }
-/* A note is a disclosure, open as the page is written: its title is the row that opens and closes it, with the sign
-   the questions use. On a phone it closes once the page is live (Home.tsx) and stands as one row over a rule. */
-.h-feat__sum { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 12px; list-style: none; cursor: pointer; }
-.h-feat__sum::-webkit-details-marker { display: none; }
-.h-feat__sum::after { content: "+"; flex: none; font: 400 17px/1 var(--s1-font-mono); color: var(--c-primary-strong); }
-.h-feat__note[open] > .h-feat__sum::after { content: "\2212"; }
-.h-feat__sum:focus-visible { outline: 2px solid var(--c-primary); outline-offset: 4px; }
-.h-feat__note:not([open]) { border-bottom: 1px solid var(--s1-ink); }
-.h-feat__h3 { font: 500 11.5px/1.4 var(--s1-font-mono); letter-spacing: 0.14em; text-transform: uppercase; color: var(--s1-ink); }
-.h-feat__note .h-lines { border-top: 1px solid var(--s1-ink); }
-.h-feat__note .h-lines li { border-bottom-color: var(--s1-rule-strong); }
-/* What wakes a bot: what, in the display face, then how, under a rule in the ink; a hairline under each row. */
-.h-wakes { width: 100%; border-collapse: collapse; border-top: 1px solid var(--s1-ink); }
-.h-wakes th, .h-wakes td { padding-block: 14px 15px; text-align: left; vertical-align: baseline; border-bottom: 0.5px solid var(--s1-rule-strong); }
-.h-wakes th { width: 40%; padding-right: 20px; font: 400 1.22rem/1.2 var(--s1-font-display); letter-spacing: -0.005em; color: var(--s1-ink); }
-.h-wakes td { font-size: 15.5px; line-height: 1.5; color: var(--s1-ink-2); text-wrap: pretty; }
+.j__title::before { content: "+ "; content: "+ " / ""; color: var(--s1-ink-3); letter-spacing: 0; }
+.j__where { display: inline-flex; align-items: center; gap: 10px; color: var(--c-primary-strong); }
+.j__pause svg { width: 14px; height: 14px; }
 @media (max-width: 479px) {
-  .h-wakes, .h-wakes tbody, .h-wakes tr, .h-wakes th, .h-wakes td { display: block; width: auto; }
-  .h-wakes tr { padding-block: 13px 14px; border-bottom: 0.5px solid var(--s1-rule-strong); }
-  .h-wakes th, .h-wakes td { padding: 0; border: 0; }
-  .h-wakes td { margin-top: 4px; }
+  .j__title { display: none; }
+  .j__bar { justify-content: flex-end; }
 }
-/* Where to get it, under the points: the download and the ticket, then who sees it. */
-.h-feat__get { display: grid; gap: 16px; }
-.h-feat__small { max-width: 48ch; }
-/* The models: four lines and what to do, beside the call on its night slab; the price map follows at once. */
-.h-feat--models { padding-bottom: clamp(28px, 4vw, 56px); }
-.h-models { display: grid; grid-template-columns: minmax(0, 1fr); gap: 36px 64px; align-items: start; }
-@media (min-width: 1024px) { .h-models { grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); } }
-.h-models__words { display: grid; gap: 30px; min-width: 0; }
-.h-models__words .h-lines { border-top-color: var(--s1-ink); }
-/* A phone: the call wraps inside its slab instead of running off its edge (Copy gives the call as written), and
-   Copy stays beside its name, the note under them. */
+
+/* The ruler at the slab's foot: the five stops, the one in force marked in jade. */
+.j__ruler { position: absolute; inset: auto 0 0; z-index: 3; padding-inline: var(--h-gutter); border-top: 0.5px solid var(--s1-rule); }
+.j__ruler-in { position: relative; max-width: var(--h-max); margin-inline: auto; }
+.j__ruler ol { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); }
+.j__stop {
+  appearance: none; display: flex; align-items: center; gap: 8px; width: 100%; min-height: 44px; padding: 0 6px; border: 0; background: none; cursor: pointer;
+  color: var(--s1-ink-2); font: 500 10.5px/1.2 var(--s1-font-mono); letter-spacing: 0.1em; text-transform: uppercase; text-align: left; white-space: nowrap;
+}
+.j__stop b { font-weight: 500; }
+.j__stop:hover, .j__stop[aria-current] { color: var(--s1-ink); }
+.j__stop[aria-current] b { color: var(--c-primary-strong); }
+.j__mark { position: absolute; top: -1px; left: 0; width: 20%; height: 2px; background: var(--c-primary); }
+@media (max-width: 699px) { .j__stop span { display: none; } }
+
+/* The steps: a screen each, pulled up over the slab, which they scroll past. */
+.j__steps { position: relative; z-index: 4; margin-top: calc(-1 * (100svh - var(--h-head-h))); pointer-events: none; }
+.j__step { display: flex; align-items: center; min-height: calc(100svh - var(--h-head-h)); padding-block: 64px 72px; scroll-snap-align: start; }
+.j__step :is(a, button) { pointer-events: auto; }
+
+/* The steps sit outside the slab: each night scope (data-theme="dark") takes the night's ink itself. */
+.j__hero { max-width: 40rem; color: var(--s1-ink); pointer-events: auto; }
+.j__h1 > span, .j__h1 > em { display: block; }
+/* A halo of the night round the words, so no star sits against a letter. */
+.j__hero :is(.h-h1, .h-lead) { text-shadow: 0 0 3px var(--c-cosmos), 0 0 22px var(--c-cosmos); }
+.j__hero .h-lead { margin-top: 22px; max-width: 32em; }
+.j__hero .h-actions { margin-top: 28px; }
+.j__hint { min-height: 30px; margin-top: 30px; padding: 0; border: 0; background: none; cursor: pointer; }
+
+/* A stop's words: a kit plate on the night paper, its points under a rule, a short jade rule before each. */
+.j__plate { width: min(100%, 31rem); padding: clamp(22px, 2.4vw, 30px); background: var(--s1-paper); color: var(--s1-ink); pointer-events: auto; }
+.j__plate .h-h2 { margin-bottom: 14px; font-size: clamp(2rem, 1.4rem + 1.9vw, 3.2rem); }
+.j__plate .h-lead { font-size: 16px; }
+.j__points { display: grid; gap: 10px; margin-top: 18px; padding-top: 16px; border-top: 0.5px solid var(--s1-rule-strong); }
+.j__points li { position: relative; padding-left: 22px; font-size: 15px; line-height: 1.55; color: var(--s1-ink-2); }
+.j__points li::before { content: ""; position: absolute; left: 0; top: 0.78em; width: 11px; height: 1.5px; background: var(--c-primary); }
+.j__points b { margin-right: 6px; font-weight: 600; color: var(--s1-ink); }
+.j__points .h-chip { vertical-align: 1px; }
+.j__points .h-chip + .j__point-body { display: block; }
+.j__plate .h-actions { margin-top: 22px; }
+@media (max-width: 899px) {
+  .j__step { align-items: flex-end; padding-top: 30svh; padding-bottom: 64px; }
+  .j__step--hero { padding-top: 34svh; }
+  .j__plate { width: 100%; }
+}
 @media (max-width: 479px) {
-  .h-models .h-code pre code { white-space: pre-wrap; overflow-wrap: anywhere; }
-  .h-models .h-slab__note { order: 3; flex-basis: 100%; }
+  .j__plate { padding: 20px 18px; }
+  .j__points { gap: 8px; margin-top: 14px; padding-top: 12px; }
+  .j__points li { font-size: 14px; }
 }
 
-/* Serve and Support: two rails of cards, side by side from 960 px; Serve on a night slab. */
-.h-lean-rails-section { padding-block: clamp(56px, 7vw, 104px); }
-.h-lean-rails { display: grid; grid-template-columns: minmax(0, 1fr); gap: 28px; }
-@media (min-width: 960px) { .h-lean-rails { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 32px; } }
-.h-lean-rail {
-  position: relative; display: grid; align-content: start; min-width: 0; padding: clamp(22px, 3vw, 40px);
-  border: 0.5px solid var(--s1-rule-strong); background: var(--c-surface-raised); container: rail / inline-size;
-}
-/* The night rail with a breath of jade, so it stands apart from the paper rail in either theme. */
-.h-lean-rail.h-night { background: color-mix(in srgb, var(--c-primary) 7%, var(--s1-paper-2)); }
-.h-lean-rail::after { content: ""; position: absolute; inset: -6px; pointer-events: none; background: var(--s1-corners); color: var(--s1-ink); }
-/* The night rail's "+" marks sit on the page's paper, outside its night scope: a grey that shows on both. */
-.h-lean-rail.h-night::after { color: var(--s1-ink-3); }
-.h-lean-rail .h-eyebrow { margin-bottom: 12px; }
-.h-lean-rail.h-night .h-eyebrow { color: var(--c-primary); }
-.h-lean-rail__title { font-size: clamp(1.9rem, 1.3rem + 1.5vw, 2.7rem); margin-bottom: clamp(20px, 2.4vw, 30px); }
-/* Also in Aha: across both columns, its cards in two columns from 960 px; under them, the way to the whole of it. */
-.h-lean-rail__more { margin-top: 26px; }
-.h-lean-rail--wide { grid-column: 1 / -1; }
-@media (min-width: 960px) { .h-lean-rail--wide .h-lean-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 40px; } }
-
-/* A card: its picture, name and line, its status, an arrow; the name's link covers the card. */
-.h-lean-cards { display: grid; border-top: 1px solid var(--s1-rule-strong); }
-.h-lean-card {
-  position: relative; display: grid; grid-template-columns: 40px minmax(0, 1fr) auto 16px; grid-template-areas: "icon text chip arrow";
-  align-items: center; gap: 6px 16px; padding: 16px 6px 16px 0; border-bottom: 0.5px solid var(--s1-rule);
-  transition: background-color 0.15s ease;
-}
-.h-lean-card:hover { background: color-mix(in srgb, var(--c-primary) 7%, transparent); }
-.h-lean-card:has(a:focus-visible) { outline: 2px solid var(--c-primary); outline-offset: -2px; }
-.h-lean-card__icon {
-  grid-area: icon; display: grid; place-items: center; width: 40px; height: 40px; box-sizing: border-box;
-  border: 0.5px solid color-mix(in srgb, var(--c-primary) 45%, transparent); background: var(--c-primary-tint); color: var(--c-primary-strong);
-}
-.h-lean-card__icon svg { width: 19px; height: 19px; stroke-width: 1.6; }
-.h-lean-card__text { grid-area: text; display: grid; gap: 3px; min-width: 0; }
-.h-lean-card__name { font: 400 1.42rem/1.12 var(--s1-font-display); letter-spacing: -0.005em; }
-.h-lean-card__name a { color: var(--s1-ink); text-decoration: none; }
-.h-lean-card__name a::after { content: ""; position: absolute; inset: 0; }
-.h-lean-card__name a:focus-visible { outline: none; }
-.h-lean-card__line { font-size: 14.5px; line-height: 1.45; color: var(--s1-ink-2); text-wrap: pretty; }
-.h-lean-card__chip { grid-area: chip; justify-self: end; }
-.h-lean-card__arrow { grid-area: arrow; width: 16px; height: 16px; color: var(--s1-ink-3); transition: transform 0.15s ease, color 0.15s ease; }
-.h-lean-card:hover .h-lean-card__arrow { transform: translateX(3px); color: var(--c-primary); }
-.h-lean-card:hover .h-lean-card__name a { color: var(--s1-ink); text-decoration: underline; text-decoration-color: var(--c-primary); text-decoration-thickness: 1.5px; text-underline-offset: 4px; }
-/* A narrow rail: the status under the line. */
-@container rail (max-width: 459px) {
-  .h-lean-card {
-    grid-template-columns: 36px minmax(0, 1fr) 16px; grid-template-areas: "icon text arrow" "icon chip arrow"; align-items: start;
-    column-gap: 14px; padding-block: 14px;
-  }
-  .h-lean-card__icon { width: 36px; height: 36px; }
-  .h-lean-card__chip { justify-self: start; margin-top: 4px; }
-  .h-lean-card__arrow { align-self: center; }
-}
-
-/* Also in Aha with pictures: each card its screenshot, then its name, line and
-   status, the arrow beside the name; one column on a phone, two in a rail 560 px wide, four from 1000 px. */
-.h-lean-rail .h-lean-cards--shots { grid-template-columns: minmax(0, 1fr); gap: 34px 28px; border-top: 0; }
-@container rail (min-width: 560px) { .h-lean-rail .h-lean-cards--shots { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-@container rail (min-width: 1000px) { .h-lean-rail .h-lean-cards--shots { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
-.h-lean-card.h-shot-card,
-.h-lean-rail .h-lean-card.h-shot-card {
-  grid-template-columns: minmax(0, 1fr) 16px; grid-template-areas: "fig fig" "text arrow" "chip chip";
-  align-items: start; gap: 16px 12px; padding: 0 0 20px; border-bottom: 0.5px solid var(--s1-rule-strong);
-}
-.h-shot-card > .h-fig { grid-area: fig; }
-.h-shot-card .h-lean-card__chip { justify-self: start; margin-top: -4px; }
-.h-shot-card .h-lean-card__arrow { margin-top: 6px; }
-.h-shot-card:hover { background: none; }
-.h-shot-card:hover .h-fig__frame:not(.is-pending) { border-color: var(--c-primary); }
-.h-shot-card:has(a:focus-visible) { outline-offset: 6px; }
-/* A narrow rail (a phone): the picture small at the card's left, the words beside it, so the four stay a short list. */
-@container rail (width < 560px) {
-  .h-lean-card.h-shot-card,
-  .h-lean-rail .h-lean-card.h-shot-card {
-    grid-template-columns: 112px minmax(0, 1fr) 16px; grid-template-areas: "fig text arrow" "fig chip arrow"; column-gap: 16px; row-gap: 8px;
-    padding-bottom: 18px;
-  }
-  .h-lean-rail .h-lean-cards--shots { gap: 18px; }
-  .h-shot-card .h-lean-card__arrow { align-self: center; margin-top: 0; }
-  .h-shot-card .h-lean-card__chip { margin-top: 0; }
-  .h-shot-card .h-fig { --h-fig-plate: 4px; align-self: start; }
-  .h-shot-card .h-fig__bar { height: 12px; padding-inline: 5px; }
-  .h-shot-card .h-fig__host { display: none; }
-  .h-shot-card .h-fig__dots { width: 13px; height: 3px; background-size: 5px 3px; background-image: radial-gradient(circle 1.5px at 1.5px 1.5px, var(--s1-ink-3) 98%, transparent); }
-  .h-shot-card .h-fig__pending { padding: 4px 6px; gap: 2px; border: 0; background: transparent; }
-  .h-shot-card .h-fig__pending-ring, .h-shot-card .h-fig__pending-note { display: none; }
-  .h-shot-card .h-fig__pending-label { font-size: 9px; letter-spacing: 0.06em; }
-}
-
-/* Pricing beside the questions, on the second paper. */
-.h-lean-price-section { padding-block: clamp(56px, 7vw, 100px); }
-.h-lean-price-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 44px 80px; align-items: start; }
-@media (min-width: 960px) { .h-lean-price-grid { grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr); } }
-.h-lean-price { display: grid; justify-items: start; gap: 18px; min-width: 0; }
-.h-lean-price .h-eyebrow { margin-bottom: 0; }
-.h-lean-price .h-lead { max-width: 30em; }
-.h-lean-price__amount { font: 400 1.7em/1 var(--s1-font-display); color: var(--c-money); white-space: nowrap; }
-.h-lean-price__beat { width: min(300px, 100%); height: 26px; color: var(--c-money); }
+/* After the journey, on paper: the first request, the price figures, the closing. */
+.h-home-paper { z-index: 2; background: var(--s1-paper); border-top: 1px solid var(--s1-rule-strong); }
+.h-first { display: grid; grid-template-columns: minmax(0, 1fr); gap: 36px 64px; align-items: start; }
+@media (min-width: 1024px) { .h-first { grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr); } }
+.h-first__words .h-lead { margin-top: 16px; }
+.h-first__words .h-actions { margin-top: 24px; }
+.h-first__code .s1-code-block { border-top: 0; }
+.h-home-note { margin-top: 18px; }
+.h-home-close { display: grid; gap: 22px; justify-items: start; }
+.h-home-close .h-lead { margin-top: 14px; }
+@media (min-width: 900px) { .h-home-close { grid-template-columns: minmax(0, 1fr) auto; align-items: end; } }
 
 /* ------------------------------------------------------------------ get started (/start/) */
 
@@ -893,8 +613,6 @@
 .h-fig__dots { width: 26px; height: 6px; flex: none; background: radial-gradient(circle 3px at 3px 3px, var(--s1-ink-3) 98%, transparent) 0 0 / 10px 6px repeat-x; }
 .h-fig__host { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
 /* A capture's status and when, at the bar's right end: over the picture, where a reader looks first. */
-.h-fig__label { display: inline-flex; align-items: center; gap: 8px; flex: none; margin-left: auto; color: var(--s1-ink); }
-.h-fig__when { font: 500 10.5px/1 var(--s1-font-mono); letter-spacing: 0.1em; text-transform: uppercase; }
 /* The capture's shape is kept before it arrives (1600 x 1000), on the second paper. */
 .h-fig__view { position: relative; aspect-ratio: 16 / 10; overflow: hidden; background: var(--s1-paper-2); }
 .h-fig__img { display: block; width: 100%; height: 100%; object-fit: cover; }
@@ -916,18 +634,12 @@
 .h-fig__credit-part { white-space: nowrap; }
 .h-fig__text { max-width: 62ch; font-size: 14px; line-height: 1.5; color: var(--s1-ink-2); text-wrap: pretty; }
 /* A capture's status on its caption (Coming: built, not released; Live: open today), before the figure's number. */
-.h-fig__status { margin-right: 10px; vertical-align: 1px; }
 .h-fig__no {
   margin-right: 10px; color: var(--c-primary-strong); font: 500 11px/1 var(--s1-font-mono); letter-spacing: 0.12em; text-transform: uppercase;
 }
 @media (max-width: 639px) {
   .h-fig { --h-fig-plate: 8px; }
-  /* A capture with a telling part (shots.ts `focus`) shows it larger on a phone: scaled about that part, clipped by
-     the frame, which keeps its shape. */
-  .h-fig[data-focus] .h-fig__img { transform: scale(var(--h-fig-zoom)); transform-origin: var(--h-fig-origin); }
 }
-/* A small figure (today's list under Bots) shows its telling part at every width. */
-.h-fig--close .h-fig__img { transform: scale(var(--h-fig-zoom)); transform-origin: var(--h-fig-origin); }
 
 /* What is not open yet: the frame dashed, the view hatched, no picture; a ring and the words in the middle. */
 .h-fig__frame.is-pending { border-style: dashed; border-color: var(--s1-ink-3); box-shadow: none; background: transparent; }
@@ -950,11 +662,6 @@
   .h-spread { grid-template-columns: minmax(0, 1.32fr) minmax(0, 1fr); }
   .h-spread--flip { grid-template-columns: minmax(0, 1fr) minmax(0, 1.32fr); }
   .h-spread--flip > .h-fig { order: 2; }
-  /* The lead picture of a section, a step wider than its points. */
-  .h-spread--lead { grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); column-gap: 44px; }
-}
-@media (min-width: 1200px) {
-  .h-spread--lead { grid-template-columns: minmax(0, 1.62fr) minmax(0, 1fr); column-gap: 56px; }
 }
 .h-spread__copy { display: grid; align-content: start; gap: 26px; min-width: 0; }
 .h-spread__points { border-top: 1px solid var(--s1-ink); }
@@ -1181,12 +888,11 @@
 .h-status__label.is-unchecked { border-style: dashed; color: var(--s1-ink-2); }
 .h-status__source { font-size: 13.5px; line-height: 1.5; color: var(--s1-ink-2); }
 
-/* ------------------------------------------------------------------ the price map (/ and /pricing/, page/PriceMap.tsx) */
+/* ------------------------------------------------------------------ the price map (/pricing/, page/PriceMap.tsx) */
 
 /* The @s1lin MetroMaps: by the token (zones, interchanges), then by the piece; ghost lines while the prices come. */
 /* On the homepage, straight after the models' section (its bottom air is the gap above the map) and before the
    backend's rails (their top air is the gap under it). */
-.h-pricemap--home { padding-block: clamp(8px, 2vw, 24px) clamp(8px, 2vw, 24px); }
 /* On a phone the map runs down the page and the names and prices stand in one column across the fare zones: a zone's
    dashed edge would strike through a price, which then reads as an old one (2026-11-03, the homepage at 390 px). There
    the shading alone marks the zones. */

@@ -1,7 +1,9 @@
+import { STATUSES } from "@/content/site";
 import { CELL_H, CELL_W, moonArt } from "./orbitMoonArt";
 import { createOrbitScene, ORBIT_COLS, ORBIT_ROWS } from "./orbitScene";
-import { MOONS } from "./Orbit";
-import { RINGS } from "./orbitMotion";
+
+/** A small moon's radii in stage units (the closing bands' moons are larger: ./ctaArt.ts). */
+const SMALL = [56, 50];
 
 const GLYPHS = /^[@%#*+=\-:. \n]+$/;
 const RAMP = "@%#*+=-:. ";
@@ -20,8 +22,7 @@ describe("the moons in ASCII", () => {
     // The planet's own glyphs, and nothing else.
     const planet = createOrbitScene([]).render(0);
     const used = new Set(planet.replace(/\n/g, ""));
-    for (const m of MOONS) {
-      const art = moonArt(RINGS[m.ring].moonR, m.status);
+    for (const art of SMALL.flatMap((r) => STATUSES.map((status) => moonArt(r, status)))) {
       expect(art).toMatch(GLYPHS);
       for (const c of art.replace(/\n/g, "")) expect(used.has(c) || c === " ", c).toBe(true);
       const rows = grid(art);
@@ -33,7 +34,7 @@ describe("the moons in ASCII", () => {
   });
 
   it("show the status as the legend's pips do: whole, half, rim, dashed rim", () => {
-    const r = RINGS.serve.moonR;
+    const r = SMALL[0];
     // How much ink a moon puts down: each glyph by its place on the ramp (@ the most, a space none).
     const ink = (art: string) => [...art.replace(/\n/g, "")].reduce((n, c) => n + RAMP.length - 1 - RAMP.indexOf(c), 0);
     const live = moonArt(r, "live");
@@ -56,7 +57,7 @@ describe("the moons in ASCII", () => {
   });
 
   it("is lit from the planet's side: the upper left denser than the lower right", () => {
-    const rows = grid(moonArt(RINGS.serve.moonR, "live"));
+    const rows = grid(moonArt(SMALL[0], "live"));
     const weight = (c: string) => RAMP.length - 1 - RAMP.indexOf(c);
     const half = rows[0].length / 2;
     const upperLeft = rows.slice(0, rows.length / 2).reduce((n, row) => n + [...row.slice(0, half)].reduce((k, c) => k + weight(c), 0), 0);

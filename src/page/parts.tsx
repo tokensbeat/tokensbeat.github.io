@@ -10,7 +10,7 @@
 import type { ReactNode } from "react";
 import { useRef } from "react";
 import { ArrowRight, ArrowUpRight, Check, Plus, type LucideIcon } from "lucide-react";
-import { Button, type ButtonVariant } from "@/components/s1lin/button";
+import { Button, type ButtonSize, type ButtonVariant } from "@/components/s1lin/button";
 import { cn } from "@/components/s1lin/cn";
 import { useOverflow } from "@/components/s1lin/use-overflow";
 import { C } from "@/content/copy";
@@ -54,11 +54,25 @@ export function More({ href, children, className }: { href: string; children: Re
   );
 }
 
-/** A button that is a link: "go" for the one thing to do (with an arrow), "plain" beside it. */
-export function LinkButton({ href, variant = "plain", arrow = variant === "go", children, className }: { href: string; variant?: ButtonVariant; arrow?: boolean; children: ReactNode; className?: string }) {
+/** A button that is a link: "go" for the one thing to do (with an arrow), "plain" beside it; "sm" on a plate. */
+export function LinkButton({
+  href,
+  variant = "plain",
+  size,
+  arrow = variant === "go",
+  children,
+  className,
+}: {
+  href: string;
+  variant?: ButtonVariant;
+  size?: ButtonSize;
+  arrow?: boolean;
+  children: ReactNode;
+  className?: string;
+}) {
   const Icon = isExternal(href) && !href.startsWith("https://console.tokensbeat.com") ? ArrowUpRight : ArrowRight;
   return (
-    <Button href={href} variant={variant} className={cn("h-btn", className)}>
+    <Button href={href} variant={variant} size={size} className={cn("h-btn", className)}>
       {children}
       {arrow && <Icon className="h-btn__icon" aria-hidden="true" focusable="false" />}
     </Button>
@@ -301,7 +315,7 @@ export function FaqList({ id, items, title, embedded = false }: { id: string; it
 
 /**
  * The closing band: the last thing to do, on the brand's jade. `aside` is a column of its own beside the words,
- * running to the plate's edges (the homepage's sharks), and is decorative: hidden from screen readers.
+ * running to the plate's edges (a product page's art), and is decorative: hidden from screen readers.
  */
 export function CtaBand({ id, title, lead, aside, children }: { id: string; title: ReactNode; lead?: string; aside?: ReactNode; children: ReactNode }) {
   return (

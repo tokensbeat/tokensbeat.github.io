@@ -4,7 +4,6 @@ import path from "node:path";
 import { assemble, files, pages, policyTags, sitePaths } from "@/entry-server";
 import { appPagePath, CONTENT_PAGES, DOC_SLUGS, LEGAL_UNLISTED } from "@/content/routes";
 import { pagePath } from "@/content/site";
-import { HOME } from "@/content/home";
 import { SEO } from "@/content/seo";
 import { LANGS, tagOf, translate } from "@/i18n";
 import { C } from "@/content/copy";
@@ -76,22 +75,24 @@ describe("the prerendered pages", () => {
   it("puts the deck's headline in / and /zh/, and a description that names the products", () => {
     expect(h1Of(page("index.html"))).toBe("Galaxies of Intelligence. Born from Within.");
     expect(h1Of(page("zh/index.html"))).toBe("星汉灿烂，若出其里。");
-    // The hero is a line of a poem; the claim under it and the head say the product in plain words.
-    expect(page("index.html")).toContain('<p class="h-home-claim">One key for the models. A team of bots for the work.</p>');
-    expect(page("zh/index.html")).toContain('<p class="h-home-claim">一把密钥通模型，一队机器人干活。</p>');
-    expect(page("index.html")).toContain("<title>TokensBeat: one key for the AI models, and Aha with its working bots</title>");
-    for (const part of ["AI models", "API key", "Aha", "bots", "Aha Code", "Postgres backend", "agent runtime", "early access"]) expect(SEO.home.en.description).toContain(part);
-    for (const part of ["AI 模型", "API 密钥", "Aha", "机器人", "Aha 代码", "Postgres 后端", "Agent 运行时", "抢先体验"]) expect(SEO.home.zh.description).toContain(part);
+    // The hero is a line of a poem; the lead under it and the head say the products in plain words.
+    expect(page("index.html")).toContain('<p class="h-lead">One account for an AI assistant, bots that run on a schedule, and one API key for every model. Pay as you go.</p>');
+    expect(page("zh/index.html")).toContain('<p class="h-lead">一个账户：AI 助手、按日程运行的机器人，和一把调用所有模型的 API 密钥。按用量付费。</p>');
+    expect(page("index.html")).toContain("<title>TokensBeat: an AI assistant, bots on a schedule, and one API key for every model</title>");
+    for (const part of ["Aha", "AI assistant", "bots", "API key", "every model", "prepaid balance"]) expect(SEO.home.en.description).toContain(part);
+    for (const part of ["Aha", "AI 助手", "机器人", "API 密钥", "所有模型", "预付余额"]) expect(SEO.home.zh.description).toContain(part);
     expect(page("index.html")).toContain(`<meta property="og:description" content="${SEO.home.en.description}" />`);
     expect(page("zh/index.html")).toContain(`<meta property="og:description" content="${SEO.home.zh.description}" />`);
   });
 
-  it("prerenders the orbit's first frame: the moons and labels placed, the planet's text in place", () => {
+  it("prerenders the journey: the chart's empty canvas and its notes, the five stops, the first stop in force", () => {
     const html = page("index.html");
-    expect(html.match(/class="h-orbit__moon /g)).toHaveLength(10);
-    expect(html).toMatch(/class="h-orbit__moon [^"]*"[^>]*style="transform:translate3d\([\d.]+cqw, [\d.]+cqw, 0\)/);
-    expect(html).toContain('class="h-orbit__planet-text"');
-    expect(html).toMatch(/<button[^>]*class="h-orbit__pause"[^>]*hidden=""/);
+    expect(html).toMatch(/<canvas class="j__cv" role="img" aria-label="A chart of the Milky Way/);
+    expect(html.match(/class="j__note"/g)).toHaveLength(16);
+    expect(html.match(/class="j__step[ "]/g)).toHaveLength(5);
+    expect(html.match(/<button type="button" class="j__stop"/g)).toHaveLength(5);
+    expect(html).toContain('<button type="button" class="j__stop" aria-current="step">');
+    expect(html).toContain("00 / 04 · Start");
   });
 
   it("points Open Graph at social cards that exist (public/og)", () => {
@@ -99,7 +100,8 @@ describe("the prerendered pages", () => {
   });
 
   it("keeps a dollar sign in the page as it is", () => {
-    expect(page("index.html")).toMatch(/Start from <b class="h-lean-price__amount">\$5<\/b>\. One prepaid balance/);
+    expect(page("index.html")).toContain('<p class="s1-stat__value">$5</p>');
+    expect(page("index.html")).toContain("Top up from $5 by card or Link, or from $15 in USDT or USDC.");
   });
 
   it("marks the 404 page for the client and keeps it out of search", () => {
@@ -109,12 +111,8 @@ describe("the prerendered pages", () => {
     expect(html).toContain("Page not found.");
   });
 
-  it("gives the homepage's questions as FAQPage data in its language, word for word as the page shows them", () => {
-    const zh = structuredData("home", "zh").find((s) => s["@type"] === "FAQPage") as { mainEntity: { name: string; acceptedAnswer: { text: string } }[] };
-    expect(zh.mainEntity.map((q) => q.name)).toEqual(HOME.faq.map((x) => x.q.zh));
-    expect(zh.mainEntity[0].name).toBe("现在能用的有哪些？");
-    const en = structuredData("home", "en").find((s) => s["@type"] === "FAQPage") as { mainEntity: { name: string; acceptedAnswer: { text: string } }[] };
-    expect(en.mainEntity.map((q) => q.acceptedAnswer.text)).toEqual(HOME.faq.map((x) => x.a.en));
+  it("gives FAQPage data only where the page shows its questions: the database page, not the homepage", () => {
+    for (const lang of LANGS) expect(structuredData("home", lang).some((s) => s["@type"] === "FAQPage")).toBe(false);
     const db = structuredData("database", "zh").find((s) => s["@type"] === "FAQPage") as { mainEntity: { name: string }[] };
     expect(db.mainEntity).toHaveLength(3);
     expect(db.mainEntity[0].name).toBe(translate("zh", C.database.faq.jsQ));

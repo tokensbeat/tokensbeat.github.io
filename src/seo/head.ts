@@ -14,7 +14,6 @@
 import { C } from "@/content/copy";
 import { AHA_URL, API_BASE_URL, CONSOLE_ORIGIN } from "@/content/links";
 import { SEO } from "@/content/seo";
-import { HOME } from "@/content/home";
 import { pagePath, type PageId } from "@/content/site";
 import { LANGS, tagOf, translate, type Lang } from "@/i18n";
 
@@ -117,9 +116,6 @@ export function structuredData(page: PageId, lang: Lang): JsonLd[] {
         { "@type": "ListItem", position: 2, name: translate(lang, C.pages[page].name), item: meta.url },
       ],
     });
-  }
-  if (page === "home") {
-    out.push(faqPage(page, lang, HOME.faq.map((x) => ({ q: x.q[lang], a: x.a[lang] }))));
   }
   if (page === "database") {
     out.push(

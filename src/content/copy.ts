@@ -821,7 +821,6 @@ export const C = {
       legendInput: "priced on input",
       legendSame: "same fare",
       table: "Every price, every route, as a table",
-      all: "All prices, by the token and by the piece",
       pieceTitle: "By the piece",
       pieceLead: "Models priced per image or per request cannot sit on a token axis. They have their own small map, in USD per piece; the unit is on every stop.",
       pieceLabel: "Price map of models priced per image or request",

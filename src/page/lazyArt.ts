@@ -1,7 +1,7 @@
 /**
  * A closing band's art starts only near the screen: its code is a dynamic import, fetched once the band's canvas comes
  * within LOAD_MARGIN of view (IntersectionObserver), so a page's first load carries none of it; the server renders the
- * canvas empty. Shared by the homepage's sharks (./SharkWater.tsx) and the product pages' art (./CtaArt.tsx).
+ * canvas empty. Used by the product pages' closing art (./CtaArt.tsx).
  */
 import { useEffect, useRef } from "react";
 

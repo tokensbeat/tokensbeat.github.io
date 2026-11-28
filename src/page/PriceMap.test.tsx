@@ -2,8 +2,7 @@
  * The price maps, read from the gateway's public price list (GET /api/v1/model-plaza/prices): on /pricing/, ghost lines
  * in the prerendered page, the live maps after (families with their logos, fare zones, an interchange, the piece map,
  * the hidden list that is their text alternative, the link to the console's table), in English and Chinese; prices
- * not published (404, 403), a failure, reduced motion; never a status, whatever the body sends. On the homepage, the
- * token map under the console's heading, with links to /pricing/'s maps and the console's table. The AI models page's
+ * not published (404, 403), a failure, reduced motion; never a status, whatever the body sends. The AI models page's
  * link to them.
  */
 import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
@@ -180,71 +179,6 @@ describe("the price map on /pricing/", () => {
       delete (SVGSVGElement.prototype as Partial<SVGSVGElement>).pauseAnimations;
       delete (SVGSVGElement.prototype as Partial<SVGSVGElement>).unpauseAnimations;
     }
-  });
-});
-
-describe("the price map on the homepage", () => {
-  /** The homepage's map section. */
-  const homeSection = () => document.getElementById("home-price-map")!.closest("section")!;
-
-  it("is in the prerendered homepage right after the models' section, as the console's heading and ghost lines, in both languages", () => {
-    const en = renderToString(<App lang="en" page="home" />);
-    expect(en).toContain(`id="home-price-map" class="h-h2">AI API pricing is a mess. Here&#x27;s the map.</h2>`);
-    expect(en).toMatch(/<figure class="s1-metro h-pricemap__map" aria-busy="true"/);
-    expect(en.match(/class="s1-metro__ghost-roundel"/g)).toHaveLength(6);
-    expect(en).not.toContain("s1-metro__line");
-    // after one kind of key and its call, before the backend's rails and the pricing band with its questions
-    expect(en.indexOf('id="home-models"')).toBeLessThan(en.indexOf('id="home-price-map"'));
-    expect(en.indexOf('id="home-price-map"')).toBeLessThan(en.indexOf('data-rail="serve"'));
-    expect(en.indexOf('data-rail="support"')).toBeLessThan(en.indexOf('id="home-pricing"'));
-    const zh = renderToString(<App lang="zh" page="home" />);
-    expect(zh).toContain(`id="home-price-map" class="h-h2">AI API 的价格一团乱，这是地图。</h2>`);
-  });
-
-  it("draws the token map from the public price list, no status on any card, then links to the full maps and the console's table", async () => {
-    const fetch = stubFetch({ body: withHealth() });
-    render(<App lang="en" page="home" />);
-    const map = await figure(/^TokensBeat's prices now/);
-    expect(fetch).toHaveBeenCalledWith("/api/v1/model-plaza/prices", expect.objectContaining({ credentials: "omit" }));
-    expect(map.closest("section")).toBe(homeSection());
-    expect(map).toHaveAttribute("aria-details", "home-price-map-list");
-    expect(within(map).getAllByRole("group").map((g) => g.getAttribute("aria-label"))).toEqual(["Price map of the models, by family and output price", "GPT", "Claude", "Qwen"]);
-    expect(within(map).getByRole("link", { name: "gpt-5.5, 1.60 / 8.00" })).toHaveAttribute("href", expect.stringMatching(/^https:\/\/console\.tokensbeat\.com\/models\?model=gpt-5\.5&group=\d+$/));
-    fireEvent.focus(within(map).getByRole("link", { name: /^claude-haiku-5, / }));
-    expect(document.querySelector(".s1-metro__status, .s1-metro__strip, .s1-metro__tip-tone")).toBeNull();
-    expect(homeSection()).not.toHaveTextContent(/Degraded|Normal|No status yet|Last 24 hours/);
-    // the token map only: the piece map is on /pricing/, one link away, beside the console's table
-    expect(within(homeSection()).queryByRole("heading", { level: 3, name: "By the piece" })).toBeNull();
-    expect(within(homeSection()).getAllByRole("figure")).toHaveLength(1);
-    expect(within(homeSection()).getByRole("link", { name: "All prices, by the token and by the piece" })).toHaveAttribute("href", "/pricing/#pricing-map");
-    expect(within(homeSection()).getByRole("link", { name: "Every price, every route, as a table" })).toHaveAttribute("href", "https://console.tokensbeat.com/models?view=pricing");
-    expect(within(document.getElementById("home-price-map-list")!).queryByRole("list", { name: "Priced by the piece" })).toBeNull();
-  });
-
-  it("is in Chinese on /zh/, its links to the Chinese pricing page and console", async () => {
-    stubFetch({ body: PLAZA });
-    render(<App lang="zh" page="home" />);
-    const map = await figure(/^TokensBeat 现在的价格/);
-    expect(within(map).getByRole("link", { name: "qwen-3.8, 0.40 / 1.20" })).toHaveAttribute("href", expect.stringMatching(/^https:\/\/console\.tokensbeat\.com\/models\?model=qwen-3\.8&group=\d+&lang=zh$/));
-    expect(within(homeSection()).getByRole("link", { name: "全部价格：按 token 与按件计价" })).toHaveAttribute("href", "/zh/pricing/#pricing-map");
-    expect(within(homeSection()).getByRole("link", { name: "每个价格、每条线路的表格" })).toHaveAttribute("href", "https://console.tokensbeat.com/models?view=pricing&lang=zh");
-  });
-
-  it("keeps its heading and says the prices are in the plaza when the gateway answers 404 (the owner's switch is off)", async () => {
-    stubFetch({ status: 404, body: { code: 404, message: "Model plaza prices are not public" } });
-    render(<App lang="en" page="home" />);
-    const map = await within(homeSection()).findByRole("figure", { busy: false });
-    expect(within(homeSection()).getByRole("heading", { level: 2, name: "AI API pricing is a mess. Here's the map." })).toBeInTheDocument();
-    expect(within(map).getByText("Live prices are in the Service Plaza")).toBeInTheDocument();
-    expect(within(map).getByRole("link", { name: "Open the Service Plaza" })).toHaveAttribute("href", "https://console.tokensbeat.com/models");
-    expect(within(homeSection()).queryByRole("link", { name: "All prices, by the token and by the piece" })).toBeNull();
-  });
-
-  it("says the map could not load when nothing answers", async () => {
-    stubFetch("offline");
-    render(<App lang="en" page="home" />);
-    const map = await within(homeSection()).findByRole("figure", { busy: false });
-    expect(within(map).getByText("The map could not load just now")).toBeInTheDocument();
   });
 });
 

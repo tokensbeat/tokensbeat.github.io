@@ -55,7 +55,6 @@ export const ZH: Readonly<Record<string, string>> = {
   "priced on input": "按输入计价",
   "same fare": "同价换乘",
   "Every price, every route, as a table": "每个价格、每条线路的表格",
-  "All prices, by the token and by the piece": "全部价格：按 token 与按件计价",
   "By the piece": "按件计价",
   "Models priced per image or per request cannot sit on a token axis. They have their own small map, in USD per piece; the unit is on every stop.":
     "按张或按次计价的模型放不进 token 的坐标轴，它们有自己的小地图，单位美元 / 件；每站标明单位。",

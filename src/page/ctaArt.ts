@@ -1,6 +1,7 @@
 /**
- * The product pages' closing art (../CtaArt.tsx): beside each page's last call to action, a variation of the homepage's
- * ASCII, drawn by the homepage's own engines with their options, so each reads as the same hand and none is a copy.
+ * The product pages' closing art (../CtaArt.tsx): beside each page's last call to action, a variation of one ASCII
+ * engine (the sharks' water, the stars, the orbit's bodies) with its options, so each reads as the same hand and none
+ * is a copy.
  *   water (./sharks/water.ts, the closing band's sharks)
  *     aha        one shark through a school that mills in bait balls: where people gather, the flagship swims
  *     storage    no sharks; bubbles rising (small fish drawn . ° o O, carried up, back in at the bottom): uploads

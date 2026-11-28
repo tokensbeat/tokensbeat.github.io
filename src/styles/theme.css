@@ -145,15 +145,14 @@
 
 /* ------------------------------------------------------------------ the night sky (both themes) */
 
-/* The homepage hero's ground (src/page/pages/Home.tsx, .h-cosmos): deep space with a haze at the top and a jade glow
-   round the planet, the same in both themes; the hero is night inside (data-theme="dark"), so its words are the night
-   tokens. Contrast on the darkest / the haze / the glow over the haze: ink 17.20 / 15.52 / 12.48, ink-2 9.61 / 8.67 /
-   6.97, primary-strong 11.92 / 10.75 / 8.65, the status hues 6.60+. The stars (src/page/starField.ts) are drawn in
-   the three star tokens on a canvas. */
+/* The homepage journey's ground (src/page/Journey.tsx, .j__stage): deep space with a haze at the top, the same in both
+   themes; the slab is night inside (data-theme="dark"), so its words are the night tokens. Contrast on the darkest /
+   the haze: ink 17.20 / 15.52, ink-2 9.61 / 8.67, primary-strong 11.92 / 10.75, the status hues 6.60+. The chart of
+   the Milky Way (src/page/milkyWay.ts) and the closing bands' stars (src/page/starField.ts) are drawn in the three star
+   tokens on a canvas. */
 :root {
   --c-cosmos: #05070d;
   --c-cosmos-haze: #0c1624;
-  --c-cosmos-glow: rgb(63 209 181 / 0.12);
   --c-star: #eef2fb;
   --c-star-cool: #bcd0ff;
   --c-star-warm: #ffe2bd;
