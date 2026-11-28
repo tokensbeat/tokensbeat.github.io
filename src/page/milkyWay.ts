@@ -1,17 +1,22 @@
 /**
- * The homepage's chart of the Milky Way (./Journey.tsx), drawn on a canvas: a river of about 7,600 seeded stars along a
- * spine, with its glow and dust lane, and four products at points along it, each drawn as an engraved plate would
- * annotate it: Aha (a jade planet with its ring and a moon), Bots (six moons on their orbits, one bringing back a
- * report), the Model API (a key, the gateway and four model stars, one route lit) and the balance (one warm star tied to
- * Aha, Bots and the API). A route runs along the river, dashed ahead and jade where the camera has been.
+ * The homepage's chart of the Milky Way (./Journey.tsx), drawn in ASCII: every frame is a grid of characters in the
+ * site's monospace face, as the site's other ASCII art is. The river is a density field (about 7,600 seeded stars along
+ * a spine, its glow and its dust lane, built once) read at each cell and set as a glyph of the ramp ` .:-=+*#%@`, warm
+ * at the bulge, cool or white elsewhere, its brightest stars twinkling between `*`, `+` and `.`. A route runs along the
+ * river in dots, faint ahead and jade where the camera has been.
+ *
+ * Each product is a constellation (星座), drawn as a star atlas draws one: its stars as `*` (a hub as `@`, a faint star
+ * as `+`), joined by dotted lines of `.`, with clear sky round them. Aha is a hub star with Chat, LaTeX and
+ * Aha Work; Bots a dipper of six stars, work handed along its lines; the Model API your key, the gateway and four model
+ * stars, one route lit; the balance one warm star tied to Aha, Bots and the API. A jade `o` runs along the line in use.
  *
  * `p` is where the reader is, 0 (the start, the whole river) to 4 (the last product), fractional between stops; the
  * camera moves from one stop's view to the next and dips out a little between products. `t` is the time in seconds,
- * which moves the moons, the request and the twinkle (it stands still when paused or under reduced motion).
+ * which moves the `o`s and the twinkle (it stands still when paused or under reduced motion).
  *
- * The products' notes are HTML (the page's own type, in its language) that the chart sets on the canvas each frame: a
- * note that would cover a plate of words, or a note already set, waits until there is room. Every colour comes from the
- * theme's tokens on the stage (the three star tokens, the cosmos, the jade and the ink), so the drawing follows them.
+ * The constellations' names are HTML notes (the page's own type, in its language) set beside their stars each frame;
+ * a note that would cover a plate of words, or a note already set, or leave the stage, waits until there is room. Every
+ * colour comes from the theme's tokens on the stage.
  */
 
 export const STOP_COUNT = 5;
@@ -20,33 +25,139 @@ type Rgb = readonly [number, number, number];
 type Pt = readonly [number, number];
 type Side = "l" | "r";
 
+/** The density ramp, from empty to dense. */
+export const RAMP = " .:-=+*#%@";
+
+/** A density (0 empty, 1 the river's brightest) as a glyph of the ramp. */
+export function glyphOf(v: number): string {
+  if (!(v > 0)) return " ";
+  const i = Math.min(RAMP.length - 1, Math.floor(Math.pow(Math.min(1, v), 0.8) * RAMP.length));
+  return RAMP[i];
+}
+
+/** A star of a constellation: where it is from the product's point (world units), how bright, and its note. */
+export interface FigureStar {
+  x: number;
+  y: number;
+  /** 0 a faint star (`+`), 1 a named star (`*`), 2 the figure's hub (`@`). */
+  mag: 0 | 1 | 2;
+  /** The chart note (home-copy.json chart.notes) set beside it. */
+  note?: string;
+  warm?: boolean;
+}
+
+export interface Figure {
+  stars: FigureStar[];
+  /** Lines between stars, by index. */
+  lines: [number, number][];
+}
+
+/** The four constellations, in the stops' order (Aha, Bots, the Model API, the balance). */
+export const FIGURES: readonly Figure[] = [
+  {
+    stars: [
+      { x: 0, y: 0, mag: 2 },
+      { x: -125, y: -45, mag: 1, note: "aha.chat" },
+      { x: 115, y: -75, mag: 1, note: "aha.latex" },
+      { x: 55, y: 105, mag: 1, note: "aha.work" },
+      { x: -35, y: -120, mag: 0 },
+      { x: 180, y: 15, mag: 0 },
+    ],
+    lines: [
+      [0, 1],
+      [0, 2],
+      [0, 3],
+      [1, 4],
+      [4, 2],
+      [2, 5],
+      [5, 3],
+    ],
+  },
+  {
+    stars: [
+      { x: -170, y: -5, mag: 1, note: "bots.0" },
+      { x: -95, y: -45, mag: 1, note: "bots.1" },
+      { x: -70, y: 40, mag: 1, note: "bots.2" },
+      { x: -160, y: 78, mag: 1, note: "bots.3" },
+      { x: 15, y: 20, mag: 1, note: "bots.4" },
+      { x: 92, y: -15, mag: 1, note: "bots.5" },
+      { x: 168, y: -58, mag: 0 },
+    ],
+    lines: [
+      [0, 1],
+      [1, 2],
+      [2, 3],
+      [3, 0],
+      [2, 4],
+      [4, 5],
+      [5, 6],
+    ],
+  },
+  {
+    stars: [
+      { x: -145, y: 20, mag: 1, note: "api.key" },
+      { x: 0, y: 0, mag: 2, note: "api.gw" },
+      { x: 120, y: -95, mag: 1 },
+      { x: 158, y: -25, mag: 1 },
+      { x: 142, y: 50, mag: 1 },
+      { x: 92, y: 118, mag: 1 },
+    ],
+    lines: [
+      [0, 1],
+      [1, 2],
+      [1, 3],
+      [1, 4],
+      [1, 5],
+    ],
+  },
+  {
+    stars: [
+      { x: 0, y: 0, mag: 2, note: "bal.core", warm: true },
+      { x: -112, y: -84, mag: 1, note: "bal.0" },
+      { x: 102, y: -95, mag: 1, note: "bal.1" },
+      { x: 70, y: 121, mag: 1, note: "bal.2" },
+    ],
+    lines: [
+      [0, 1],
+      [0, 2],
+      [0, 3],
+    ],
+  },
+];
+
+/** The Model API's model stars (indices in its figure); the note "A model" rides on the one whose route is lit. */
+const MODEL_STARS = [2, 3, 4, 5];
+
 interface Colours {
   star: Rgb;
   cool: Rgb;
   warm: Rgb;
-  cosmos: Rgb;
   jade: Rgb;
   jade2: Rgb;
   ink: Rgb;
   ink2: Rgb;
 }
 
-interface Star {
+/** The river's density, in a grid over the world, with the share of it that is the bulge's warm light. */
+interface Field {
+  x0: number;
+  y0: number;
+  step: number;
+  w: number;
+  h: number;
+  all: Float32Array;
+  warm: Float32Array;
+}
+
+/** A bright star, drawn as its own glyph and twinkling. */
+interface Bright {
   x: number;
   y: number;
   d: number;
-  col: number;
-  sz: number;
-  a: number;
+  big: boolean;
   tw: number;
   ph: number;
-}
-
-interface World {
-  stars: Star[];
-  glows: { x: number; y: number; sz: number; sp: "warm" | "cool"; a: number }[];
-  dust: { x: number; y: number; rx: number; ry: number; ang: number; a: number }[];
-  deep: { fx: number; fy: number; sz: number; a: number; col: number; tw: number; ph: number }[];
+  tint: 0 | 1 | 2;
 }
 
 interface Placed {
@@ -57,7 +168,6 @@ interface Placed {
   alpha: number;
 }
 
-/** A note the chart places: its element, and its size once measured (reset when the type or the screen changes). */
 interface Note {
   el: HTMLElement;
   w: number;
@@ -65,19 +175,34 @@ interface Note {
   on: boolean;
 }
 
+/** A character set over the river at a point (CSS px): a constellation's star or the dots of its lines, the route, a runner. */
+interface Mark {
+  x: number;
+  y: number;
+  g: string;
+  col: Rgb;
+  a: number;
+  /** A star is set a size larger, in bold. */
+  big?: boolean;
+  /** A dot of a line or of the route, which breaks round a label (a star or a runner does not). */
+  stroke?: boolean;
+}
+
 export interface ChartOptions {
   stage: HTMLElement;
   canvas: HTMLCanvasElement;
   /** The plates of words over the chart, which no note may cover. */
   plates: () => HTMLElement[];
-  /** A stop's name in the page's language, written under it when the chart is seen from afar. */
+  /** Words set straight on the chart (the hero): the river leaves their box empty, so no character sits on a letter. */
+  veils?: () => HTMLElement[];
+  /** A stop's name in the page's language, written under its constellation when the chart is seen from afar. */
   stopName: (k: number) => string;
 }
 
 export interface Chart {
-  /** Measure the stage again (a new size, a new plate width). */
+  /** Measure the stage and the grid again (a new size, a new plate width, the web font arrived). */
   resize(): void;
-  /** The notes' type changed (the web fonts arrived): measure them again on the next draw. */
+  /** The type changed (the web fonts arrived): measure the cells and the notes again. */
   remeasure(): void;
   draw(p: number, t: number): void;
 }
@@ -98,6 +223,13 @@ const gauss = (r: () => number) => {
   while (!u) u = r();
   return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * r());
 };
+
+/** A cell's fixed random in [0, 1) (its twinkle phase, its tint, a far star). */
+function hash(c: number, r: number): number {
+  let h = Math.imul(c, 374761393) + Math.imul(r, 668265263);
+  h = Math.imul(h ^ (h >>> 13), 1274126177);
+  return ((h ^ (h >>> 16)) >>> 0) / 4294967296;
+}
 
 /** The Milky Way's spine (world units), a Catmull-Rom curve through seven points; the products sit at points 2 to 5. */
 export const SPINE: readonly Pt[] = [
@@ -139,10 +271,12 @@ function normal(s: number): [number, number, number] {
 const meander = (s: number) => (Math.sin(s * 2.3) + 0.5 * Math.sin(s * 5.1 + 1)) * 70;
 
 const ease = (t: number) => t * t * (3 - 2 * t);
+/** 0 below a, 1 above b, smooth between. */
+const smooth = (a: number, b: number, x: number) => ease(Math.max(0, Math.min(1, (x - a) / (b - a))));
 
 const rgba = (c: Rgb, a: number) => `rgba(${c[0]},${c[1]},${c[2]},${a})`;
 
-/** A CSS colour as RGB, through a canvas (which resolves any colour syntax). */
+/** A CSS colour as RGB, through a canvas (which resolves any colour syntax to sRGB). */
 function rgbOf(colour: string): Rgb {
   const x = document.createElement("canvas").getContext("2d");
   if (!x) return [0, 0, 0];
@@ -157,26 +291,51 @@ function rgbOf(colour: string): Rgb {
   return [+m[0], +m[1], +m[2]];
 }
 
-/** A soft round glow of one colour, drawn once and stamped many times. */
-function sprite(c: Rgb, size = 128): HTMLCanvasElement {
-  const s = document.createElement("canvas");
-  s.width = s.height = size;
-  const g = s.getContext("2d");
-  if (!g) return s;
-  const gr = g.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2);
-  gr.addColorStop(0, rgba(c, 1));
-  gr.addColorStop(0.25, rgba(c, 0.45));
-  gr.addColorStop(0.6, rgba(c, 0.1));
-  gr.addColorStop(1, rgba(c, 0));
-  g.fillStyle = gr;
-  g.fillRect(0, 0, size, size);
-  return s;
+/** Adds a soft round light (a Gaussian) to a field, centred on world (x, y). */
+function splat(arr: Float32Array, F: Omit<Field, "all" | "warm">, x: number, y: number, sigma: number, amp: number) {
+  const gx = (x - F.x0) / F.step;
+  const gy = (y - F.y0) / F.step;
+  const s = sigma / F.step;
+  const rad = Math.ceil(s * 2.5);
+  const k = -1 / (2 * s * s);
+  for (let j = Math.max(0, Math.floor(gy) - rad); j <= Math.min(F.h - 1, Math.ceil(gy) + rad); j++) {
+    const dy2 = (j - gy) * (j - gy);
+    for (let i = Math.max(0, Math.floor(gx) - rad); i <= Math.min(F.w - 1, Math.ceil(gx) + rad); i++) {
+      arr[j * F.w + i] += amp * Math.exp(((i - gx) * (i - gx) + dy2) * k);
+    }
+  }
 }
 
-/** The river's stars, glows, dust and the far stars behind it, from one seed. */
-function buildWorld(): World {
+/** One pass of a 3 x 3 box blur. */
+function blur(arr: Float32Array, w: number, h: number): Float32Array<ArrayBuffer> {
+  const out = new Float32Array(arr.length);
+  for (let j = 0; j < h; j++) {
+    for (let i = 0; i < w; i++) {
+      let sum = 0;
+      let n = 0;
+      for (let dj = -1; dj <= 1; dj++) {
+        const jj = j + dj;
+        if (jj < 0 || jj >= h) continue;
+        for (let di = -1; di <= 1; di++) {
+          const ii = i + di;
+          if (ii < 0 || ii >= w) continue;
+          sum += arr[jj * w + ii];
+          n++;
+        }
+      }
+      out[j * w + i] = sum / n;
+    }
+  }
+  return out;
+}
+
+/** The river, from one seed: its density field (normalised so its brightest are about 1) and its bright stars. */
+export function buildRiver(): { field: Field; bright: Bright[] } {
   const r = mulberry32(207);
-  const world: World = { stars: [], glows: [], dust: [], deep: [] };
+  const G = { x0: -1400, y0: -2400, step: 12, w: 492, h: 300 };
+  let pts: Float32Array<ArrayBuffer> = new Float32Array(G.w * G.h);
+  let ptsWarm: Float32Array<ArrayBuffer> = new Float32Array(G.w * G.h);
+  const bright: Bright[] = [];
   const N = SPINE.length - 1;
   for (let i = 0; i < 7600; i++) {
     const s = r() < 0.3 ? 3.4 + gauss(r) * 0.55 : r() * N;
@@ -186,56 +345,103 @@ function buildWorld(): World {
     if (Math.abs(off - meander(s)) < 34 && r() < 0.65) continue;
     const bulge = Math.exp(-((s - 3.4) ** 2) / 0.5);
     const p = r();
-    const col = p < 0.5 * bulge ? 2 : p < 0.62 ? 0 : p < 0.97 ? 1 : 3;
+    const tint = p < 0.5 * bulge ? 2 : p < 0.62 ? 0 : 1;
     const big = r();
-    world.stars.push({
-      x: x + nx * off + gauss(r) * 16,
-      y: y + ny * off + gauss(r) * 16,
-      d: 0.86 + r() * 0.28,
-      col,
-      sz: big < 0.84 ? 0.6 + r() * 0.5 : big < 0.98 ? 1.1 + r() * 0.5 : 1.7 + r() * 0.6,
-      a: 0.3 + r() * 0.65,
-      tw: r() < 0.3 ? 2 + r() * 5 : 0,
-      ph: r() * 6.28,
-    });
+    const sz = big < 0.84 ? 0.6 + r() * 0.5 : big < 0.98 ? 1.1 + r() * 0.5 : 1.7 + r() * 0.6;
+    const a = 0.3 + r() * 0.65;
+    const tw = r() < 0.3 ? 2 + r() * 5 : 0;
+    const ph = r() * 6.28;
+    const sx = x + nx * off + gauss(r) * 16;
+    const sy = y + ny * off + gauss(r) * 16;
+    const d = 0.86 + r() * 0.28;
+    const gi = Math.round((sx - G.x0) / G.step);
+    const gj = Math.round((sy - G.y0) / G.step);
+    if (gi >= 0 && gi < G.w && gj >= 0 && gj < G.h) {
+      const v = a * (0.4 + sz * 0.6);
+      pts[gj * G.w + gi] += v;
+      if (tint === 2) ptsWarm[gj * G.w + gi] += v;
+    }
+    if (sz >= 1.1) bright.push({ x: sx, y: sy, d, big: sz >= 1.7, tw, ph, tint: tint as 0 | 1 | 2 });
   }
+  for (let k = 0; k < 2; k++) {
+    pts = blur(pts, G.w, G.h);
+    ptsWarm = blur(ptsWarm, G.w, G.h);
+  }
+  const all = pts;
+  const warm = ptsWarm;
   for (let i = 0; i < 300; i++) {
     const s = r() < 0.3 ? 3.4 + gauss(r) * 0.6 : r() * N;
     const [x, y] = spine(s);
     const [nx, ny] = normal(s);
     const off = gauss(r) * 130;
     const bulge = Math.exp(-((s - 3.4) ** 2) / 0.6);
-    world.glows.push({ x: x + nx * off, y: y + ny * off, sz: 260 + r() * 380, sp: r() < 0.45 * bulge + 0.08 ? "warm" : "cool", a: 0.04 + r() * 0.07 });
+    const sigma = (260 + r() * 380) / 3.2;
+    const amp = (0.04 + r() * 0.07) * 1.6;
+    const isWarm = r() < 0.45 * bulge + 0.08;
+    splat(all, G, x + nx * off, y + ny * off, sigma, amp);
+    if (isWarm) splat(warm, G, x + nx * off, y + ny * off, sigma, amp);
   }
+  // The dust lane darkens the river along its meander.
   for (let i = 0; i < 220; i++) {
     const s = r() * N;
     const [x, y] = spine(s);
     const [nx, ny, ang] = normal(s);
     const off = meander(s) + gauss(r) * 22;
-    world.dust.push({ x: x + nx * off, y: y + ny * off, rx: 110 + r() * 170, ry: 16 + r() * 26, ang: ang + (r() - 0.5) * 0.25, a: 0.25 + r() * 0.25 });
+    const cx = x + nx * off;
+    const cy = y + ny * off;
+    const rx = 110 + r() * 170;
+    const ry = 16 + r() * 26;
+    const th = ang + (r() - 0.5) * 0.25;
+    const a = 0.25 + r() * 0.25;
+    const cos = Math.cos(th);
+    const sin = Math.sin(th);
+    const rad = Math.ceil(rx / G.step) + 1;
+    const gi0 = Math.round((cx - G.x0) / G.step);
+    const gj0 = Math.round((cy - G.y0) / G.step);
+    for (let j = Math.max(0, gj0 - rad); j <= Math.min(G.h - 1, gj0 + rad); j++) {
+      for (let k = Math.max(0, gi0 - rad); k <= Math.min(G.w - 1, gi0 + rad); k++) {
+        const wx = G.x0 + k * G.step - cx;
+        const wy = G.y0 + j * G.step - cy;
+        const u = (wx * cos + wy * sin) / rx;
+        const v = (-wx * sin + wy * cos) / ry;
+        const q = u * u + v * v;
+        if (q > 4) continue;
+        const keep = 1 - a * 1.4 * Math.exp(-q * 1.2);
+        all[j * G.w + k] *= Math.max(0, keep);
+        warm[j * G.w + k] *= Math.max(0, keep);
+      }
+    }
   }
-  for (let i = 0; i < 260; i++) world.deep.push({ fx: r(), fy: r(), sz: 0.4 + r() * 0.8, a: 0.2 + r() * 0.5, col: r() < 0.75 ? 0 : 1, tw: 2 + r() * 6, ph: r() * 6.28 });
-  return world;
+  // Normalise: the river's 99th percentile is 1.
+  const lit: number[] = [];
+  for (let i = 0; i < all.length; i += 7) if (all[i] > 0.01) lit.push(all[i]);
+  lit.sort((a, b) => a - b);
+  const norm = lit.length ? lit[Math.floor(lit.length * 0.99)] : 1;
+  for (let i = 0; i < all.length; i++) {
+    all[i] /= norm;
+    warm[i] /= norm;
+  }
+  return { field: { ...G, all, warm }, bright };
 }
 
-const BOT_SPEED = [0.5, 0.36, 0.28, 0.22, 0.18, 0.15];
-const MODELS: readonly Pt[] = [
-  [118, -96],
-  [150, -26],
-  [138, 48],
-  [96, 116],
-];
-const TIES: readonly (readonly [number, string])[] = [
-  [-2.5, "bal.0"],
-  [-0.75, "bal.1"],
-  [1.05, "bal.2"],
-];
+/** A field read at world (x, y), between its four nearest points. */
+function sample(F: Field, arr: Float32Array, x: number, y: number): number {
+  const gx = (x - F.x0) / F.step;
+  const gy = (y - F.y0) / F.step;
+  const i = Math.floor(gx);
+  const j = Math.floor(gy);
+  if (i < 0 || j < 0 || i >= F.w - 1 || j >= F.h - 1) return 0;
+  const fx = gx - i;
+  const fy = gy - j;
+  const o = j * F.w + i;
+  return (arr[o] * (1 - fx) + arr[o + 1] * fx) * (1 - fy) + (arr[o + F.w] * (1 - fx) + arr[o + F.w + 1] * fx) * fy;
+}
 
 /**
  * The chart on `canvas`, or null where the browser gives no 2D context (the page then shows the night slab and its
  * words without the drawing).
  */
-export function createChart({ stage, canvas, plates, stopName }: ChartOptions): Chart | null {
+export function createChart({ stage, canvas, plates, veils = () => [], stopName }: ChartOptions): Chart | null {
   const ctx = canvas.getContext("2d");
   if (!ctx) return null;
   const cs = getComputedStyle(stage);
@@ -244,15 +450,14 @@ export function createChart({ stage, canvas, plates, stopName }: ChartOptions): 
     star: token("--c-star"),
     cool: token("--c-star-cool"),
     warm: token("--c-star-warm"),
-    cosmos: token("--c-cosmos"),
     jade: token("--c-primary"),
     jade2: token("--c-primary-strong"),
     ink: token("--s1-ink"),
     ink2: token("--s1-ink-2"),
   };
   const MONO = cs.getPropertyValue("--s1-font-mono").trim() || "monospace";
-  const SPR = { cool: sprite(COL.cool), warm: sprite(COL.warm), star: sprite(COL.star, 64), dark: sprite(COL.cosmos) };
-  const WORLD = buildWorld();
+  const { field: FIELD, bright: BRIGHT } = buildRiver();
+  const TINTS = [COL.star, COL.cool, COL.warm] as const;
   const notes = new Map<string, Note>(
     [...stage.querySelectorAll<HTMLElement>("[data-note]")].map((el) => [el.dataset.note!, { el, w: 0, h: 0, on: false }]),
   );
@@ -261,7 +466,18 @@ export function createChart({ stage, canvas, plates, stopName }: ChartOptions): 
   let H = 1;
   let dpr = 1;
   let plateRight = 0;
+  // The grid: the font size, a cell's width and height, and how many cells.
+  let FS = 12;
+  let CW = 7.2;
+  let CH = 16;
+  let COLS = 1;
+  let ROWS = 1;
+  let mask = new Uint8Array(1);
+  // The slab's bar and ruler: rows the river leaves empty, so their words read.
+  let topRows = 0;
+  let bottomRows = 0;
   let placed: Placed[] = [];
+  let marks: Mark[] = [];
 
   /** The camera for a stop: the whole river at the start, then each product in close-up, set right of the words. */
   function view(k: number) {
@@ -279,9 +495,9 @@ export function createChart({ stage, canvas, plates, stopName }: ChartOptions): 
     const g = SPINE[k + 1];
     // On a computer the product sits in the open sky right of the words' plate, scaled to the room it has.
     const room = mob ? W : W - plateRight;
-    const z = mob ? Math.min(0.85, W / 470) : Math.max(0.68, Math.min(1, room / 700));
+    const z = mob ? Math.min(0.8, W / 530) : Math.max(0.68, Math.min(1, room / 700));
     const tx = mob ? 0.5 * W : plateRight + room * 0.5;
-    const ty = mob ? 0.22 * H : 0.48 * H;
+    const ty = mob ? 0.2 * H : 0.48 * H;
     return { cx: g[0] - (tx - W / 2) / z, cy: g[1] - (ty - H / 2) / z, z };
   }
 
@@ -295,227 +511,93 @@ export function createChart({ stage, canvas, plates, stopName }: ChartOptions): 
     return { cx: a.cx + (b.cx - a.cx) * e, cy: a.cy + (b.cy - a.cy) * e, z };
   }
 
-  /* Drawing helpers in screen space: the kit's "+", a hairline leader, a filled dot, a ring. */
-  function plus(x: number, y: number, s: number, c: Rgb, a: number) {
-    ctx!.fillStyle = rgba(c, a);
-    ctx!.fillRect(x - 0.5, y - s, 1, s * 2);
-    ctx!.fillRect(x - s, y - 0.5, s * 2, 1);
+  const cellOf = (x: number, y: number): [number, number] => [Math.floor(x / CW), Math.floor(y / CH)];
+  const inGrid = (c: number, r: number) => c >= 0 && r >= 0 && c < COLS && r < ROWS;
+  /** Clears the river from a block of cells round (c, r), so a constellation reads on clear sky. */
+  function clear(c: number, r: number, rc: number, rr: number) {
+    for (let j = r - rr; j <= r + rr; j++) for (let i = c - rc; i <= c + rc; i++) if (inGrid(i, j)) mask[j * COLS + i] = 1;
   }
-  function leader(x: number, y: number, len: number, side: Side, c: Rgb, a: number) {
-    ctx!.fillStyle = rgba(c, a);
-    ctx!.fillRect(x - 0.5, y - len, 1, len);
-    ctx!.fillRect(side === "r" ? x : x - 7, y - len, 7, 1);
+  /** A character at a point; the river leaves its cell empty. Nothing is set on the bar's or the ruler's rows. */
+  function mark(x: number, y: number, g: string, col: Rgb, a: number, big = false, stroke = false) {
+    const [c, r] = cellOf(x, y);
+    if (!inGrid(c, r) || r < topRows || r >= ROWS - bottomRows) return;
+    mask[r * COLS + c] = 1;
+    marks.push({ x, y, g, col, a, big, stroke });
   }
-  function dot(x: number, y: number, r: number, fill: string) {
-    ctx!.fillStyle = fill;
-    ctx!.beginPath();
-    ctx!.arc(x, y, r, 0, 6.283);
-    ctx!.fill();
+  /**
+   * A line between two points as a star atlas draws one, a dotted line: a `.` every `gap` px along it, off the stars
+   * at its ends, the river cleared round it.
+   */
+  function line(a: Pt, b: Pt, col: Rgb, alpha: number, gap = 6) {
+    const len = Math.hypot(b[0] - a[0], b[1] - a[1]);
+    const n = Math.floor(len / gap);
+    const keep = Math.min(0.45, (CW * 1.1) / Math.max(1, len));
+    for (let k = 1; k < n; k++) {
+      const u = k / n;
+      if (u < keep || u > 1 - keep) continue;
+      const x = a[0] + (b[0] - a[0]) * u;
+      const y = a[1] + (b[1] - a[1]) * u;
+      const [c, r] = cellOf(x, y);
+      clear(c, r, 1, 0);
+      mark(x, y, ".", col, alpha, false, true);
+    }
   }
-  function ring(x: number, y: number, r: number, stroke: string) {
-    ctx!.strokeStyle = stroke;
-    ctx!.beginPath();
-    ctx!.arc(x, y, r, 0, 6.283);
-    ctx!.stroke();
+  /** A star of a constellation at its point, its glyph by brightness, a size larger, on clear sky. */
+  function star(at: Pt, mag: 0 | 1 | 2, col: Rgb) {
+    const [c, r] = cellOf(at[0], at[1]);
+    clear(c, r, mag === 2 ? 2 : 1, mag === 2 ? 1 : 0);
+    mark(at[0], at[1], mag === 2 ? "@" : mag === 1 ? "*" : "+", col, mag === 0 ? 0.7 : 1, mag > 0);
+  }
+  /** A jade `o` a share `u` of the way from a to b. */
+  function runner(a: Pt, b: Pt, u: number) {
+    mark(a[0] + (b[0] - a[0]) * u, a[1] + (b[1] - a[1]) * u, "o", COL.jade2, 1, true);
   }
   const place = (id: string, x: number, y: number, side: Side, alpha: number) => placed.push({ id, x, y, side, alpha });
 
-  function drawAha(P: Pt, z: number, t: number, f: number) {
-    const R = 44 * z;
-    const rx = 104 * z;
-    const ry = 30 * z;
-    const rot = -0.36;
-    const arc = (from: number, to: number, w: number, a: number) => {
-      ctx!.save();
-      ctx!.translate(P[0], P[1]);
-      ctx!.rotate(rot);
-      ctx!.strokeStyle = rgba(COL.jade2, a);
-      ctx!.lineWidth = w;
-      ctx!.beginPath();
-      ctx!.ellipse(0, 0, rx, ry, 0, from, to);
-      ctx!.stroke();
-      ctx!.restore();
-    };
-    const onRing = (th: number): Pt => {
-      const x0 = Math.cos(th) * rx;
-      const y0 = Math.sin(th) * ry;
-      return [P[0] + x0 * Math.cos(rot) - y0 * Math.sin(rot), P[1] + x0 * Math.sin(rot) + y0 * Math.cos(rot)];
-    };
-    const mth = 4.0 + t * 0.22;
-    const mpos = onRing(mth);
-    const moonFront = Math.sin(mth) > 0;
-    const moon = () => dot(mpos[0], mpos[1], Math.max(1.5, 6.5 * z), rgba(COL.star, 0.95));
-    arc(Math.PI, 2 * Math.PI, Math.max(1, 1.5 * z), 0.55);
-    if (!moonFront) moon();
-    const gr = ctx!.createRadialGradient(P[0] - R * 0.38, P[1] - R * 0.42, R * 0.1, P[0], P[1], R);
-    gr.addColorStop(0, rgba(COL.jade2, 1));
-    gr.addColorStop(0.55, rgba(COL.jade, 1));
-    gr.addColorStop(1, rgba(COL.cosmos, 1));
-    ctx!.fillStyle = gr;
-    ctx!.beginPath();
-    ctx!.arc(P[0], P[1], R, 0, 6.283);
-    ctx!.fill();
-    arc(0, Math.PI, Math.max(1, 1.6 * z), 0.9);
-    if (moonFront) moon();
-    if (f <= 0.3) return;
-    const pts: readonly (readonly [string, number, Side, number])[] = [
-      ["aha.chat", 3.35, "l", 70],
-      ["aha.latex", 5.75, "r", 64],
-      ["aha.work", 1.35, "r", -1],
-    ];
-    for (const [id, th, side, lead] of pts) {
-      const [x, y] = onRing(th);
-      plus(x, y, 5, COL.ink, 0.9 * f);
-      if (lead > 0) {
-        const L = lead * Math.max(0.7, z);
-        leader(x, y, L, side, COL.ink, 0.4 * f);
-        place(id, x, y - L, side, f);
-      } else {
-        // A note under the ring: the hairline goes down to it.
-        ctx!.fillStyle = rgba(COL.ink, 0.4 * f);
-        ctx!.fillRect(x - 0.5, y, 1, 40);
-        ctx!.fillRect(x, y + 40, 7, 1);
-        place(id, x, y + 40, side, f);
-      }
-    }
-  }
-
-  function drawBots(P: Pt, z: number, t: number, f: number) {
-    const rot = -0.22;
-    const cr = Math.cos(rot);
-    const sr = Math.sin(rot);
-    ctx!.lineWidth = 1;
-    for (let i = 0; i < 6; i++) {
-      const rx = (48 + i * 24) * z;
-      const ry = rx * 0.42;
-      ctx!.save();
-      ctx!.translate(P[0], P[1]);
-      ctx!.rotate(rot);
-      ctx!.strokeStyle = rgba(COL.star, 0.3);
-      ctx!.setLineDash([2.5, 3.5]);
-      ctx!.beginPath();
-      ctx!.ellipse(0, 0, rx, ry, 0, Math.PI, 2 * Math.PI);
-      ctx!.stroke();
-      ctx!.setLineDash([]);
-      ctx!.strokeStyle = rgba(COL.star, 0.42);
-      ctx!.beginPath();
-      ctx!.ellipse(0, 0, rx, ry, 0, 0, Math.PI);
-      ctx!.stroke();
-      ctx!.restore();
-    }
-    dot(P[0], P[1], Math.max(2, 13 * z), rgba(COL.star, 1));
-    ring(P[0], P[1], Math.max(4, 22 * z), rgba(COL.star, 0.5));
-    // One moon at a time brings a report back to the planet.
-    const report = Math.floor(t / 1.6) % 6;
-    const rp = (t % 1.6) / 1.6;
-    for (let i = 0; i < 6; i++) {
-      const rx = (48 + i * 24) * z;
-      const ry = rx * 0.42;
-      const th = i * 1.05 + 0.4 + t * BOT_SPEED[i] * 0.5;
-      const x0 = Math.cos(th) * rx;
-      const y0 = Math.sin(th) * ry;
-      const x = P[0] + x0 * cr - y0 * sr;
-      const y = P[1] + x0 * sr + y0 * cr;
-      dot(x, y, Math.max(1.4, (3 + (i % 3)) * z), rgba(COL.star, Math.sin(th) > 0 ? 1 : 0.6));
-      if (i === report) dot(x + (P[0] - x) * rp, y + (P[1] - y) * rp, Math.max(1.5, 2.6 * z), rgba(COL.jade, 1 - rp * 0.4));
-      if (f > 0.3) place(`bots.${i}`, x + (x >= P[0] ? 10 : -10), y + 9, x >= P[0] ? "r" : "l", f);
-    }
-  }
-
-  function drawApi(P: Pt, z: number, t: number, f: number) {
-    const key: Pt = [P[0] - 128 * z, P[1] + 18 * z];
-    const act = Math.floor(t / 2.4) % 4;
-    const ph = (t % 2.4) / 2.4;
-    const model = (i: number): Pt => [P[0] + MODELS[i][0] * z, P[1] + MODELS[i][1] * z];
-    const bend = (i: number): Pt => [P[0] + MODELS[i][0] * z * 0.45, P[1]];
-    ctx!.lineWidth = 1;
-    ctx!.strokeStyle = rgba(COL.star, 0.38);
-    ctx!.beginPath();
-    ctx!.moveTo(key[0], key[1]);
-    ctx!.lineTo(P[0], P[1]);
-    ctx!.stroke();
-    MODELS.forEach((_, i) => {
-      const m = model(i);
-      const c = bend(i);
-      ctx!.strokeStyle = i === act ? rgba(COL.jade, 0.95) : rgba(COL.star, 0.26);
-      ctx!.lineWidth = i === act ? 1.4 : 1;
-      ctx!.beginPath();
-      ctx!.moveTo(P[0], P[1]);
-      ctx!.quadraticCurveTo(c[0], c[1], m[0], m[1]);
-      ctx!.stroke();
-      dot(m[0], m[1], Math.max(1.6, 4.2 * z), rgba(COL.star, 0.95));
-      ctx!.lineWidth = 1;
-      ring(m[0], m[1], Math.max(3.5, 9 * z), i === act ? rgba(COL.jade, 1) : rgba(COL.star, 0.45));
-      if (i === act && f > 0.3) place("api.model", m[0] + 14, m[1], "r", f);
+  /** A constellation at screen point P, the camera at zoom z; f is how near its stop the reader is (notes show from 0.3). */
+  function figure(k: number, P: Pt, z: number, t: number, f: number) {
+    const fig = FIGURES[k - 1];
+    const pos = fig.stars.map((s): Pt => [P[0] + s.x * z, P[1] + s.y * z]);
+    const active = MODEL_STARS[Math.floor(t / 2.4) % MODEL_STARS.length];
+    // The lines first, in the stars' ink; the Model API's lit route in jade.
+    fig.lines.forEach(([i, j]) => {
+      const lit = k === 3 && ((i === 0 && j === 1) || (i === 1 && j === active));
+      line(pos[i], pos[j], lit ? COL.jade : COL.star, lit ? 1 : 0.7, lit ? 4.5 : 6);
     });
-    // The request: from the key to the gateway, then along the chosen route.
-    let px: number;
-    let py: number;
-    if (ph < 0.45) {
-      const u = ph / 0.45;
-      px = key[0] + (P[0] - key[0]) * u;
-      py = key[1] + (P[1] - key[1]) * u;
+    fig.stars.forEach((s, i) => star(pos[i], s.mag, s.warm ? COL.warm : s.mag === 0 ? COL.ink2 : COL.star));
+    // What moves along the lines.
+    if (k === 1) {
+      const arm = 1 + (Math.floor(t / 1.6) % 3);
+      runner(pos[0], pos[arm], (t % 1.6) / 1.6);
+    } else if (k === 2) {
+      const [i, j] = fig.lines[Math.floor(t / 1.2) % fig.lines.length];
+      runner(pos[i], pos[j], (t % 1.2) / 1.2);
+    } else if (k === 3) {
+      const ph = (t % 2.4) / 2.4;
+      if (ph < 0.45) runner(pos[0], pos[1], ph / 0.45);
+      else runner(pos[1], pos[active], (ph - 0.45) / 0.55);
     } else {
-      const u = (ph - 0.45) / 0.55;
-      const v = 1 - u;
-      const m = model(act);
-      const c = bend(act);
-      px = v * v * P[0] + 2 * v * u * c[0] + u * u * m[0];
-      py = v * v * P[1] + 2 * v * u * c[1] + u * u * m[1];
+      const tie = 1 + (Math.floor(t / 1.4) % 3);
+      runner(pos[0], pos[tie], (t % 1.4) / 1.4);
     }
-    dot(px, py, Math.max(1.5, 2.8 * z), rgba(COL.jade, 1));
-    plus(P[0], P[1], 7, COL.ink, 0.95);
-    ring(P[0], P[1], Math.max(4, 12 * z), rgba(COL.star, 0.5));
-    dot(key[0], key[1], Math.max(2, 6 * z), rgba(COL.jade, 1));
-    ring(key[0], key[1], Math.max(4, 13 * z), rgba(COL.jade2, 0.9));
-    if (f > 0.3) {
-      const L = 58 * Math.max(0.7, z);
-      leader(key[0], key[1], L, "l", COL.ink, 0.4 * f);
-      place("api.key", key[0], key[1] - L, "l", f);
-      ctx!.fillStyle = rgba(COL.ink, 0.4 * f);
-      ctx!.fillRect(P[0] - 0.5, P[1] + 14, 1, 52);
-      ctx!.fillRect(P[0], P[1] + 66, 7, 1);
-      place("api.gw", P[0], P[1] + 66, "r", f);
-    }
-  }
-
-  function drawBalance(P: Pt, z: number, t: number, f: number) {
-    ctx!.lineWidth = 1;
-    ctx!.setLineDash([2.5, 3.5]);
-    for (let i = 1; i <= 3; i++) ring(P[0], P[1], (28 + i * 28) * z, rgba(COL.warm, 0.42 - i * 0.08));
-    ctx!.setLineDash([]);
-    // The balance pays each in turn: a jade drop runs out along one tie.
-    const k = Math.floor(t / 1.4) % 3;
-    const u = (t % 1.4) / 1.4;
-    TIES.forEach(([th, id], i) => {
-      const x = P[0] + Math.cos(th) * 140 * z;
-      const y = P[1] + Math.sin(th) * 140 * z;
-      ctx!.strokeStyle = rgba(COL.star, 0.3);
-      ctx!.beginPath();
-      ctx!.moveTo(P[0], P[1]);
-      ctx!.lineTo(x, y);
-      ctx!.stroke();
-      plus(x, y, 5.5, COL.ink, 0.9);
-      if (i === k) dot(P[0] + (x - P[0]) * u, P[1] + (y - P[1]) * u, Math.max(1.5, 2.6 * z), rgba(COL.jade, 1));
-      if (f > 0.3) place(id, x + (x >= P[0] ? 10 : -10), y - 8, x >= P[0] ? "r" : "l", f);
+    if (f <= 0.3) return;
+    fig.stars.forEach((s, i) => {
+      const id = s.note ?? (k === 3 && i === active ? "api.model" : null);
+      if (!id) return;
+      const [x, y] = pos[i];
+      // As an atlas names a star: just above it, away from the figure's middle (a hub's name under it, to the right).
+      if (s.x === 0) place(id, x + CW, y + CH * 1.6, "r", f);
+      else if (s.x > 0) place(id, x + CW, y - CH * 1.1, "r", f);
+      else place(id, x - CW, y - CH * 1.1, "l", f);
     });
-    ctx!.globalCompositeOperation = "lighter";
-    ctx!.globalAlpha = 0.55;
-    ctx!.drawImage(SPR.warm, P[0] - 60 * z, P[1] - 60 * z, 120 * z, 120 * z);
-    ctx!.globalAlpha = 1;
-    ctx!.globalCompositeOperation = "source-over";
-    dot(P[0], P[1], Math.max(2.5, 9 * z), rgba(COL.warm, 1));
-    if (f > 0.3) {
-      const L = 70 * Math.max(0.7, z);
-      leader(P[0], P[1] - 12 * z, L, "r", COL.ink, 0.4 * f);
-      place("bal.core", P[0], P[1] - 12 * z - L, "r", f);
-    }
   }
 
-  const PRODUCTS = [null, drawAha, drawBots, drawApi, drawBalance] as const;
-
-  /** Set the notes collected this frame, in order; one that would cover a plate or a note already set waits. */
-  function setNotes() {
+  /**
+   * Set the notes collected this frame, in order; one that would cover a plate or a note already set waits. Returns
+   * the boxes of the notes shown, in CSS px, so the sky under them is left clear.
+   */
+  function setNotes(): number[][] {
+    const shown: number[][] = [];
     const sr = stage.getBoundingClientRect();
     const boxes = plates()
       .map((pl) => {
@@ -531,17 +613,19 @@ export function createChart({ stage, canvas, plates, stopName }: ChartOptions): 
         note.w = note.el.offsetWidth;
         note.h = note.el.offsetHeight;
       }
-      const x = n.side === "r" ? n.x + 6 : n.x - 6 - note.w;
+      const x = n.side === "r" ? n.x : n.x - note.w;
       const y = n.y - note.h / 2;
       const box = [x - 4, y - 2, x + note.w + 4, y + note.h + 2];
       if (box[0] < 0 || box[2] > W || box[1] < 0 || box[3] > H || boxes.some((b) => box[0] < b[2] && b[0] < box[2] && box[1] < b[3] && b[1] < box[3])) continue;
       boxes.push(box);
+      shown.push(box);
       note.on = true;
       note.el.dataset.side = n.side;
       note.el.style.transform = `translate(${x.toFixed(1)}px, ${y.toFixed(1)}px)`;
       note.el.style.opacity = Math.max(0, Math.min(1, (n.alpha - 0.35) / 0.4)).toFixed(3);
     }
     for (const n of notes.values()) if (!n.on) n.el.style.opacity = "0";
+    return shown;
   }
 
   function draw(p: number, t: number) {
@@ -550,98 +634,171 @@ export function createChart({ stage, canvas, plates, stopName }: ChartOptions): 
     const c = ctx!;
     c.setTransform(dpr, 0, 0, dpr, 0, 0);
     c.clearRect(0, 0, W, H);
-
-    // The far stars, drifting a little with the camera.
-    for (const s of WORLD.deep) {
-      const x = (((s.fx * W - cam.cx * 0.04) % W) + W) % W;
-      const y = (((s.fy * H - cam.cy * 0.04) % H) + H) % H;
-      const tw = 0.6 + 0.4 * Math.sin((t / s.tw) * 6.283 + s.ph);
-      c.fillStyle = rgba(s.col ? COL.cool : COL.star, s.a * tw);
-      c.fillRect(x, y, s.sz, s.sz);
-    }
-
-    // The river's glow.
-    c.globalCompositeOperation = "lighter";
-    for (const g of WORLD.glows) {
-      const [x, y] = proj(g.x, g.y);
-      const s = g.sz * cam.z;
-      if (x + s < 0 || x - s > W || y + s < 0 || y - s > H) continue;
-      c.globalAlpha = g.a;
-      c.drawImage(SPR[g.sp], x - s / 2, y - s / 2, s, s);
-    }
-    c.globalAlpha = 1;
-    c.globalCompositeOperation = "source-over";
-
-    // Its dust lane.
-    for (const d of WORLD.dust) {
-      const [x, y] = proj(d.x, d.y);
-      const rx = d.rx * cam.z;
-      if (x + rx < 0 || x - rx > W || y + rx < 0 || y - rx > H) continue;
-      c.save();
-      c.translate(x, y);
-      c.rotate(d.ang);
-      c.scale(rx / 64, (d.ry * cam.z) / 64);
-      c.globalAlpha = d.a;
-      c.drawImage(SPR.dark, -64, -64, 128, 128);
-      c.restore();
-    }
-    c.globalAlpha = 1;
-
-    // Its stars.
-    const SC = [COL.star, COL.cool, COL.warm, COL.jade2];
-    for (const s of WORLD.stars) {
-      const [x, y] = proj(s.x, s.y, s.d);
-      if (x < -3 || x > W + 3 || y < -3 || y > H + 3) continue;
-      c.fillStyle = rgba(SC[s.col], s.tw ? s.a * (0.55 + 0.45 * Math.sin((t / s.tw) * 6.283 + s.ph)) : s.a);
-      if (s.sz < 1.3) c.fillRect(x - s.sz / 2, y - s.sz / 2, s.sz, s.sz);
-      else {
-        c.beginPath();
-        c.arc(x, y, s.sz * 0.6, 0, 6.283);
-        c.fill();
-      }
-    }
-
-    // The route along the river: dashed ahead, jade where the camera has been.
-    const sNow = 1 + Math.max(0, p);
-    c.lineWidth = 1;
-    c.setLineDash([3, 5]);
-    c.strokeStyle = rgba(COL.star, 0.22);
-    c.beginPath();
-    for (let k = 0; k <= 80; k++) {
-      const [x, y] = proj(...spine(1 + (k / 80) * 4));
-      if (k) c.lineTo(x, y);
-      else c.moveTo(x, y);
-    }
-    c.stroke();
-    c.setLineDash([]);
-    c.strokeStyle = rgba(COL.jade, 0.85);
-    c.beginPath();
-    for (let k = 0; k <= 60; k++) {
-      const [x, y] = proj(...spine(1 + (k / 60) * (sNow - 1)));
-      if (k) c.lineTo(x, y);
-      else c.moveTo(x, y);
-    }
-    c.stroke();
-
+    mask.fill(0);
+    marks = [];
     placed = [];
+
+    // Where the products are on screen: their constellations get clear sky, and the route stops short of them.
+    const centres = [1, 2, 3, 4].map((k) => proj(SPINE[k + 1][0], SPINE[k + 1][1]));
+    const inSky = (x: number, y: number, radius: number) => centres.some((P) => Math.hypot(x - P[0], y - P[1]) < radius);
+
+    // The route along the river: dotted ahead, jade where the camera has been.
+    const sNow = 1 + Math.max(0, p);
+    // A dot every few px along the spine, jade and close where the camera has been, faint and sparse ahead.
+    let prevPt: Pt | null = null;
+    let run = 0;
+    for (let k = 0; k <= 400; k++) {
+      const s = 1 + (k / 400) * 4;
+      const pt = proj(...spine(s));
+      if (prevPt) run += Math.hypot(pt[0] - prevPt[0], pt[1] - prevPt[1]);
+      prevPt = pt;
+      const gone = s <= sNow;
+      if (run < (gone ? 5 : 11)) continue;
+      run = 0;
+      if (inSky(pt[0], pt[1], 205 * cam.z)) continue;
+      mark(pt[0], pt[1], ".", gone ? COL.jade : COL.star, gone ? 0.95 : 0.45, false, true);
+    }
+
+    // The constellations, and seen from afar each stop's number and name under it.
+    const far = cam.z < 0.55;
+    const labels: { c: number; r: number; k: number }[] = [];
+    const skies: Pt[] = [];
     for (let k = 1; k < STOP_COUNT; k++) {
       const P = proj(SPINE[k + 1][0], SPINE[k + 1][1]);
-      const f = Math.max(0, Math.min(1, 1 - Math.abs(p - k) * 1.6));
       if (P[0] < -320 || P[0] > W + 320 || P[1] < -320 || P[1] > H + 320) continue;
-      PRODUCTS[k]!(P, cam.z, t, f);
-      if (cam.z < 0.55) {
-        // Seen from afar: the stop's number and name under it, a hairline down to the words.
-        const y0 = P[1] + 150 * cam.z + 8;
-        c.fillStyle = rgba(COL.ink, 0.35);
-        c.fillRect(P[0] - 0.5, P[1] + 16 * cam.z + 6, 1, y0 - P[1] - 16 * cam.z - 6);
-        c.font = `500 11px ${MONO}`;
-        c.fillStyle = rgba(COL.jade2, 1);
-        c.fillText(`0${k}`, P[0] + 6, y0 + 10);
-        c.fillStyle = rgba(COL.ink2, 1);
-        c.fillText(stopName(k), P[0] + 30, y0 + 10);
+      skies.push(P);
+      const f = Math.max(0, Math.min(1, 1 - Math.abs(p - k) * 1.6));
+      figure(k, P, cam.z, t, f);
+      if (far) {
+        const [lc, lr] = cellOf(P[0], P[1] + 140 * cam.z + CH * 1.5);
+        labels.push({ c: lc, r: lr, k });
+        clear(lc + 6, lr, 8, 0);
       }
     }
-    setNotes();
+
+    // The hero's words: no river under them, the river thinning out over 60 px round them.
+    const sr = stage.getBoundingClientRect();
+    const veiled = veils()
+      .map((el) => el.getBoundingClientRect())
+      .filter((b) => b.bottom > sr.top && b.top < sr.bottom)
+      .map((b) => [b.left - sr.left - 8, b.top - sr.top - 6, b.right - sr.left + 8, b.bottom - sr.top + 6]);
+    const veil = (x: number, y: number) => {
+      let k = 1;
+      for (const [x0, y0, x1, y1] of veiled) k = Math.min(k, smooth(0, 60, Math.hypot(Math.max(x0 - x, 0, x - x1), Math.max(y0 - y, 0, y - y1))));
+      return k;
+    };
+
+    // The names shown: the sky under each is clear, and a line or the route breaks round it (its stars stay).
+    for (const [x0, y0, x1, y1] of setNotes()) {
+      const c0 = Math.floor(x0 / CW);
+      const c1 = Math.floor(x1 / CW);
+      const r0 = Math.floor(y0 / CH);
+      const r1 = Math.floor(y1 / CH);
+      for (let r = r0; r <= r1; r++) for (let cc = c0; cc <= c1; cc++) if (inGrid(cc, r)) mask[r * COLS + cc] = 1;
+      marks = marks.filter((m) => !m.stroke || m.x < x0 || m.x > x1 || m.y < y0 || m.y > y1);
+    }
+
+    // The river: each cell's density as a glyph, in three tints, a row at a time. Close to a constellation the river
+    // steps back: fainter overall, and a clear sky round each figure, soft-edged, as a star atlas draws one.
+    const gain = 1 - 0.5 * smooth(0.45, 0.8, cam.z);
+    const skyIn = 205 * cam.z;
+    const skyOut = 290 * cam.z;
+    const rows: number[][][] = [[], [], []];
+    const spark = new Map<number, [string, number]>();
+    for (const b of BRIGHT) {
+      const [x, y] = proj(b.x, b.y, b.d);
+      if (x < 0 || y < 0 || x >= W || y >= H) continue;
+      if (skies.some((P) => Math.hypot(x - P[0], y - P[1]) < skyOut) || (veiled.length && veil(x, y) < 0.5)) continue;
+      const [cc, rr] = cellOf(x, y);
+      const on = b.tw ? Math.sin((t / b.tw) * 6.283 + b.ph) : 1;
+      const g = on > 0.55 ? (b.big ? "*" : "+") : on > -0.35 ? "+" : ".";
+      spark.set(rr * COLS + cc, [g, b.tint]);
+    }
+    const ox = Math.floor((cam.cx * 0.04) / CW);
+    const oy = Math.floor((cam.cy * 0.04) / CH);
+    for (let r = 0; r < ROWS; r++) {
+      if (r < topRows || r >= ROWS - bottomRows) {
+        rows[0].push([]);
+        rows[1].push([]);
+        rows[2].push([]);
+        continue;
+      }
+      const line0 = new Array<number>(COLS).fill(32);
+      const line1 = new Array<number>(COLS).fill(32);
+      const line2 = new Array<number>(COLS).fill(32);
+      const wy = cam.cy + ((r + 0.5) * CH - H / 2) / cam.z;
+      for (let col = 0; col < COLS; col++) {
+        const at = r * COLS + col;
+        if (mask[at]) continue;
+        const sp = spark.get(at);
+        if (sp) {
+          (sp[1] === 2 ? line2 : sp[1] === 1 ? line1 : line0)[col] = sp[0].charCodeAt(0);
+          continue;
+        }
+        const wx = cam.cx + ((col + 0.5) * CW - W / 2) / cam.z;
+        const all = sample(FIELD, FIELD.all, wx, wy);
+        const h = hash(col, r);
+        let clearSky = veiled.length ? veil((col + 0.5) * CW, (r + 0.5) * CH) : 1;
+        for (const P of skies) {
+          const d = Math.hypot((col + 0.5) * CW - P[0], (r + 0.5) * CH - P[1]);
+          if (d < skyOut) clearSky = Math.min(clearSky, smooth(skyIn, skyOut, d));
+        }
+        let g = " ";
+        if (all > 0.04 && clearSky > 0) {
+          const tw = 1 + 0.1 * Math.sin(t * 0.8 + h * 6.283);
+          g = glyphOf(all * tw * gain * clearSky);
+        }
+        if (g === " ") {
+          // A far star now and then on the empty sky, drifting a little with the camera.
+          if (clearSky > 0.5 && hash(col + ox, r + oy) < 0.012) line1[col] = 46;
+          continue;
+        }
+        const warm = sample(FIELD, FIELD.warm, wx, wy) / all;
+        (warm > 0.42 ? line2 : h < 0.35 ? line1 : line0)[col] = g.charCodeAt(0);
+      }
+      rows[0].push(line0);
+      rows[1].push(line1);
+      rows[2].push(line2);
+    }
+    c.font = `500 ${FS}px ${MONO}`;
+    c.textAlign = "left";
+    c.textBaseline = "middle";
+    rows.forEach((layer, i) => {
+      c.fillStyle = rgba(TINTS[i], 0.62 + 0.28 * gain);
+      layer.forEach((codes, r) => codes.length && c.fillText(String.fromCharCode(...codes), 0, (r + 0.5) * CH));
+    });
+
+    // Over the river: the route, the constellations' lines, stars and runners, then the stops' names from afar.
+    c.textAlign = "center";
+    for (const m of marks) {
+      c.font = m.big ? `700 ${Math.round(FS * 1.35)}px ${MONO}` : `500 ${FS}px ${MONO}`;
+      c.fillStyle = rgba(m.col, m.a);
+      // A dot sits on the line itself, not on the text's baseline below it.
+      c.fillText(m.g, m.x, m.g === "." ? m.y - FS * 0.3 : m.y);
+    }
+    c.textAlign = "left";
+    c.font = `500 ${FS}px ${MONO}`;
+    for (const l of labels) {
+      c.fillStyle = rgba(COL.jade2, 1);
+      c.fillText(`0${l.k}`, l.c * CW, (l.r + 0.5) * CH);
+      c.fillStyle = rgba(COL.ink2, 1);
+      c.fillText(stopName(l.k), (l.c + 3) * CW, (l.r + 0.5) * CH);
+    }
+  }
+
+  function measure() {
+    FS = W < 600 ? 11 : 12;
+    CH = Math.round(FS * 1.34);
+    ctx!.font = `500 ${FS}px ${MONO}`;
+    CW = ctx!.measureText("M").width || FS * 0.6;
+    COLS = Math.ceil(W / CW);
+    ROWS = Math.ceil(H / CH);
+    mask = new Uint8Array(COLS * ROWS);
+    const sr = stage.getBoundingClientRect();
+    const bar = stage.querySelector<HTMLElement>(".j__bar")?.getBoundingClientRect();
+    const ruler = stage.querySelector<HTMLElement>(".j__ruler")?.getBoundingClientRect();
+    topRows = bar ? Math.ceil((bar.bottom - sr.top + 2) / CH) : 0;
+    bottomRows = ruler ? Math.ceil((sr.bottom - ruler.top + 2) / CH) : 0;
   }
 
   function resize() {
@@ -657,6 +814,7 @@ export function createChart({ stage, canvas, plates, stopName }: ChartOptions): 
   }
 
   function remeasure() {
+    measure();
     for (const n of notes.values()) n.w = n.h = 0;
   }
 

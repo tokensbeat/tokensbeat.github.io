@@ -182,7 +182,7 @@ describe("the homepage", () => {
     render(<App lang="en" page="home" />);
     const journey = screen.getByRole("region", { name: "Galaxies of Intelligence. Born from Within." });
     expect(journey.querySelector(".j__stage")).toHaveAttribute("data-theme", "dark");
-    expect(within(journey).getByRole("img", { name: /^A chart of the Milky Way with four products along it/ })).toBeInTheDocument();
+    expect(within(journey).getByRole("img", { name: /^A star chart of the Milky Way drawn in characters, with four constellations along it/ })).toBeInTheDocument();
     const notes = journey.querySelector(".j__notes")!;
     expect(notes).toHaveAttribute("aria-hidden", "true");
     expect([...notes.querySelectorAll("[data-note] b")].map((b) => b.textContent)).toEqual([

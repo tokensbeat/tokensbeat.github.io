@@ -1,6 +1,6 @@
 /**
- * The homepage's journey (2026-11-27): one night slab, sticky under the head, holding the chart of the Milky Way
- * (./milkyWay.ts), and five steps that scroll over it, a screen each: the hero with the poem, then Aha, Bots, the Model
+ * The homepage's journey (2026-11-27): one night slab, sticky under the head, holding the chart of the Milky Way drawn
+ * in ASCII, its products as constellations (./milkyWay.ts, 2026-11-28), and five steps that scroll over it, a screen each: the hero with the poem, then Aha, Bots, the Model
  * API and Pricing, each a kit plate of words. Where the reader is in the steps moves the chart's camera along the river
  * to that product. The slab's bar says where the chart is and holds Pause; the ruler at its foot jumps to a stop.
  *
@@ -97,22 +97,25 @@ export function Journey() {
     if (!stageEl || !canvasEl || !stepsEl) return;
     const steps = [...stepsEl.querySelectorAll<HTMLElement>(".j__step")];
     const plates = [...stepsEl.querySelectorAll<HTMLElement>(".j__plate")];
+    const veils = [...stepsEl.querySelectorAll<HTMLElement>(".j__hero")];
     const headLine = () => document.querySelector<HTMLElement>(".h-head")?.offsetHeight ?? 0;
     const where = () => scrollStop(steps.map((s) => s.getBoundingClientRect().top), headLine());
-    const chart: Chart | null = createChart({ stage: stageEl, canvas: canvasEl, plates: () => plates, stopName: (k) => words.stops[k][lang] });
+    const chart: Chart | null = createChart({ stage: stageEl, canvas: canvasEl, plates: () => plates, veils: () => veils, stopName: (k) => words.stops[k][lang] });
 
     // The loop runs only while the slab is on screen and the tab is shown; it draws only when the camera or the time
-    // moved, or the stage changed (`dirty`), so a still chart (paused, settled, reduced motion) costs no canvas work.
-    const S = { p: where(), t: 0, last: 0, visible: true, raf: 0, drawnP: NaN, drawnT: NaN, dirty: true };
+    // moved, or the stage changed (`dirty`), so a still chart (paused, settled, reduced motion) costs no canvas work,
+    // and when only the time moved (the runners, the twinkle) at most 30 times a second.
+    const S = { p: where(), t: 0, last: 0, visible: true, raf: 0, drawnP: NaN, drawnT: NaN, drawnAt: 0, dirty: true };
     const sync = (p: number) => {
       if (mark.current) mark.current.style.transform = `translateX(${(p * 100).toFixed(2)}%)`;
       setCurrent(Math.round(p));
     };
-    const paint = () => {
-      if (!chart || (!S.dirty && S.drawnP === S.p && S.drawnT === S.t)) return;
+    const paint = (now = 0) => {
+      if (!chart || (!S.dirty && S.drawnP === S.p && (S.drawnT === S.t || now - S.drawnAt < 1000 / 30))) return;
       chart.draw(S.p, S.t);
       S.drawnP = S.p;
       S.drawnT = S.t;
+      S.drawnAt = now;
       S.dirty = false;
     };
     const frame = (now: number) => {
@@ -125,7 +128,7 @@ export function Journey() {
       if (Math.abs(target - S.p) < 0.0005) S.p = target;
       if (!still && !calm) S.t += dt;
       sync(S.p);
-      paint();
+      paint(now);
     };
     const start = () => {
       if (S.raf || !S.visible || document.hidden) return;

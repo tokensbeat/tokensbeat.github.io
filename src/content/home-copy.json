@@ -13,8 +13,8 @@
   },
   "chart": {
     "label": {
-      "en": "A chart of the Milky Way with four products along it: Aha, Bots, the Model API and the balance.",
-      "zh": "一张银河星图，沿银河依次是四个产品：Aha、机器人、模型 API 和余额。"
+      "en": "A star chart of the Milky Way drawn in characters, with four constellations along it: Aha, Bots, the Model API and the balance.",
+      "zh": "一张用字符画成的银河星图，沿银河有四个星座：Aha、机器人、模型 API 和余额。"
     },
     "title": { "en": "The Milky Way", "zh": "银河" },
     "stopsLabel": { "en": "Stops", "zh": "站点" },

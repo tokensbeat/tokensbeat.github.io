@@ -87,7 +87,7 @@ describe("the prerendered pages", () => {
 
   it("prerenders the journey: the chart's empty canvas and its notes, the five stops, the first stop in force", () => {
     const html = page("index.html");
-    expect(html).toMatch(/<canvas class="j__cv" role="img" aria-label="A chart of the Milky Way/);
+    expect(html).toMatch(/<canvas class="j__cv" role="img" aria-label="A star chart of the Milky Way drawn in characters/);
     expect(html.match(/class="j__note"/g)).toHaveLength(16);
     expect(html.match(/class="j__step[ "]/g)).toHaveLength(5);
     expect(html.match(/<button type="button" class="j__stop"/g)).toHaveLength(5);
