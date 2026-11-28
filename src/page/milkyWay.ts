@@ -866,6 +866,18 @@ export function createChart({ stage, canvas, plates, veils = () => [], stopName 
   return { resize, remeasure, draw };
 }
 
+/** A frame every this many ms when only the time moves (30 a second). */
+export const TICK_MS = 1000 / 30;
+
+/**
+ * When the next time-only frame is due, after a draw at `now`. After a time-only draw it is a tick after the one that
+ * was due (a 60 Hz screen draws every other frame, and a late frame does not push the next back); after a draw for the
+ * camera or the stage, a tick from now, so a long scroll never pushes it ahead of the clock.
+ */
+export function nextDue(due: number, now: number, timeOnly: boolean): number {
+  return timeOnly && now - due < TICK_MS * 2 ? due + TICK_MS : now + TICK_MS;
+}
+
 /**
  * Where the reader is, 0 to STOP_COUNT - 1, from the steps' tops and the line under the head: piecewise, a step at a
  * time, so a step taller than the screen (a long plate on a phone) still lands on its own product.

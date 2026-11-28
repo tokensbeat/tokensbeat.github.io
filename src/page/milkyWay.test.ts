@@ -4,7 +4,7 @@
  * is.
  */
 import { HOME } from "@/content/home";
-import { buildRiver, createChart, FIGURES, glyphOf, RAMP, scrollStop, STOP_COUNT } from "./milkyWay";
+import { buildRiver, createChart, FIGURES, glyphOf, nextDue, RAMP, scrollStop, STOP_COUNT, TICK_MS } from "./milkyWay";
 
 /** A 2D context that records what is drawn (jsdom has no canvas): each text set and where. */
 function recorder() {
@@ -164,6 +164,33 @@ describe("the ASCII chart", () => {
     } finally {
       el.remove();
     }
+  });
+
+  it("draws 30 frames a second when only time moves, and resumes them at once after a long scroll", () => {
+    // A 60 Hz screen: the loop asks at every frame; a draw happens when the camera moved, or when the time-only frame is due.
+    const frame = 1000 / 60;
+    let due = 0;
+    let drawnAt = -Infinity;
+    const draws: number[] = [];
+    const run = (from: number, to: number, cameraMoving: boolean) => {
+      for (let now = from; now < to; now += frame) {
+        const timeOnly = !cameraMoving;
+        if (timeOnly && now < due) continue;
+        draws.push(now);
+        drawnAt = now;
+        due = nextDue(due, now, timeOnly);
+      }
+    };
+    // Two seconds of scrolling: a draw at every frame.
+    run(0, 2000, true);
+    expect(draws.length).toBeGreaterThanOrEqual(119);
+    // Then still: the next time-only frame comes within a tick of the camera settling, and 30 a second after that.
+    draws.length = 0;
+    run(2000, 3000, false);
+    expect(draws[0] - 2000).toBeLessThanOrEqual(TICK_MS + frame);
+    expect(draws.length).toBeGreaterThanOrEqual(29);
+    expect(draws.length).toBeLessThanOrEqual(31);
+    expect(drawnAt).toBeGreaterThan(2950);
   });
 
   it("reads where the reader is from the steps' tops, a step at a time", () => {
