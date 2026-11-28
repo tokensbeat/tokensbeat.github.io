@@ -438,11 +438,15 @@ html:has(.j__steps) { scroll-padding-top: var(--h-head-h); scroll-snap-type: y p
 .j__note { position: absolute; left: 0; top: 0; display: grid; gap: 2px; width: max-content; max-width: 260px; opacity: 0; will-change: transform, opacity; }
 .j__note[data-side="l"] { text-align: right; }
 .j__note b {
-  font: 500 11px/1.25 var(--s1-font-mono); letter-spacing: 0.14em; text-transform: uppercase; color: var(--s1-ink);
+  font: 500 12px/1.25 var(--s1-font-mono); letter-spacing: 0.14em; text-transform: uppercase; color: var(--s1-ink);
   text-shadow: 0 0 4px var(--c-cosmos), 0 0 10px var(--c-cosmos);
 }
-.j__note i { font: italic 400 15.5px/1.2 var(--s1-font-display); color: var(--s1-ink-2); text-shadow: 0 0 4px var(--c-cosmos), 0 0 10px var(--c-cosmos); }
-@media (max-width: 599px) { .j__note i { display: none; } }
+/* The line under a name: the display face, large enough and bright enough to read on the night at a glance. */
+.j__note i {
+  font: italic 400 17px/1.15 var(--s1-font-display); color: color-mix(in srgb, var(--s1-ink) 86%, transparent);
+  text-shadow: 0 0 4px var(--c-cosmos), 0 0 10px var(--c-cosmos);
+}
+.j__stage[data-narrow] .j__note i { display: none; }
 /* Aha and TokensBeat keep their capitals inside the mono caps (home.ts keepsCase). */
 :is(.h-eyebrow span, .j__note b, .j__stop span).h-keep-case { text-transform: none; letter-spacing: 0.02em; }
 

@@ -4,7 +4,8 @@
  *   the journey      one night slab with the chart of the Milky Way, sticky under the head, and five steps over it:
  *                    the hero (the owner's line from 《观沧海》 as the h1, the second sentence in jade, the claim in
  *                    plain words, Aha and a key), then Aha, Bots, the Model API and Pricing, each a plate of words while
- *                    the chart's camera moves to that product (../Journey.tsx, ../milkyWay.ts)
+ *                    the chart's camera moves to that product; the chart is ASCII, each product a constellation
+ *                    (../Journey.tsx, ../milkyWay.ts)
  *   first request    the call in cURL, Python and Node.js (the kit's Tabs and Code with Copy), beside the words and
  *                    the links to a key, the docs and the model prices
  *   pricing          no subscription: the three figures (the kit's Stats) and where a fee shows
