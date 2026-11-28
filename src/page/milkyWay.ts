@@ -50,6 +50,8 @@ export interface Figure {
   stars: FigureStar[];
   /** Lines between stars, by index. */
   lines: [number, number][];
+  /** On a phone (under 900 px) the figure is drawn at this share of its size: Bots' six names need a computer's room. */
+  compact?: number;
 }
 
 /** The four constellations, in the stops' order (Aha, Bots, the Model API, the balance). */
@@ -75,14 +77,15 @@ export const FIGURES: readonly Figure[] = [
   },
   {
     stars: [
-      { x: -170, y: -5, mag: 1, note: "bots.0" },
-      { x: -95, y: -45, mag: 1, note: "bots.1" },
-      { x: -70, y: 40, mag: 1, note: "bots.2" },
-      { x: -160, y: 78, mag: 1, note: "bots.3" },
-      { x: 15, y: 20, mag: 1, note: "bots.4" },
-      { x: 92, y: -15, mag: 1, note: "bots.5" },
-      { x: 168, y: -58, mag: 0 },
+      { x: -230, y: -10, mag: 1, note: "bots.0" },
+      { x: -130, y: -70, mag: 1, note: "bots.1" },
+      { x: -95, y: 55, mag: 1, note: "bots.2" },
+      { x: -235, y: 128, mag: 1, note: "bots.3" },
+      { x: 30, y: 30, mag: 1, note: "bots.4" },
+      { x: 150, y: -62, mag: 1, note: "bots.5" },
+      { x: 235, y: -112, mag: 0 },
     ],
+    compact: 0.74,
     lines: [
       [0, 1],
       [1, 2],
@@ -166,6 +169,8 @@ interface Placed {
   y: number;
   side: Side;
   alpha: number;
+  /** Where the note goes when its first place is taken (below its star instead of above). */
+  alt?: { x: number; y: number };
 }
 
 interface Note {
@@ -475,7 +480,10 @@ export function createChart({ stage, canvas, plates, veils = () => [], stopName 
   let mask = new Uint8Array(1);
   // The slab's bar and ruler: rows the river leaves empty, so their words read.
   let topRows = 0;
-  let bottomRows = 0;
+  /** The first row under the ruler's top: rows from it down are the ruler's. */
+  let endRow = 1;
+  /** The bar's and the ruler's boxes (CSS px), which no note may cover. */
+  let chrome: number[][] = [];
   let placed: Placed[] = [];
   let marks: Mark[] = [];
 
@@ -520,7 +528,7 @@ export function createChart({ stage, canvas, plates, veils = () => [], stopName 
   /** A character at a point; the river leaves its cell empty. Nothing is set on the bar's or the ruler's rows. */
   function mark(x: number, y: number, g: string, col: Rgb, a: number, big = false, stroke = false) {
     const [c, r] = cellOf(x, y);
-    if (!inGrid(c, r) || r < topRows || r >= ROWS - bottomRows) return;
+    if (!inGrid(c, r) || r < topRows || r >= endRow) return;
     mask[r * COLS + c] = 1;
     marks.push({ x, y, g, col, a, big, stroke });
   }
@@ -548,16 +556,18 @@ export function createChart({ stage, canvas, plates, veils = () => [], stopName 
     clear(c, r, mag === 2 ? 2 : 1, mag === 2 ? 1 : 0);
     mark(at[0], at[1], mag === 2 ? "@" : mag === 1 ? "*" : "+", col, mag === 0 ? 0.7 : 1, mag > 0);
   }
-  /** A jade `o` a share `u` of the way from a to b. */
+  /** A jade `o` a share `u` of the way from a to b; never on a star at either end (nor still on one under reduced motion). */
   function runner(a: Pt, b: Pt, u: number) {
+    if (u < 0.1 || u > 0.9) return;
     mark(a[0] + (b[0] - a[0]) * u, a[1] + (b[1] - a[1]) * u, "o", COL.jade2, 1, true);
   }
-  const place = (id: string, x: number, y: number, side: Side, alpha: number) => placed.push({ id, x, y, side, alpha });
+  const place = (id: string, x: number, y: number, side: Side, alpha: number, alt?: { x: number; y: number }) => placed.push({ id, x, y, side, alpha, alt });
 
   /** A constellation at screen point P, the camera at zoom z; f is how near its stop the reader is (notes show from 0.3). */
   function figure(k: number, P: Pt, z: number, t: number, f: number) {
     const fig = FIGURES[k - 1];
-    const pos = fig.stars.map((s): Pt => [P[0] + s.x * z, P[1] + s.y * z]);
+    const fz = z * (W < 900 ? (fig.compact ?? 1) : 1);
+    const pos = fig.stars.map((s): Pt => [P[0] + s.x * fz, P[1] + s.y * fz]);
     const active = MODEL_STARS[Math.floor(t / 2.4) % MODEL_STARS.length];
     // The lines first, in the stars' ink; the Model API's lit route in jade.
     fig.lines.forEach(([i, j]) => {
@@ -586,9 +596,11 @@ export function createChart({ stage, canvas, plates, veils = () => [], stopName 
       if (!id) return;
       const [x, y] = pos[i];
       // As an atlas names a star: just above it, away from the figure's middle (a hub's name under it, to the right).
-      if (s.x === 0) place(id, x + CW, y + CH * 1.6, "r", f);
-      else if (s.x > 0) place(id, x + CW, y - CH * 1.1, "r", f);
-      else place(id, x - CW, y - CH * 1.1, "l", f);
+      // When that place is taken, the other side of the star (above for a hub, below for the others).
+      const nx = s.x < 0 ? x - CW : x + CW;
+      const side = s.x < 0 ? "l" : "r";
+      if (s.x === 0) place(id, nx, y + CH * 1.6, side, f, { x: nx, y: y - CH * 1.6 });
+      else place(id, nx, y - CH * 1.1, side, f, { x: nx, y: y + CH * 1.4 });
     });
   }
 
@@ -599,30 +611,41 @@ export function createChart({ stage, canvas, plates, veils = () => [], stopName 
   function setNotes(): number[][] {
     const shown: number[][] = [];
     const sr = stage.getBoundingClientRect();
-    const boxes = plates()
-      .map((pl) => {
-        const b = pl.getBoundingClientRect();
-        return [b.left - sr.left - 8, b.top - sr.top - 8, b.right - sr.left + 8, b.bottom - sr.top + 8];
-      })
-      .filter((b) => b[3] > 0 && b[1] < H);
+    const boxes = [
+      ...chrome,
+      ...plates()
+        .map((pl) => {
+          const b = pl.getBoundingClientRect();
+          return [b.left - sr.left - 8, b.top - sr.top - 8, b.right - sr.left + 8, b.bottom - sr.top + 8];
+        })
+        .filter((b) => b[3] > 0 && b[1] < H),
+    ];
+    const free = (box: number[]) =>
+      box[0] >= 0 && box[2] <= W && box[1] >= 0 && box[3] <= H && !boxes.some((b) => box[0] < b[2] && b[0] < box[2] && box[1] < b[3] && b[1] < box[3]);
     for (const n of notes.values()) n.on = false;
     for (const n of placed) {
       const note = notes.get(n.id);
-      if (!note) continue;
+      const opacity = Math.max(0, Math.min(1, (n.alpha - 0.35) / 0.4));
+      // A note that would not show reserves nothing: no hole in the sky, no place taken from another.
+      if (!note || opacity < 0.01) continue;
       if (!note.w) {
         note.w = note.el.offsetWidth;
         note.h = note.el.offsetHeight;
       }
-      const x = n.side === "r" ? n.x : n.x - note.w;
-      const y = n.y - note.h / 2;
-      const box = [x - 4, y - 2, x + note.w + 4, y + note.h + 2];
-      if (box[0] < 0 || box[2] > W || box[1] < 0 || box[3] > H || boxes.some((b) => box[0] < b[2] && b[0] < box[2] && box[1] < b[3] && b[1] < box[3])) continue;
-      boxes.push(box);
-      shown.push(box);
+      const at = [n, ...(n.alt ? [n.alt] : [])].map(({ x: ax, y: ay }) => {
+        const x = n.side === "r" ? ax : ax - note.w;
+        const y = ay - note.h / 2;
+        // A cell of clear sky round the words.
+        return { x, y, box: [x - CW, y - CH * 0.5, x + note.w + CW, y + note.h + CH * 0.5] };
+      });
+      const spot = at.find((a) => free(a.box));
+      if (!spot) continue;
+      boxes.push(spot.box);
+      shown.push(spot.box);
       note.on = true;
       note.el.dataset.side = n.side;
-      note.el.style.transform = `translate(${x.toFixed(1)}px, ${y.toFixed(1)}px)`;
-      note.el.style.opacity = Math.max(0, Math.min(1, (n.alpha - 0.35) / 0.4)).toFixed(3);
+      note.el.style.transform = `translate(${spot.x.toFixed(1)}px, ${spot.y.toFixed(1)}px)`;
+      note.el.style.opacity = opacity.toFixed(3);
     }
     for (const n of notes.values()) if (!n.on) n.el.style.opacity = "0";
     return shown;
@@ -661,7 +684,8 @@ export function createChart({ stage, canvas, plates, veils = () => [], stopName 
 
     // The constellations, and seen from afar each stop's number and name under it.
     const far = cam.z < 0.55;
-    const labels: { c: number; r: number; k: number }[] = [];
+    const labels: { x: number; r: number; k: number }[] = [];
+    ctx!.font = `500 ${FS}px ${MONO}`;
     const skies: Pt[] = [];
     for (let k = 1; k < STOP_COUNT; k++) {
       const P = proj(SPINE[k + 1][0], SPINE[k + 1][1]);
@@ -670,9 +694,15 @@ export function createChart({ stage, canvas, plates, veils = () => [], stopName 
       const f = Math.max(0, Math.min(1, 1 - Math.abs(p - k) * 1.6));
       figure(k, P, cam.z, t, f);
       if (far) {
-        const [lc, lr] = cellOf(P[0], P[1] + 140 * cam.z + CH * 1.5);
-        labels.push({ c: lc, r: lr, k });
-        clear(lc + 6, lr, 8, 0);
+        // Its number and name under it, kept inside the page's 16 px gutters and off the bar's and ruler's rows.
+        const text = `0${k} ${stopName(k)}`;
+        const width = ctx!.measureText(text).width + CW;
+        const x = Math.max(16, Math.min(W - 16 - width, P[0] - CW));
+        const lr = Math.floor((P[1] + Math.max(140 * cam.z, 18) + CH * 1.2) / CH);
+        if (lr >= topRows && lr < endRow) {
+          labels.push({ x, r: lr, k });
+          for (let cc = Math.floor(x / CW) - 1; cc <= Math.ceil((x + width) / CW); cc++) clear(cc, lr, 0, 0);
+        }
       }
     }
 
@@ -701,8 +731,9 @@ export function createChart({ stage, canvas, plates, veils = () => [], stopName 
     // The river: each cell's density as a glyph, in three tints, a row at a time. Close to a constellation the river
     // steps back: fainter overall, and a clear sky round each figure, soft-edged, as a star atlas draws one.
     const gain = 1 - 0.5 * smooth(0.45, 0.8, cam.z);
-    const skyIn = 205 * cam.z;
-    const skyOut = 290 * cam.z;
+    const skyIn = Math.max(205 * cam.z, 30);
+    const skyOut = Math.max(290 * cam.z, 54);
+    const skyRing = skyOut * 1.7;
     const rows: number[][][] = [[], [], []];
     const spark = new Map<number, [string, number]>();
     for (const b of BRIGHT) {
@@ -717,7 +748,7 @@ export function createChart({ stage, canvas, plates, veils = () => [], stopName 
     const ox = Math.floor((cam.cx * 0.04) / CW);
     const oy = Math.floor((cam.cy * 0.04) / CH);
     for (let r = 0; r < ROWS; r++) {
-      if (r < topRows || r >= ROWS - bottomRows) {
+      if (r < topRows || r >= endRow) {
         rows[0].push([]);
         rows[1].push([]);
         rows[2].push([]);
@@ -740,8 +771,9 @@ export function createChart({ stage, canvas, plates, veils = () => [], stopName 
         const h = hash(col, r);
         let clearSky = veiled.length ? veil((col + 0.5) * CW, (r + 0.5) * CH) : 1;
         for (const P of skies) {
-          const d = Math.hypot((col + 0.5) * CW - P[0], (r + 0.5) * CH - P[1]);
-          if (d < skyOut) clearSky = Math.min(clearSky, smooth(skyIn, skyOut, d));
+          // A ragged edge (each cell's own share of the radius), so the clearing is no disc, and a dimmer ring round it.
+          const d = Math.hypot((col + 0.5) * CW - P[0], (r + 0.5) * CH - P[1]) * (0.88 + 0.24 * h);
+          if (d < skyRing) clearSky = Math.min(clearSky, smooth(skyIn, skyOut, d) * (0.55 + 0.45 * smooth(skyOut, skyRing, d)));
         }
         let g = " ";
         if (all > 0.04 && clearSky > 0) {
@@ -756,9 +788,10 @@ export function createChart({ stage, canvas, plates, veils = () => [], stopName 
         const warm = sample(FIELD, FIELD.warm, wx, wy) / all;
         (warm > 0.42 ? line2 : h < 0.35 ? line1 : line0)[col] = g.charCodeAt(0);
       }
-      rows[0].push(line0);
-      rows[1].push(line1);
-      rows[2].push(line2);
+      const lit = (line: number[]) => (line.some((code) => code !== 32) ? line : []);
+      rows[0].push(lit(line0));
+      rows[1].push(lit(line1));
+      rows[2].push(lit(line2));
     }
     c.font = `500 ${FS}px ${MONO}`;
     c.textAlign = "left";
@@ -780,9 +813,9 @@ export function createChart({ stage, canvas, plates, veils = () => [], stopName 
     c.font = `500 ${FS}px ${MONO}`;
     for (const l of labels) {
       c.fillStyle = rgba(COL.jade2, 1);
-      c.fillText(`0${l.k}`, l.c * CW, (l.r + 0.5) * CH);
+      c.fillText(`0${l.k}`, l.x, (l.r + 0.5) * CH);
       c.fillStyle = rgba(COL.ink2, 1);
-      c.fillText(stopName(l.k), (l.c + 3) * CW, (l.r + 0.5) * CH);
+      c.fillText(stopName(l.k), l.x + 3 * CW, (l.r + 0.5) * CH);
     }
   }
 
@@ -797,8 +830,16 @@ export function createChart({ stage, canvas, plates, veils = () => [], stopName 
     const sr = stage.getBoundingClientRect();
     const bar = stage.querySelector<HTMLElement>(".j__bar")?.getBoundingClientRect();
     const ruler = stage.querySelector<HTMLElement>(".j__ruler")?.getBoundingClientRect();
-    topRows = bar ? Math.ceil((bar.bottom - sr.top + 2) / CH) : 0;
-    bottomRows = ruler ? Math.ceil((sr.bottom - ruler.top + 2) / CH) : 0;
+    const barBottom = bar ? bar.bottom - sr.top : 0;
+    const rulerTop = ruler ? ruler.top - sr.top : H;
+    // The grid starts at the stage's top: a row is the bar's if any of it is above the bar's foot, the ruler's if any
+    // of it is below the ruler's top.
+    topRows = Math.max(0, Math.ceil((barBottom + 2) / CH));
+    endRow = Math.min(ROWS, Math.floor((rulerTop - 2) / CH));
+    chrome = [
+      [0, 0, W, barBottom + 2],
+      [0, rulerTop - 2, W, H],
+    ];
   }
 
   function resize() {
@@ -810,6 +851,9 @@ export function createChart({ stage, canvas, plates, veils = () => [], stopName 
     canvas.height = Math.round(H * dpr);
     const plate = plates()[0];
     plateRight = plate ? plate.getBoundingClientRect().right - r.left + 24 : W * 0.4;
+    // Where the sky beside the plate is narrow (a phone, or under 600 px on a smaller laptop), the names go without
+    // the line under them (the stylesheet reads data-narrow), so every star keeps its name.
+    stage.toggleAttribute("data-narrow", W < 900 || W - plateRight < 600);
     remeasure();
   }
 

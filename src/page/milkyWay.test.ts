@@ -6,9 +6,9 @@
 import { HOME } from "@/content/home";
 import { buildRiver, createChart, FIGURES, glyphOf, RAMP, scrollStop, STOP_COUNT } from "./milkyWay";
 
-/** A 2D context that records what is drawn (jsdom has no canvas): the text set, by glyph. */
+/** A 2D context that records what is drawn (jsdom has no canvas): each text set and where. */
 function recorder() {
-  const texts: string[] = [];
+  const texts: { text: string; x: number; y: number }[] = [];
   const ctx = {
     font: "",
     fillStyle: "",
@@ -17,23 +17,39 @@ function recorder() {
     globalAlpha: 1,
     setTransform() {},
     clearRect() {},
-    fillText(text: string) {
-      texts.push(text);
+    fillText(text: string, x: number, y: number) {
+      texts.push({ text, x, y });
     },
-    measureText: () => ({ width: 7.2 }),
+    measureText: (text: string) => ({ width: 7.2 * text.length }),
   };
   return { ctx, texts };
 }
 
-/** A stage with the chart's notes and a plate, sized as a laptop's slab. */
-function stage(w = 1440, h = 848) {
+/** A box for getBoundingClientRect. */
+const rect = (left: number, top: number, right: number, bottom: number) =>
+  ({ left, top, right, bottom, width: right - left, height: bottom - top, x: left, y: top, toJSON() {} }) as DOMRect;
+
+/** A stage as a laptop's slab: the chart's notes, its bar (40 px) and its ruler (44 px). */
+const W = 1440;
+const H = 848;
+const BAR = 40;
+const RULER = H - 44;
+function stage(w = W, h = H, bar = BAR, ruler = h - 44) {
   const el = document.createElement("div");
   for (const n of HOME.chart.notes) {
     const note = document.createElement("div");
     note.dataset.note = n.id;
     el.append(note);
   }
-  el.getBoundingClientRect = () => ({ left: 0, top: 0, right: w, bottom: h, width: w, height: h, x: 0, y: 0, toJSON() {} });
+  const barH = bar;
+  const barEl = document.createElement("div");
+  barEl.className = "j__bar";
+  barEl.getBoundingClientRect = () => rect(0, 0, w, barH);
+  const rulerEl = document.createElement("nav");
+  rulerEl.className = "j__ruler";
+  rulerEl.getBoundingClientRect = () => rect(0, ruler, w, h);
+  el.append(barEl, rulerEl);
+  el.getBoundingClientRect = () => rect(0, 0, w, h);
   document.body.append(el);
   return el;
 }
@@ -99,20 +115,52 @@ describe("the ASCII chart", () => {
       expect(chart).not.toBeNull();
       for (const p of [0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4]) {
         texts.length = 0;
-        chart!.draw(p, p * 3.1);
-        const glyphs = new Set(texts.filter((t) => t.length === 1));
-        // The river's rows, then the marks over it: at a product, its stars, the dots of its lines and a runner.
-        expect(texts.some((t) => t.length > 40), `rows at ${p}`).toBe(true);
+        // A time when every runner is midway along its line.
+        chart!.draw(p, 0.7);
+        const glyphs = texts.filter((t) => t.text.length === 1);
+        // The river: rows of characters with real glyphs in them, not only spaces.
+        expect(texts.some((t) => t.text.length > 40 && /[^ ]/.test(t.text)), `river at ${p}`).toBe(true);
+        // Nothing is set on the bar's or the ruler's rows.
+        for (const t of texts) if (t.text.trim()) expect(t.y > BAR && t.y < RULER, `"${t.text.slice(0, 12)}" at y ${t.y} (${p})`).toBe(true);
         if (Number.isInteger(p) && p > 0) {
-          expect(glyphs.has("*"), `stars at ${p}`).toBe(true);
-          expect(glyphs.has("."), `dotted lines at ${p}`).toBe(true);
-          expect(glyphs.has("o"), `a runner at ${p}`).toBe(true);
+          expect(glyphs.some((g) => g.text === "*"), `stars at ${p}`).toBe(true);
+          expect(glyphs.some((g) => g.text === "o"), `a runner at ${p}`).toBe(true);
+          // The figure's own dotted lines: the route never comes this close to a product, so these dots are its lines.
+          const centre = glyphs.find((g) => g.text === "@") ?? glyphs.find((g) => g.text === "*")!;
+          const near = glyphs.filter((g) => g.text === "." && Math.hypot(g.x - centre.x, g.y - centre.y) < 150);
+          expect(near.length, `dotted lines at ${p}`).toBeGreaterThan(5);
         }
       }
-      // Seen from afar, each stop's name is written under its constellation.
+      // At rest (reduced motion: t = 0) no runner sits on a star.
+      texts.length = 0;
+      chart!.draw(1, 0);
+      expect(texts.some((t) => t.text === "o")).toBe(false);
+      // Seen from afar, each stop's name is written under its constellation, inside the page's gutters.
       texts.length = 0;
       chart!.draw(0, 0);
-      for (const name of ["Aha", "Bots", "Model API", "Pricing"]) expect(texts, name).toContain(name);
+      for (const name of ["Aha", "Bots", "Model API", "Pricing"]) {
+        const label = texts.find((t) => t.text === name);
+        expect(label, name).toBeDefined();
+        expect(label!.x + name.length * 7.2, name).toBeLessThanOrEqual(W - 16);
+      }
+    } finally {
+      el.remove();
+    }
+  });
+
+  it("leaves the ruler's rows empty on a phone too, where the grid's rows do not end at the ruler's top", () => {
+    // 390 x 811 with a 40 px ruler: the grid is anchored at the top, so the ruler starts inside a row (771 / 15).
+    const { ctx, texts } = recorder();
+    const canvas = document.createElement("canvas");
+    canvas.getContext = (() => ctx) as unknown as HTMLCanvasElement["getContext"];
+    const el = stage(390, 811, 32, 771);
+    try {
+      const chart = createChart({ stage: el, canvas, plates: () => [], stopName: (k) => HOME.chart.stops[k].en });
+      for (const p of [0, 1, 2, 3, 4]) {
+        texts.length = 0;
+        chart!.draw(p, 0.7);
+        for (const t of texts) if (t.text.trim()) expect(t.y > 32 && t.y < 771, `"${t.text.slice(0, 12)}" at y ${t.y} (${p})`).toBe(true);
+      }
     } finally {
       el.remove();
     }

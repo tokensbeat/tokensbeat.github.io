@@ -105,17 +105,20 @@ export function Journey() {
     // The loop runs only while the slab is on screen and the tab is shown; it draws only when the camera or the time
     // moved, or the stage changed (`dirty`), so a still chart (paused, settled, reduced motion) costs no canvas work,
     // and when only the time moved (the runners, the twinkle) at most 30 times a second.
-    const S = { p: where(), t: 0, last: 0, visible: true, raf: 0, drawnP: NaN, drawnT: NaN, drawnAt: 0, dirty: true };
+    const S = { p: where(), t: 0, last: 0, visible: true, raf: 0, drawnP: NaN, drawnT: NaN, nextAt: 0, dirty: true };
+    const TICK = 1000 / 30;
     const sync = (p: number) => {
       if (mark.current) mark.current.style.transform = `translateX(${(p * 100).toFixed(2)}%)`;
       setCurrent(Math.round(p));
     };
     const paint = (now = 0) => {
-      if (!chart || (!S.dirty && S.drawnP === S.p && (S.drawnT === S.t || now - S.drawnAt < 1000 / 30))) return;
+      if (!chart || (!S.dirty && S.drawnP === S.p && (S.drawnT === S.t || now < S.nextAt))) return;
       chart.draw(S.p, S.t);
       S.drawnP = S.p;
       S.drawnT = S.t;
-      S.drawnAt = now;
+      // The next time-only frame is due a tick after the last one was due, not after it was drawn, so a 60 Hz screen
+      // gets every other frame (30 a second) and a late frame does not push the next one back.
+      S.nextAt = now - S.nextAt < TICK * 2 ? S.nextAt + TICK : now + TICK;
       S.dirty = false;
     };
     const frame = (now: number) => {
