@@ -101,10 +101,19 @@ export function Journey() {
     const where = () => scrollStop(steps.map((s) => s.getBoundingClientRect().top), headLine());
     const chart: Chart | null = createChart({ stage: stageEl, canvas: canvasEl, plates: () => plates, stopName: (k) => words.stops[k][lang] });
 
-    const S = { p: where(), t: 0, last: 0, visible: true, raf: 0 };
+    // The loop runs only while the slab is on screen and the tab is shown; it draws only when the camera or the time
+    // moved, or the stage changed (`dirty`), so a still chart (paused, settled, reduced motion) costs no canvas work.
+    const S = { p: where(), t: 0, last: 0, visible: true, raf: 0, drawnP: NaN, drawnT: NaN, dirty: true };
     const sync = (p: number) => {
       if (mark.current) mark.current.style.transform = `translateX(${(p * 100).toFixed(2)}%)`;
       setCurrent(Math.round(p));
+    };
+    const paint = () => {
+      if (!chart || (!S.dirty && S.drawnP === S.p && S.drawnT === S.t)) return;
+      chart.draw(S.p, S.t);
+      S.drawnP = S.p;
+      S.drawnT = S.t;
+      S.dirty = false;
     };
     const frame = (now: number) => {
       S.raf = requestAnimationFrame(frame);
@@ -116,11 +125,15 @@ export function Journey() {
       if (Math.abs(target - S.p) < 0.0005) S.p = target;
       if (!still && !calm) S.t += dt;
       sync(S.p);
-      if (S.visible) chart?.draw(S.p, S.t);
+      paint();
     };
     const start = () => {
-      if (S.raf) return;
+      if (S.raf || !S.visible || document.hidden) return;
+      // Back on screen: the camera starts where the reader is, not where it was left.
+      S.p = where();
       S.last = 0;
+      sync(S.p);
+      paint();
       S.raf = requestAnimationFrame(frame);
     };
     const stop = () => {
@@ -128,27 +141,34 @@ export function Journey() {
       S.raf = 0;
     };
 
-    sync(S.p);
-    chart?.draw(S.p, S.t);
     start();
 
     const onVisibility = () => (document.hidden ? stop() : start());
     document.addEventListener("visibilitychange", onVisibility);
-    const seen = typeof IntersectionObserver === "undefined" ? null : new IntersectionObserver(([e]) => (S.visible = e.isIntersecting));
+    const seen =
+      typeof IntersectionObserver === "undefined"
+        ? null
+        : new IntersectionObserver(([e]) => {
+            S.visible = e.isIntersecting;
+            if (S.visible) start();
+            else stop();
+          });
     seen?.observe(stageEl);
     const sized =
       typeof ResizeObserver === "undefined"
         ? null
         : new ResizeObserver(() => {
             chart?.resize();
-            chart?.draw(S.p, S.t);
+            S.dirty = true;
+            paint();
           });
     sized?.observe(stageEl);
     let live = true;
     document.fonts?.ready.then(() => {
       if (!live) return;
       chart?.remeasure();
-      chart?.draw(S.p, S.t);
+      S.dirty = true;
+      paint();
     });
     return () => {
       live = false;
@@ -188,7 +208,7 @@ export function Journey() {
                 variant="icon"
                 size="sm"
                 className="j__pause"
-                aria-label={(paused ? words.play : words.pause)[lang]}
+                aria-label={words.pause[lang]}
                 aria-pressed={paused}
                 onClick={() => setPaused((v) => !v)}
               >

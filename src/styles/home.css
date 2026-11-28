@@ -422,7 +422,9 @@
 /* A step at a time: each step snaps under the head (proximity, so the paper sections after the journey scroll freely). */
 html:has(.j__steps) { scroll-padding-top: var(--h-head-h); scroll-snap-type: y proximity; }
 
-.j { position: relative; z-index: 2; }
+/* The section is night too: when a phone's address bar retracts, the screen grows past the slab's stable height
+   (svh) and the strip under it shows the night, not the paper. */
+.j { position: relative; z-index: 2; background: var(--c-cosmos); }
 /* The night slab, sticky under the head and night in both themes (data-theme="dark" on it): the chart's ground. */
 .j__stage {
   --s1-paper: var(--c-cosmos); --s1-paper-2: var(--c-cosmos-haze);

@@ -77,7 +77,7 @@ export interface ChartOptions {
 export interface Chart {
   /** Measure the stage again (a new size, a new plate width). */
   resize(): void;
-  /** The notes' type changed (the web fonts arrived): measure them again. */
+  /** The notes' type changed (the web fonts arrived): measure them again on the next draw. */
   remeasure(): void;
   draw(p: number, t: number): void;
 }
@@ -534,7 +534,7 @@ export function createChart({ stage, canvas, plates, stopName }: ChartOptions): 
       const x = n.side === "r" ? n.x + 6 : n.x - 6 - note.w;
       const y = n.y - note.h / 2;
       const box = [x - 4, y - 2, x + note.w + 4, y + note.h + 2];
-      if (box[0] < 0 || box[2] > W || boxes.some((b) => box[0] < b[2] && b[0] < box[2] && box[1] < b[3] && b[1] < box[3])) continue;
+      if (box[0] < 0 || box[2] > W || box[1] < 0 || box[3] > H || boxes.some((b) => box[0] < b[2] && b[0] < box[2] && box[1] < b[3] && b[1] < box[3])) continue;
       boxes.push(box);
       note.on = true;
       note.el.dataset.side = n.side;

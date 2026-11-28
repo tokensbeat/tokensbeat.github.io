@@ -172,7 +172,7 @@ describe("the homepage", () => {
     expect(hrefOf("Open Aha")).toEqual(Array(3).fill("https://aha.tokensbeat.com"));
     expect(hrefOf("Get an API key")).toEqual(Array(4).fill("https://console.tokensbeat.com/keys"));
     expect(hrefOf("Read the docs")).toEqual(["/docs/"]);
-    expect(hrefOf("Model prices")).toEqual(["https://console.tokensbeat.com/models"]);
+    expect(hrefOf("Model prices")).toEqual(["https://console.tokensbeat.com/models?view=pricing"]);
     // The API's plate sends the reader to the call further down.
     expect(hrefOf("See the code")).toEqual(["#home-code"]);
     expect(document.getElementById("home-code")).toHaveTextContent("Your first request.");
@@ -195,8 +195,11 @@ describe("the homepage", () => {
     expect(stops.map((b) => b.textContent)).toEqual(["00Start", "01Aha", "02Bots", "03Model API", "04Pricing"]);
     expect(stops.map((b) => b.getAttribute("aria-current"))).toEqual(["step", null, null, null, null]);
     expect(journey.querySelector(".j__where")).toHaveTextContent("00 / 04 · Start");
-    fireEvent.click(within(journey).getByRole("button", { name: "Pause" }));
-    expect(within(journey).getByRole("button", { name: "Play" })).toHaveAttribute("aria-pressed", "true");
+    // A toggle with one name: pressed while the chart is paused (its icon turns to Play).
+    const pause = within(journey).getByRole("button", { name: "Pause" });
+    expect(pause).toHaveAttribute("aria-pressed", "false");
+    fireEvent.click(pause);
+    expect(within(journey).getByRole("button", { name: "Pause" })).toHaveAttribute("aria-pressed", "true");
   });
 
   it("hides Pause under reduced motion: the chart follows the scroll and stands still", () => {
@@ -271,7 +274,7 @@ describe("the homepage", () => {
     expect(hrefOf("打开 Aha")).toEqual(Array(3).fill("https://aha.tokensbeat.com"));
     expect(hrefOf("获取 API 密钥")).toEqual(Array(4).fill("https://console.tokensbeat.com/keys?lang=zh"));
     expect(hrefOf("阅读文档")).toEqual(["/zh/docs/"]);
-    expect(hrefOf("模型价格")).toEqual(["https://console.tokensbeat.com/models?lang=zh"]);
+    expect(hrefOf("模型价格")).toEqual(["https://console.tokensbeat.com/models?view=pricing&lang=zh"]);
     const pricing = screen.getByRole("article", { name: "一份余额，用多少付多少。" });
     expect(hrefOf("查看价格", pricing)).toEqual(["/zh/pricing/"]);
     expect(hrefOf("隐私政策", pricing)).toEqual(["/zh/legal/privacy/"]);

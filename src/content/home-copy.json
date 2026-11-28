@@ -19,7 +19,6 @@
     "title": { "en": "The Milky Way", "zh": "银河" },
     "stopsLabel": { "en": "Stops", "zh": "站点" },
     "pause": { "en": "Pause", "zh": "暂停" },
-    "play": { "en": "Play", "zh": "播放" },
     "stops": [
       { "en": "Start", "zh": "起点" },
       { "en": "Aha", "zh": "Aha" },
@@ -119,14 +118,14 @@
     "eyebrow": { "en": "Model API", "zh": "模型 API" },
     "title": { "en": "Your first request.", "zh": "第一次调用。" },
     "lead": {
-      "en": "Set TOKENSBEAT_API_KEY and a model from your account, then call the endpoint you already know.",
-      "zh": "设置好 TOKENSBEAT_API_KEY 和账户里的一个模型名，就能用熟悉的接口调用。"
+      "en": "Set TOKENSBEAT_API_KEY to your key and TOKENSBEAT_MODEL to a model on your account, then call the endpoint you already know.",
+      "zh": "把 TOKENSBEAT_API_KEY 设为你的密钥，TOKENSBEAT_MODEL 设为账户里的一个模型名，就能用熟悉的接口调用。"
     },
     "tabs": { "en": "Code examples", "zh": "代码示例" },
     "primary": { "label": { "en": "Get an API key", "zh": "获取 API 密钥" }, "href": "https://console.tokensbeat.com/keys" },
     "links": [
       { "label": { "en": "Read the docs", "zh": "阅读文档" }, "href": "/docs" },
-      { "label": { "en": "Model prices", "zh": "模型价格" }, "href": "https://console.tokensbeat.com/models" }
+      { "label": { "en": "Model prices", "zh": "模型价格" }, "href": "https://console.tokensbeat.com/models?view=pricing" }
     ]
   },
   "pricing": {

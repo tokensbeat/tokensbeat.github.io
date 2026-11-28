@@ -54,7 +54,7 @@ export interface HomeStop {
 
 export interface HomeDeck {
   hero: { eyebrow: Bi; titleA: Bi; titleB: Bi; lead: Bi; hint: Bi; primary: HomeLink; secondary: HomeLink };
-  chart: { label: Bi; title: Bi; stopsLabel: Bi; pause: Bi; play: Bi; stops: Bi[]; notes: HomeNote[] };
+  chart: { label: Bi; title: Bi; stopsLabel: Bi; pause: Bi; stops: Bi[]; notes: HomeNote[] };
   stops: HomeStop[];
   code: { eyebrow: Bi; title: Bi; lead: Bi; tabs: Bi; primary: HomeLink; links: HomeLink[] };
   pricing: { eyebrow: Bi; title: Bi; lead: Bi; stats: { id: string; label: Bi; value: string }[]; note: Bi };
