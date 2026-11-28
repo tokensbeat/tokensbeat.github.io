@@ -222,7 +222,7 @@ describe("the water", () => {
     expect(snoutsIn / snouts).toBeLessThan(0.05);
   });
 
-  it("draws the homepage's water glyph for glyph as before: one fingerprint of 20 s of frames (a faster raster must not move a cell)", () => {
+  it("draws the default water glyph for glyph as before: one fingerprint of 20 s of frames (a faster raster must not move a cell)", () => {
     // FNV-1a over every clear, block and glyph (with its place and strength), as main drew them before the raster
     // passed over the cells no sample can hit (2026-11-16). A change that means to change the water writes a new one.
     let h = 2166136261;
@@ -250,7 +250,7 @@ describe("the water", () => {
     expect((h >>> 0).toString(16)).toBe("75750db0");
   }, 60_000); // 20 s of frames: seconds on a laptop, more on a 2-core CI runner (5 s default timed out there)
 
-  it("draws the sharks' blocks as strongly as blockAlpha says: none at 0 (Aha's first frame), the homepage's at 1", () => {
+  it("draws the sharks' blocks as strongly as blockAlpha says: none at 0 (Aha's first frame), the default at 1", () => {
     const w = new World();
     w.resize(600, 420, 8, 12);
     const { ctx, drawn } = recorder();

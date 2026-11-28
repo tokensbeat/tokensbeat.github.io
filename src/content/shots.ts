@@ -5,21 +5,16 @@
  * Chinese, an English and a Chinese one (<id>-<light|dark>-<en|zh>.webp). The page shows the one for its language and
  * the reader's theme (src/page/figures.tsx).
  *
- * One capture is of something not released: `room`, the Workspace built for the next Aha update, taken from its
- * branch's build with sample bots; its `status` is "coming" and its caption and credit say so.
- *
- * Every capture is made from demo data: Aha from a local build signed in as a demo user (Bots: the app's five starter
- * bots, its API answered from memory; Aha Code: the Windows app's own page with the app's bridge answered from memory,
- * one invented project), the console from its mock build, News from the public site above its first headline. No real account, name, e-mail, balance, key or chat is in
+ * Every capture is made from demo data: Aha from a local build signed in as a demo user, the console from its mock
+ * build, News from the public site above its first headline. No real account, name, e-mail, balance, key or chat is in
  * any of them.
  *
  * Each has its words in both languages: the address on its frame, the alternative text, the caption and the credit.
  */
 import type { Lang } from "@/i18n";
 import type { Bi } from "./home";
-import type { SiteStatus } from "./site";
 
-export type ShotId = "room" | "bots" | "code" | "latex" | "beads" | "metro" | "diary" | "news" | "aha" | "storage" | "newkey" | "models" | "workspaces" | "ticket";
+export type ShotId = "latex" | "beads" | "metro" | "diary" | "news" | "aha" | "newkey" | "models" | "workspaces" | "ticket";
 export type Theme = "light" | "dark";
 
 export interface Shot {
@@ -29,19 +24,6 @@ export interface Shot {
   alt: Bi;
   caption: Bi;
   credit: Bi;
-  /**
-   * On a phone a whole capture is too small to read: a figure beside its points shows this part of it larger (the
-   * capture scaled by `zoom` about `origin`, a CSS transform-origin), clipped by the frame. The caption must hold for
-   * the part as for the whole.
-   */
-  focus?: { zoom: number; origin: string };
-  /**
-   * What the picture shows, in the site's status words, said on its caption: `coming` for a capture of something
-   * built and not released (its caption and credit must say so), `live` for what is open today beside it.
-   */
-  status?: SiteStatus;
-  /** With a status: when, in two or three words, said beside the chip on the frame's bar ("next Aha update", "today"). */
-  when?: Bi;
 }
 
 /** Every capture's size: the figures reserve this shape before the picture arrives. */
@@ -54,56 +36,6 @@ const ahaCredit: Bi = { en: "Aha · demo account · 6 Nov 2026", zh: "Aha · 演
 const consoleCredit: Bi = { en: "Console · demo data · 6 Nov 2026", zh: "控制台 · 演示数据 · 2026 年 11 月 6 日" };
 
 export const SHOTS: Readonly<Record<ShotId, Shot>> = {
-  // The Workspace of the next Aha update (the house: a room for each bot), captured from its branch's build with
-  // sample bots. Not released: the caption and the credit say so, and nothing else on the site claims it.
-  room: {
-    id: "room",
-    host: "Aha",
-    alt: {
-      en: "A bot's room in the new Workspace, drawn in 3D: a corner room with a sage wall and a terracotta floor, where a small white robot works at a desk with a screen by the window, beside two armchairs, a rug and plants. A bar above reads All rooms and Atlas's room; a card below names the bot Atlas, its job, its model and that it is working, with Open chat and Room style.",
-      zh: "新工作间里一个机器人的房间，3D 画面：墙是灰绿色，地面是陶红色，一个白色小机器人在窗边带屏幕的书桌前干活，旁边有两把扶手椅、一块地毯和几盆植物。上方写着「全部房间」和「Atlas 的房间」；下方的卡片写着机器人 Atlas、它的分工、所用模型和「正在干活」，还有「打开对话」和「房间风格」。",
-    },
-    caption: {
-      en: "The new Workspace, coming in the next Aha update: a house where each bot will have a room, and pressing a room will take you inside. Here Atlas, a sample bot, is at work in its own.",
-      zh: "新的工作间，随下一次 Aha 更新推出：一栋房子，每个机器人会有一间自己的房间，到时点一下就能走进去。图中是示例机器人 Atlas 在自己的房间里干活。",
-    },
-    credit: { en: "Aha · next update · sample bots · 16 Nov 2026", zh: "Aha · 下次更新 · 示例机器人 · 2026 年 11 月 16 日" },
-    status: "coming",
-    when: { en: "next Aha update", zh: "下一次 Aha 更新" },
-    // On a phone: the room and the bot's card, a step closer (the pill above them and the empty ground at the right
-    // are left out).
-    focus: { zoom: 1.18, origin: "6% 87%" },
-  },
-  bots: {
-    id: "bots",
-    host: `${AHA}/#/bots`,
-    alt: {
-      en: "The Bots page in Aha, as a list: five bots with their jobs. Scout the researcher is reading 12 pages, Quill the writer is writing, Patch the coder needs an answer and has an Answer button, Lookout is idle. Each shows its runs and the percent of its share it has used.",
-      zh: "Aha 的机器人页面，列表视图：五个机器人和各自的分工。研究员阿探正在读 12 个网页，写手墨墨正在写，工程师补丁在等你决定、旁边有「去回答」按钮，值守守望空闲。每个机器人都列出运行次数和已用份额的百分比。",
-    },
-    caption: {
-      en: "Today: the Bots list. Patch, the coder, waits for an answer. Use is a percent of each bot's share.",
-      zh: "今天的样子：机器人列表。工程师补丁在等你回复。用量按各自份额的百分比显示。",
-    },
-    credit: { en: "Aha · demo account · 16 Nov 2026", zh: "Aha · 演示账户 · 2026 年 11 月 16 日" },
-    // The card that waits for the user, whole and alone: the lower left of the capture.
-    focus: { zoom: 2.2, origin: "8% 100%" },
-    status: "live",
-    when: { en: "today", zh: "今天" },
-  },
-  code: {
-    id: "code",
-    host: "Aha Code",
-    alt: {
-      en: "Aha Code in the Aha for Windows window, in a project named orders-api, on a chat titled No error for a bad e-mail: Aha waits for approval to run pytest, with Deny and Allow once on the card and a box to always allow this command in this project.",
-      zh: "Aha Windows 版窗口里的 Aha 代码，项目名为 orders-api，对话标题是「错误邮箱没有提示」：Aha 等你批准运行 pytest，卡片上有「拒绝」和「允许一次」，还有一个在本项目里始终允许这条命令的选项。",
-    },
-    caption: {
-      en: "Before a command runs, Aha Code asks: deny it, allow it once, or always in this project.",
-      zh: "运行命令之前，Aha 代码先问你：拒绝、允许一次，或在这个项目里一直允许。",
-    },
-    credit: { en: "Aha for Windows · demo project · 16 Nov 2026", zh: "Aha Windows 版 · 演示项目 · 2026 年 11 月 16 日" },
-  },
   latex: {
     id: "latex",
     host: AHA,
@@ -163,16 +95,6 @@ export const SHOTS: Readonly<Record<ShotId, Shot>> = {
     },
     caption: { en: "Aha, the first app on the runtime, as a person opens it.", zh: "Aha：运行时上的第一个应用，打开时的样子。" },
     credit: ahaCredit,
-  },
-  storage: {
-    id: "storage",
-    host: CONSOLE,
-    alt: {
-      en: "The console's Storage page: 13.4 MB used of a free 500 MB quota, and the space by kind: uploads, images, chats, LaTeX, diary photos and video frames.",
-      zh: "控制台的存储页：免费 500 MB 配额已用 13.4 MB，下面按类别列出空间：上传、图片、对话、LaTeX、日记照片和视频帧。",
-    },
-    caption: { en: "One quota for everything kept in Aha, measured by kind.", zh: "Aha 里保存的一切共用一份配额，按类别统计。" },
-    credit: consoleCredit,
   },
   newkey: {
     id: "newkey",

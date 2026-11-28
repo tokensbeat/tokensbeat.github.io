@@ -1,7 +1,6 @@
 import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { App } from "@/App";
 import { C } from "@/content/copy";
-import { HOME } from "@/content/home";
 import { appPagePath, CONTENT_PAGES } from "@/content/routes";
 import { NAV_SERVE, NAV_SUPPORT, pagePath, SITE_PAGES } from "@/content/site";
 import { LANGS, translate } from "@/i18n";
@@ -152,232 +151,147 @@ describe("the foot", () => {
 });
 
 describe("the homepage", () => {
-  it("heads the page with the owner's line in two sentences, the claim in plain words under it, then its sections, live products first", () => {
+  it("heads the journey with the owner's line in two sentences, then a plate for each stop and the paper sections", () => {
     render(<App lang="en" page="home" />);
     const h1 = screen.getByRole("heading", { level: 1 });
     expect(h1).toHaveTextContent("Galaxies of Intelligence. Born from Within.");
     // The poem's two halves, a line each, the second in jade (owner, 2026-11-16: the poem is the headline).
     expect([h1.querySelector(":scope > span")!.textContent, h1.querySelector(":scope > em")!.textContent]).toEqual(["Galaxies of Intelligence.", "Born from Within."]);
-    const claim = document.querySelector(".h-home-claim")!;
-    expect(claim).toHaveTextContent("One key for the models. A team of bots for the work.");
-    expect(h1.compareDocumentPosition(claim) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
-    expect(document.querySelector(".h-home-motto")).toBeNull();
-    const h2s = screen.getAllByRole("heading", { level: 2 }).map((h) => h.textContent);
-    expect(h2s).toEqual([
-      "New this month",
-      "Bots that work while you are away.",
-      "Aha Code works in the folder on your own computer.",
-      "One kind of key reaches the models.",
-      "AI API pricing is a mess. Here's the map.",
-      "More that is open today.",
-      "A backend for your app, opening in stages.",
-      "People and tools while you build.",
-      "One balance. Pay for what you use.",
-      "Questions",
-      "Step onto the Bedrock. Build Your Universe.",
+    const lead = screen.getByText("One account for an AI assistant, bots that run on a schedule, and one API key for every model. Pay as you go.");
+    expect(h1.compareDocumentPosition(lead) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(screen.getAllByRole("heading", { level: 2 }).map((h) => h.textContent)).toEqual([
+      "An assistant for chat, papers and code.",
+      "Bots that work while you're away.",
+      "One key for every model.",
+      "One balance. Pay as you go.",
+      "Your first request.",
+      "No subscription.",
+      "Start with Aha.",
     ]);
-    // Aha in the hero and the closing band; a key in the hero, beside the call and in the closing band.
-    expect(hrefOf("Open Aha")).toEqual(["https://aha.tokensbeat.com", "https://aha.tokensbeat.com"]);
-    expect(hrefOf("Get an API key")).toEqual(Array(3).fill("https://console.tokensbeat.com/keys"));
-    expect(hrefOf("See pricing")).toEqual(["/pricing/"]);
-    expect(document.querySelectorAll("details.h-faq__item")).toHaveLength(4);
+    // Aha in the hero, on its plate and at the close; a key in the hero, on the API's plate, beside the call and at the close.
+    expect(hrefOf("Open Aha")).toEqual(Array(3).fill("https://aha.tokensbeat.com"));
+    expect(hrefOf("Get an API key")).toEqual(Array(4).fill("https://console.tokensbeat.com/keys"));
+    expect(hrefOf("Read the docs")).toEqual(["/docs/"]);
+    expect(hrefOf("Model prices")).toEqual(["https://console.tokensbeat.com/models?view=pricing"]);
+    // The API's plate sends the reader to the call further down.
+    expect(hrefOf("See the code")).toEqual(["#home-code"]);
+    expect(document.getElementById("home-code")).toHaveTextContent("Your first request.");
   });
 
-  it("dates what is new this month, each line with its status and a link to its section on the page", () => {
+  it("draws the chart on a night slab: its notes hidden from screen readers, the five stops, where the reader is, and Pause", () => {
     render(<App lang="en" page="home" />);
-    const news = screen.getByRole("region", { name: "New this month" });
-    const items = [...news.querySelectorAll<HTMLElement>("[data-news]")];
-    expect(items.map((li) => [li.dataset.news, li.querySelector("time")!.textContent, li.querySelector("[data-status]")!.getAttribute("data-status"), within(li).getByRole("link").textContent])).toEqual([
-      ["bots", "15 Nov", "live", "Bots"],
-      ["code", "16 Nov", "early", "Aha Code"],
-      ["keys", "16 Nov", "live", "One kind of key"],
+    const journey = screen.getByRole("region", { name: "Galaxies of Intelligence. Born from Within." });
+    expect(journey.querySelector(".j__stage")).toHaveAttribute("data-theme", "dark");
+    expect(within(journey).getByRole("img", { name: /^A chart of the Milky Way with four products along it/ })).toBeInTheDocument();
+    const notes = journey.querySelector(".j__notes")!;
+    expect(notes).toHaveAttribute("aria-hidden", "true");
+    expect([...notes.querySelectorAll("[data-note] b")].map((b) => b.textContent)).toEqual([
+      "Chat", "LaTeX", "Aha Work", "Coder", "Watcher", "Researcher", "Team", "Writer", "Webhook", "Your key", "Gateway", "A model", "One balance", "Aha", "Bots", "API",
     ]);
-    for (const li of items) {
-      const href = within(li).getByRole("link").getAttribute("href")!;
-      expect(href).toMatch(/^#home-(bots|code|models)$/);
-      expect(document.getElementById(href.slice(1)), href).toBeInTheDocument();
-    }
+    // Aha keeps its capitals inside the mono caps; the other names are set in caps.
+    expect(notes.querySelector('[data-note="aha.work"] b')).toHaveClass("h-keep-case");
+    expect(notes.querySelector('[data-note="api.key"] b')).not.toHaveClass("h-keep-case");
+    const stops = within(within(journey).getByRole("navigation", { name: "Stops" })).getAllByRole("button");
+    expect(stops.map((b) => b.textContent)).toEqual(["00Start", "01Aha", "02Bots", "03Model API", "04Pricing"]);
+    expect(stops.map((b) => b.getAttribute("aria-current"))).toEqual(["step", null, null, null, null]);
+    expect(journey.querySelector(".j__where")).toHaveTextContent("00 / 04 · Start");
+    // A toggle with one name: pressed while the chart is paused (its icon turns to Play).
+    const pause = within(journey).getByRole("button", { name: "Pause" });
+    expect(pause).toHaveAttribute("aria-pressed", "false");
+    fireEvent.click(pause);
+    expect(within(journey).getByRole("button", { name: "Pause" })).toHaveAttribute("aria-pressed", "true");
   });
 
-  it("tells Bots as they are: live, a job from one sentence, routines, asks that wait, a team room, what wakes one, and never money", () => {
-    render(<App lang="en" page="home" />);
-    const bots = screen.getByRole("region", { name: "Bots that work while you are away." });
-    expect(bots.querySelector('.h-eyebrow [data-status="live"]')).toBeInTheDocument();
-    // Bots are Live; the one thing in the section that is not is its lead picture, the coming Workspace's room, and it
-    // alone carries Coming. Today's list beside it carries Live.
-    // (Each picture says its status twice: on its frame's bar, over the picture, and on its caption.)
-    expect([...bots.querySelectorAll("[data-status]")].map((c) => [c.closest("figure")?.getAttribute("data-shot") ?? "section", c.getAttribute("data-status")])).toEqual([
-      ["section", "live"],
-      ["room", "coming"],
-      ["room", "coming"],
-      ["bots", "live"],
-      ["bots", "live"],
-    ]);
-    expect(bots).toHaveTextContent("The new Workspace, coming in the next Aha update: a house where each bot will have a room, and pressing a room will take you inside. Here Atlas, a sample bot, is at work in its own.");
-    expect(bots).toHaveTextContent("A bot is a job, not a character");
-    expect(bots).toHaveTextContent("Up to eight in an account.");
-    expect([...bots.querySelectorAll(".h-spread__points h3")].map((h) => h.textContent)).toEqual(["Made from one sentence", "Routines", "It asks, then waits", "One room for the team"]);
-    expect(bots).toHaveTextContent("one of five starters, from Researcher to Chief of staff");
-    expect(bots).toHaveTextContent("At most 24 such runs in any 24 hours, across all your bots.");
-    expect([...bots.querySelectorAll("[data-wake]")].map((r) => [r.getAttribute("data-wake"), r.querySelector("th")!.textContent])).toEqual([
-      ["routine", "A routine"],
-      ["feed", "A feed or a page"],
-      ["address", "A request to its address"],
-      ["you", "You"],
-    ]);
-    expect(bots.querySelectorAll('[data-note="bounds"] li')).toHaveLength(3);
-    expect(bots).toHaveTextContent("Each bot gets a share of your key's 30-day allowance.");
-    // The two notes are disclosures, open as the page is written, each named by its title.
-    const notes = [...bots.querySelectorAll<HTMLDetailsElement>("details.h-feat__note")];
-    expect(notes.map((n) => [n.dataset.note, n.open, n.querySelector("summary h3")!.textContent])).toEqual([
-      ["wakes", true, "What wakes a bot"],
-      ["bounds", true, "What keeps it in bounds"],
-    ]);
-    expect(hrefOf("Open Bots in Aha", bots)).toEqual(["https://aha.tokensbeat.com/#/bots"]);
-    // Bots never show a price or a balance: neither does what the site says about them. Nor are they
-    // characters, and nothing that is not released is promised (phone push, a bot on the user's PC).
-    expect(bots.textContent).not.toMatch(/\$|balance|price|credit|companion|persona|phone|your PC|GitHub/i);
-  });
-
-  it("folds Bots' notes to a row each on a phone once the page is live, and leaves them open on a wide screen", () => {
-    vi.stubGlobal("matchMedia", (query: string) => ({ matches: query === "(max-width: 639px)", addEventListener() {}, removeEventListener() {} }));
+  it("hides Pause under reduced motion: the chart follows the scroll and stands still", () => {
+    vi.stubGlobal("matchMedia", (query: string) => ({ matches: query === "(prefers-reduced-motion: reduce)", addEventListener() {}, removeEventListener() {} }));
     try {
       render(<App lang="en" page="home" />);
-      const notes = [...document.querySelectorAll<HTMLDetailsElement>("details.h-feat__note")];
-      expect(notes).toHaveLength(2);
-      expect(notes.map((n) => n.open)).toEqual([false, false]);
-      // Still on the page, for a reader who opens one and for search engines.
-      expect(notes[0].querySelectorAll("[data-wake]")).toHaveLength(4);
+      expect(screen.queryByRole("button", { name: "Pause" })).toBeNull();
+      expect(screen.getByRole("navigation", { name: "Stops" })).toBeInTheDocument();
     } finally {
       vi.unstubAllGlobals();
     }
   });
 
-  it("says in the hero's own line that Aha Code is in early access", () => {
+  it("tells each stop on its plate as it is: Aha (Aha Work in early access), Bots, the Model API and Pricing", () => {
     render(<App lang="en" page="home" />);
-    const hero = screen.getByRole("region", { name: "Galaxies of Intelligence. Born from Within." });
-    expect(hero.querySelector(".h-lean-hero__line")).toHaveTextContent("Aha Code, now in early access, works in the folder on your own Windows computer.");
-  });
-
-  it("tells Aha Code as it is: early access inside Aha for Windows 0.4.1, the download, and nothing that is not released", () => {
-    render(<App lang="en" page="home" />);
-    const code = screen.getByRole("region", { name: "Aha Code works in the folder on your own computer." });
-    // Released, but shown only for the accounts TokensBeat turns on: Early access, never Live, Beta or Coming.
-    expect([...code.querySelectorAll("[data-status]")].map((c) => c.getAttribute("data-status"))).toEqual(["early"]);
-    expect(code.querySelectorAll(".h-spread__points > li")).toHaveLength(4);
-    expect(code).toHaveTextContent("Your repo stays on your computer.");
-    expect(code).toHaveTextContent("It asks before a command runs");
-    expect(code).toHaveTextContent("Early access: Aha Code shows for the accounts TokensBeat has turned it on for. Aha for Windows 0.4.1 runs on Windows 10 and 11 (x64).");
-    expect(hrefOf("Download Aha for Windows", code)).toEqual(["https://aha.tokensbeat.com/desktop/download/windows"]);
-    // Who sees it is said before the download, so nobody installs the app expecting what their account does not show.
-    const who = code.querySelector(".h-feat__small")!;
-    expect(who.compareDocumentPosition(within(code).getByRole("link", { name: "Download Aha for Windows" })) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
-    expect(hrefOf("Ask for early access", code)).toEqual(["https://console.tokensbeat.com/support/new?category=general&subject=Aha+Code+early+access"]);
+    const plate = (name: string) => screen.getByRole("article", { name });
+    const aha = plate("An assistant for chat, papers and code.");
+    expect([...aha.querySelectorAll(".j__points b")].map((b) => b.textContent)).toEqual(["Chat", "LaTeX", "Aha Work"]);
+    // Released inside Aha for Windows for the accounts TokensBeat turns on: the one chip on the journey.
+    expect([...document.querySelectorAll(".j [data-status]")].map((c) => [c.closest("li")!.dataset.point, c.getAttribute("data-status")])).toEqual([["work", "early"]]);
+    expect(aha).toHaveTextContent("The repository stays on your machine.");
+    expect(hrefOf("Download for Windows", aha)).toEqual(["https://aha.tokensbeat.com/desktop/download/windows"]);
+    const bots = plate("Bots that work while you're away.");
+    expect(bots).toHaveTextContent("Up to eight per account, each with its own budget.");
+    expect(hrefOf("Open Bots in Aha", bots)).toEqual(["https://aha.tokensbeat.com/#/bots"]);
+    // Bots never show a price or a balance; they are not characters; nothing unreleased (phone push, a bot on the user's PC).
+    expect(bots.textContent).not.toMatch(/\$|balance|price|credit|companion|persona|phone|your PC|GitHub/i);
+    const api = plate("One key for every model.");
+    expect(api).toHaveTextContent("No plans or groups to choose.");
+    // The plan that was retired on 2026-11-16 is not offered, and no reseller is named.
+    expect(api.textContent).not.toMatch(/Official only|Best price/);
+    const pricing = plate("One balance. Pay as you go.");
+    expect(pricing).toHaveTextContent("Top up from $5 by card or Link, or from $15 in USDT or USDC.");
+    expect(hrefOf("See pricing", pricing)).toEqual(["/pricing/"]);
+    expect(hrefOf("Privacy", pricing)).toEqual(["/legal/privacy/"]);
     // Not released: Aha for VS Code, the phone apps, a Mac build.
     expect(document.querySelector("main")!.textContent).not.toMatch(/VS Code|Android|iPhone|iOS|macOS|Mac\b/);
   });
 
-  it("shows what else is open in Aha, each card with its status and where it goes", () => {
+  it("gives the first request in three languages, each with Copy, the model from the reader's own environment", () => {
     render(<App lang="en" page="home" />);
-    const aha = screen.getByRole("region", { name: "More that is open today." });
-    // Aha's own storage by its name: the backend's Storage & Functions, in early access, is another thing.
-    expect(within(aha).getAllByRole("heading", { level: 3 }).map((h) => h.textContent)).toEqual(["LaTeX", "TokensBeat News", "Metro2Line", "Aha Storage"]);
-    for (const id of ["latex", "news", "metro", "aha-storage"]) expect(aha.querySelector(`[data-item="${id}"] [data-status="live"]`), id).toBeInTheDocument();
-    expect(hrefOf("TokensBeat News", aha)).toEqual(["https://news.tokensbeat.com"]);
-    expect(hrefOf("Aha Storage", aha)).toEqual(["https://console.tokensbeat.com/plaza/storage"]);
-    expect(hrefOf("Metro2Line", aha)).toEqual(["/aha/"]);
-    expect(hrefOf("Everything Aha does", aha)).toEqual(["/aha/"]);
+    const code = screen.getByRole("region", { name: "Your first request." });
+    const tabs = within(within(code).getByRole("tablist", { name: "Code examples" })).getAllByRole("tab");
+    expect(tabs.map((t) => t.textContent)).toEqual(["cURL", "Python", "Node.js"]);
+    expect(code.querySelector("pre")).toHaveTextContent("curl https://api.tokensbeat.com/v1/chat/completions");
+    expect(code.querySelector("pre")).toHaveTextContent('{"model": "$TOKENSBEAT_MODEL",');
+    expect(within(code).getByRole("button", { name: "Copy code" })).toBeInTheDocument();
+    fireEvent.click(tabs[1]);
+    expect(code.querySelector("pre")).toHaveTextContent('base_url="https://api.tokensbeat.com/v1"');
+    expect(code.querySelector("pre")).toHaveTextContent('model=os.environ["TOKENSBEAT_MODEL"]');
   });
 
-  it("says one kind of key beside the call itself: no plan to pick, the docs' own cURL example", () => {
+  it("gives the price figures, then closes with Aha and a key", () => {
     render(<App lang="en" page="home" />);
-    const models = screen.getByRole("region", { name: "One kind of key reaches the models." });
-    expect(models.querySelector('.h-eyebrow [data-status="live"]')).toBeInTheDocument();
-    expect(models.querySelectorAll(".h-lines li")).toHaveLength(4);
-    expect(models).toHaveTextContent("Nobody picks a plan or a route.");
-    // The plan that was retired on 2026-11-16 is not offered, and no reseller is named.
-    expect(models.textContent).not.toMatch(/Official only|Best price/);
-    expect(models.querySelector("pre")).toHaveTextContent("curl https://api.tokensbeat.com/v1/chat/completions");
-    expect(within(models).getByRole("button", { name: "Copy cURL" })).toBeInTheDocument();
-    expect(models).toHaveTextContent("Where a discounted route serves the model, it goes there first.");
-    expect(hrefOf("Read the quickstart", models)).toEqual(["/docs/"]);
-    expect(hrefOf("How the gateway works", models)).toEqual(["/ai-models/"]);
-  });
-
-  it("names each part of the backend and of the support once, as a card with its status and its page", () => {
-    render(<App lang="en" page="home" />);
-    const serve = screen.getByRole("region", { name: "A backend for your app, opening in stages." });
-    expect(within(serve).getAllByRole("heading", { level: 3 }).map((h) => h.textContent)).toEqual(["Database & Auth", "Storage & Functions", "Agents", "Supabase Move"]);
-    expect(hrefOf("Database & Auth", serve)).toEqual(["/database/"]);
-    for (const id of ["database", "storage", "agents"]) expect(serve.querySelector(`[data-item="${id}"] [data-status="early"]`), id).toBeInTheDocument();
-    expect(serve.querySelector('[data-item="supabase"] [data-status="coming"]')).toBeInTheDocument();
-    const support = screen.getByRole("region", { name: "People and tools while you build." });
-    expect(within(support).getAllByRole("heading", { level: 3 }).map((h) => h.textContent)).toEqual(["Workspace", "Guides & Docs", "Human Support", "Build with Us"]);
-    expect(hrefOf("Build with Us", support)).toEqual(["/build/"]);
-    expect(support.querySelector('[data-item="workspace"] [data-status="beta"]')).toBeInTheDocument();
-    // A person answers: said without "bots", which are a product now.
-    expect(support).toHaveTextContent("A person answers your ticket.");
+    const pricing = screen.getByRole("region", { name: "No subscription." });
+    expect([...pricing.querySelectorAll(".s1-stat")].map((s) => [s.querySelector(".s1-stat__label")!.textContent, s.querySelector(".s1-stat__value")!.textContent])).toEqual([
+      ["Monthly fee", "$0"],
+      ["Card or Link, from", "$5"],
+      ["USDT or USDC, from", "$15"],
+    ]);
+    expect(pricing).toHaveTextContent("Any fee for the method you pick shows at checkout, before you pay.");
+    const close = screen.getByRole("region", { name: "Start with Aha." });
+    expect(within(close).getAllByRole("link").map((a) => [a.textContent, a.getAttribute("href")])).toEqual([
+      ["Open Aha", "https://aha.tokensbeat.com"],
+      ["Get an API key", "https://console.tokensbeat.com/keys"],
+    ]);
   });
 
   it("speaks Chinese on /zh/, with each link in Chinese", () => {
     render(<App lang="zh" page="home" />);
     expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("星汉灿烂，若出其里。");
-    expect(document.querySelector(".h-home-claim")).toHaveTextContent("一把密钥通模型，一队机器人干活。");
-    expect(hrefOf("打开 Aha")).toEqual(["https://aha.tokensbeat.com", "https://aha.tokensbeat.com"]);
-    expect(hrefOf("获取 API 密钥")).toEqual(Array(3).fill("https://console.tokensbeat.com/keys?lang=zh"));
-    expect(hrefOf("申请抢先体验")[0]).toMatch(/^https:\/\/console\.tokensbeat\.com\/support\/new\?.*lang=zh$/);
-    expect(hrefOf("下载 Aha Windows 版")).toEqual(["https://aha.tokensbeat.com/desktop/download/windows"]);
-    expect(hrefOf("数据库与认证", screen.getByRole("region", { name: "给你应用的后端，正在分批开放。" }))).toEqual(["/zh/database/"]);
-    expect(hrefOf("看快速开始")).toEqual(["/zh/docs/"]);
-    expect(screen.getByRole("heading", { level: 2, name: "常见问题" })).toBeInTheDocument();
-    expect(screen.getByRole("region", { name: "你不在的时候，机器人照常干活。" })).toHaveTextContent("一个机器人就是一份差事，不是一个角色");
-  });
-
-  it.each([
-    ["en", "Step onto the Bedrock. Build Your Universe.", ["Step onto the Bedrock.", "Build Your Universe."], /[㐀-鿿]/, ["Open Aha", "Get an API key"]],
-    ["zh", "踏上基石，构建你的宇宙。", ["踏上基石，", "构建你的宇宙。"], /[A-Za-z]{4,}/, ["打开 Aha", "获取 API 密钥"]],
-  ] as const)("closes (%s) on its line in the page's language alone, a sentence a line, with its two buttons", (lang, name, titleLines, otherLanguage, buttons) => {
-    render(<App lang={lang} page="home" />);
-    const band = screen.getByRole("region", { name });
-    const title = within(band).getByRole("heading", { level: 2, name });
-    expect(title).toHaveClass("h-cta__title");
-    expect([...title.querySelectorAll("[data-line]")].map((l) => l.textContent)).toEqual(titleLines);
-    // One language at a time (owner, 2026-11-12): no line in the other language under the title.
-    expect(band.querySelector(".h-cta__deck")).toBeNull();
-    expect(band.querySelector("[lang]")).toBeNull();
-    expect(band.querySelector(".h-cta__words")!.textContent!.replace(/\b(Aha|API)\b/g, "")).not.toMatch(otherLanguage);
-    expect(within(band).getAllByRole("heading")).toHaveLength(1);
-    expect(within(band).getAllByRole("link").map((a) => [a.textContent, a.getAttribute("href")])).toEqual([
-      [buttons[0], "https://aha.tokensbeat.com"],
-      [buttons[1], `https://console.tokensbeat.com/keys${lang === "zh" ? "?lang=zh" : ""}`],
-    ]);
-    // The sharks are decoration beside the words: hidden from screen readers, which read the words themselves.
-    const water = band.querySelector("canvas.h-sharks")!;
-    expect(water.closest(".h-cta__aside")).toHaveAttribute("aria-hidden", "true");
-  });
-
-  it("draws the orbit's first frame, its labels as links with their status, and Pause hidden until it moves", () => {
-    render(<App lang="en" page="home" />);
-    const labels = screen.getByRole("list", { name: "How TokensBeat sits around your app" });
-    expect(within(labels).getAllByRole("link")).toHaveLength(10);
-    expect(within(labels).getByRole("link", { name: "Agent runtime (Early access)" })).toHaveAttribute("href", "/agents/");
-    const moons = document.querySelectorAll<HTMLElement>(".h-orbit__moon");
-    expect(moons).toHaveLength(10);
-    // jsdom answers prefers-reduced-motion with false and has no IntersectionObserver: the figure counts as moving.
-    expect(screen.getByRole("button", { name: "Pause the orbit" })).toBeVisible();
-    fireEvent.click(screen.getByRole("button", { name: "Pause the orbit" }));
-    expect(screen.getByRole("button", { name: "Play the orbit" })).toBeVisible();
-    expect(screen.getByRole("button", { name: "Play the orbit" }).closest("figure")).toHaveAttribute("data-paused");
+    expect(hrefOf("打开 Aha")).toEqual(Array(3).fill("https://aha.tokensbeat.com"));
+    expect(hrefOf("获取 API 密钥")).toEqual(Array(4).fill("https://console.tokensbeat.com/keys?lang=zh"));
+    expect(hrefOf("阅读文档")).toEqual(["/zh/docs/"]);
+    expect(hrefOf("模型价格")).toEqual(["https://console.tokensbeat.com/models?view=pricing&lang=zh"]);
+    const pricing = screen.getByRole("article", { name: "一份余额，用多少付多少。" });
+    expect(hrefOf("查看价格", pricing)).toEqual(["/zh/pricing/"]);
+    expect(hrefOf("隐私政策", pricing)).toEqual(["/zh/legal/privacy/"]);
+    expect(screen.getByRole("navigation", { name: "站点" })).toBeInTheDocument();
+    expect(document.querySelector(".j__where")).toHaveTextContent("00 / 04 · 起点");
+    expect(screen.getByRole("article", { name: "你不在时，机器人照常做事。" })).toHaveTextContent("每个账户最多八个，额度各自独立。");
   });
 });
 
 describe("the Aha page", () => {
-  it.each(LANGS)("gives Aha Code the status the homepage gives it: early access inside Aha for Windows, never 'not open yet' (%s)", (lang) => {
+  it.each([
+    ["en", "Aha Code"],
+    ["zh", "Aha 代码"],
+  ] as const)("gives Aha Code its status: early access inside Aha for Windows, never 'not open yet' (%s)", (lang, name) => {
     render(<App lang={lang} page="aha" />);
-    const title = screen.getByRole("heading", { level: 3, name: HOME.code.eyebrow[lang].split(" · ")[1] });
-    const cell = title.closest("li")!;
-    expect(cell.querySelector("[data-status]")).toHaveAttribute("data-status", HOME.code.status);
-    expect(HOME.code.status).toBe("early");
+    const cell = screen.getByRole("heading", { level: 3, name }).closest("li")!;
+    expect(cell.querySelector("[data-status]")).toHaveAttribute("data-status", "early");
     expect(cell).toHaveTextContent(lang === "zh" ? "随 Aha Windows 版提供" : "Inside Aha for Windows");
     expect(document.querySelector("main")!.textContent).not.toMatch(/Not open yet|尚未开放/);
   });
@@ -393,49 +307,6 @@ describe.each(["aha", "storage", "database", "supabase", "pricing", "models", "h
     expect(art.closest(".h-cta__aside")).toHaveAttribute("aria-hidden", "true");
     expect(art).not.toHaveAttribute("data-drawn");
     expect(within(band).getAllByRole("link").length).toBeGreaterThan(0);
-  });
-});
-
-describe("the homepage's hero", () => {
-  afterEach(() => vi.unstubAllGlobals());
-
-  it("is one composition on the night sky in both themes: the words, the orbit and the stars, which stop with Pause", () => {
-    // A canvas that can draw, and a frame clock that never fires (the loop's state is what this test reads).
-    const ctx = {
-      globalAlpha: 1, fillStyle: "", setTransform() {}, clearRect() {}, fillRect() {}, beginPath() {}, arc() {}, fill() {}, drawImage() {},
-      createRadialGradient: () => ({ addColorStop() {} }),
-    };
-    vi.spyOn(HTMLCanvasElement.prototype, "getContext").mockReturnValue(ctx as unknown as CanvasRenderingContext2D);
-    vi.stubGlobal("requestAnimationFrame", () => 1);
-    vi.stubGlobal("cancelAnimationFrame", () => undefined);
-    render(<App lang="en" page="home" />);
-    const hero = screen.getByRole("region", { name: "Galaxies of Intelligence. Born from Within." });
-    expect(hero).toHaveAttribute("data-theme", "dark");
-    expect(hero).toHaveClass("h-cosmos");
-    expect(within(hero).getByRole("figure")).toBeInTheDocument();
-    expect(within(hero).getByRole("link", { name: "Open Aha" })).toBeInTheDocument();
-    expect(within(hero).getByRole("link", { name: "Get an API key" })).toBeInTheDocument();
-    const sky = hero.querySelector<HTMLCanvasElement>("canvas.h-cosmos__stars")!;
-    expect(sky).toHaveAttribute("aria-hidden", "true");
-    expect(sky.dataset.state).toBe("moving");
-    fireEvent.click(screen.getByRole("button", { name: "Pause the orbit" }));
-    expect(sky.dataset.state).toBe("paused");
-    fireEvent.click(screen.getByRole("button", { name: "Play the orbit" }));
-    expect(sky.dataset.state).toBe("moving");
-    // The head's "+" marks would sit on the sky's edge: the homepage's head drops them.
-    expect(screen.getByRole("banner")).toHaveClass("h-head--cosmos");
-  });
-
-  it("draws each moon as ASCII in the planet's glyphs, its label still riding beside it", () => {
-    render(<App lang="en" page="home" />);
-    const arts = [...document.querySelectorAll<HTMLElement>(".h-orbit__moon > .h-orbit__moon-art")];
-    expect(arts).toHaveLength(10);
-    for (const art of arts) {
-      expect(art.textContent).toMatch(/^[@%#*+=\-:. \n]+$/);
-      expect(art.textContent!.trim()).not.toBe("");
-      expect(art.style.getPropertyValue("--moon-d")).toMatch(/^\d+\.\d{3}em$/);
-    }
-    expect(document.querySelectorAll(".h-orbit__labels a[data-moon]")).toHaveLength(10);
   });
 });
 

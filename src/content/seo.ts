@@ -13,15 +13,15 @@ export interface SeoText {
 export const SEO: Readonly<Record<PageId, { en: SeoText; zh: SeoText }>> = {
   home: {
     // Plain words, not the headline's: the hero's h1 is a line of Cao Cao's poem, which says nothing a search engine
-    // can rank. The title is the claim under it; the description names the gateway, Aha with its bots and Aha Code,
-    // and the backend that is opening in stages.
+    // can rank. The title and the description name what the journey's stops show: Aha, its bots, one key for every
+    // model, and one balance.
     en: {
-      title: "TokensBeat: one key for the AI models, and Aha with its working bots",
-      description: "AI models through one API key at public prices, and Aha: chat, bots that run your routines while you are away, and Aha Code on your own Windows computer. A Postgres backend and an agent runtime are in early access.",
+      title: "TokensBeat: an AI assistant, bots on a schedule, and one API key for every model",
+      description: "One account for Aha, an AI assistant for chat, papers and code; bots that run on a schedule; and one OpenAI-compatible API key for every model. One prepaid balance, pay as you go.",
     },
     zh: {
-      title: "TokensBeat：一把密钥通 AI 模型，Aha 里有干活的机器人",
-      description: "一把 API 密钥调用各家 AI 模型，价格公开；还有 Aha：对话、在你离开时按例行任务干活的机器人，以及在你自己 Windows 电脑上的 Aha 代码。Postgres 后端与 Agent 运行时处于抢先体验。",
+      title: "TokensBeat：AI 助手、按日程运行的机器人，一把密钥调用所有模型",
+      description: "一个账户：Aha，对话、论文、代码的 AI 助手；按日程运行的机器人；一把兼容 OpenAI 接口的 API 密钥调用所有模型。一份预付余额，按用量付费。",
     },
   },
   database: {

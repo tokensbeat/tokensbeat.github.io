@@ -30,6 +30,6 @@ describe("the licences of code and art taken from other projects", () => {
     expect(bundle["assets/water.js"].code.match(/drewdi/g)).toHaveLength(1);
     expect(bundle["assets/index.js"].code).toMatch(/^\/\*!\nsrc\/assets\/model-logos:[\s\S]*LobeHub[\s\S]*\*\/\nvar t=2;$/);
     expect(bundle["assets/data.js"].code).toBe("var d=3;");
-    expect(noticesFor([path.join(SRC, "page/StarField.tsx")], findVendored(SRC))).toEqual([]);
+    expect(noticesFor([path.join(SRC, "page/Journey.tsx")], findVendored(SRC))).toEqual([]);
   });
 });

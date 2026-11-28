@@ -1,6 +1,6 @@
 /**
  * The closing band's water (./world.ts drawn by ./render.ts) on a canvas. Loaded only when the band comes near the
- * screen (../SharkWater.tsx), so the homepage's first load carries none of it.
+ * screen (../CtaArt.tsx, ../lazyArt.ts), so a page's first load carries none of it.
  *
  * startSharkWater runs it: the simulation in fixed 1/60 s steps, drawn at most 30 times a second, only while the
  * canvas is on screen (IntersectionObserver) and the tab is shown (visibilitychange). Under reduced motion it lets the
@@ -9,7 +9,7 @@
  * still, hidden, off) and gets data-drawn once it holds a frame, which the stylesheet fades in.
  *
  * The product pages' closing bands run variations of it (../ctaArt.ts): startSharkWater's options are the World's
- * (./world.ts WaterOptions), its seed and the fish's glyphs; left out, the water is the homepage's.
+ * (./world.ts WaterOptions), its seed and the fish's glyphs; left out, the water is the default (the homepage's sharks until 2026-11-27).
  *
  * After stackedlol/ascii-sharks (src/engine.ts at a0074c1; MIT, Copyright (c) 2026 drewdi, ./LICENSE), whose notice
  * the build puts at the top of this chunk (scripts/vendor-notices.mjs).

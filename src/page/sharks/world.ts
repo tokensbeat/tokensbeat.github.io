@@ -14,7 +14,7 @@
  * sharks, more fish or only some kinds, a current every fish swims with, water that a fish leaves by one side and comes
  * back to from the other, lanes. Aha's loading screen draws one more (with its own copy of this file): longer
  * sharks, more fish, and a calm oval in the middle that everything swims round, where its words are. Left out, each
- * option is the homepage's water, number for number.
+ * option is the default water (the homepage's until 2026-11-27), number for number.
  */
 
 export const TAU = Math.PI * 2;
@@ -94,11 +94,11 @@ const SPECIES: Species[] = [
 ];
 const ALL_SPECIES: readonly number[] = SPECIES.map((_, i) => i);
 
-/** A variation of the water (the product pages' closing bands); every option left out is the homepage's own. */
+/** A variation of the water (the product pages' closing bands); every option left out is the default. */
 export interface WaterOptions {
   /** How many sharks, up to three; left out, two in a small panel and three in a large one. */
   sharks?: number;
-  /** How many fish, as a multiple of the homepage's number for water of the same size (1). */
+  /** How many fish, as a multiple of the default number for water of the same size (1). */
   fish?: number;
   /** The kinds of fish there are, by their place in SPECIES (all four). */
   species?: readonly number[];
@@ -110,7 +110,7 @@ export interface WaterOptions {
   wrap?: "x" | "y";
   /** Level lanes the fish keep to, the top one swimming right, the next left and so on, at `speed` px/s (none). */
   lanes?: { count: number; speed: number };
-  /** How long the sharks are, as a multiple of the homepage's length for water of the same size (1). */
+  /** How long the sharks are, as a multiple of the default length for water of the same size (1). */
   sharkSize?: number;
   /**
    * An oval in the middle of the water, its half-width and half-height in px, that the fish and the sharks swim round

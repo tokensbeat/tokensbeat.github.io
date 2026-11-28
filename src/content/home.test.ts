@@ -1,7 +1,8 @@
 /**
  * The homepage's deck (home-copy.json) as a whole: every text in both languages, the brand written TokensBeat, no
  * AI-flavoured words (owner: short, concrete sentences; never "unlock", "seamless", 赋能, 一站式…), Aha never called
- * 智能体 or "the agent", nothing that is not released, no reseller's name, and every address one hrefFor can resolve.
+ * 智能体 or "the agent", nothing that is not released, no reseller's name, the journey's stops and notes as the chart
+ * draws them, and every address one hrefFor can resolve.
  */
 // @ts-expect-error -- scripts/ is the node project's (JSDoc-typed JavaScript), not this one's
 import { namedLines } from "../../scripts/check-public-text.mjs";
@@ -54,7 +55,8 @@ describe("the homepage's deck", () => {
   it("writes the brand TokensBeat, and Aha by its name", () => {
     for (const t of TEXTS) {
       for (const text of [t.en, t.zh]) {
-        for (const m of text.match(/tokens\s?beat/gi) ?? []) expect(m, t.path).toBe("TokensBeat");
+        // The brand, not the environment variables a call reads (TOKENSBEAT_API_KEY).
+        for (const m of text.match(/tokens\s?beat(?!_)/gi) ?? []) expect(m, t.path).toBe("TokensBeat");
         expect(text, t.path).not.toMatch(/\b(the|our) agent\b/i);
       }
     }
@@ -71,34 +73,38 @@ describe("the homepage's deck", () => {
     }
   });
 
-  it("states each product's status as it is today", () => {
-    expect(HOME.bots.status).toBe("live");
-    // Released inside Aha for Windows, shown for the accounts TokensBeat turns on.
-    expect(HOME.code.status).toBe("early");
-    expect(HOME.models.status).toBe("live");
-    expect(Object.fromEntries(HOME.news.items.map((n) => [n.id, n.status]))).toEqual({ bots: "live", code: "early", keys: "live" });
+  it("states each product's status as it is today: only Aha Work carries one, Early access", () => {
+    // Everything on the journey is Live but Aha Work: released inside Aha for Windows, shown for the accounts
+    // TokensBeat turns on. A Live line carries no chip (the chips are kept for what is not open to all).
+    const marked = HOME.stops.flatMap((s) => s.points.filter((p) => p.status).map((p) => [s.id, p.id, p.status]));
+    expect(marked).toEqual([["aha", "work", "early"]]);
   });
 
-  it("says nothing of the coming Workspace's house and rooms: that is its picture's caption alone, labelled Coming", () => {
-    // The hero, New this month and the questions describe what is open today. (Bots' own "One room for the team" is
-    // the Team chat, live; the Vanguard card "Workspace" is the cloud dev box, in beta.)
-    const today = [HOME.hero, HOME.news, HOME.faq] as unknown as Json[];
-    for (const t of today.flatMap((node, i) => texts(node, ["hero", "news", "faq"][i]))) {
-      expect(String(t.en), t.path).not.toMatch(/\b(house|rooms?|floors?|3D)\b/i);
-      expect(String(t.zh), t.path).not.toMatch(/房间|房子|工作间|楼/);
-    }
+  it("walks the five stops in order, each note of the chart named once", () => {
+    expect(HOME.chart.stops.map((s) => s.en)).toEqual(["Start", "Aha", "Bots", "Model API", "Pricing"]);
+    expect(HOME.stops.map((s) => s.id)).toEqual(["aha", "bots", "api", "pricing"]);
+    const ids = HOME.chart.notes.map((n) => n.id);
+    expect(new Set(ids).size).toBe(ids.length);
+    // The points milkyWay.ts draws a note at: Aha's three, the six moons, the key, the gateway and a model, the balance and its three ties.
+    expect(ids).toEqual(["aha.chat", "aha.latex", "aha.work", ...[0, 1, 2, 3, 4, 5].map((i) => `bots.${i}`), "api.key", "api.gw", "api.model", "bal.core", "bal.0", "bal.1", "bal.2"]);
+  });
+
+  it("says nothing of the coming Workspace's house and rooms", () => {
     for (const t of TEXTS) {
-      expect(t.en, t.path).not.toMatch(/\b(house|floors?|3D)\b/i);
-      expect(t.zh, t.path).not.toMatch(/房子|工作间/);
+      expect(t.en, t.path).not.toMatch(/\b(house|rooms?|floors?|3D)\b/i);
+      expect(t.zh, t.path).not.toMatch(/房间|房子|工作间|楼/);
     }
   });
 
   it("links only addresses hrefFor resolves, in both languages", () => {
     const all = hrefs(DECK);
-    expect(all.length).toBeGreaterThan(20);
+    expect(all.length).toBeGreaterThan(10);
     for (const href of all) for (const lang of LANGS) expect(() => hrefFor(href, lang), href).not.toThrow();
     expect(hrefFor("ticket:Aha Code early access", "zh")).toBe("https://console.tokensbeat.com/support/new?category=general&subject=Aha+Code+early+access&lang=zh");
     expect(hrefFor("/docs", "zh")).toBe("/zh/docs/");
-    expect(hrefFor("#home-bots", "zh")).toBe("#home-bots");
+    expect(hrefFor("#home-code", "zh")).toBe("#home-code");
+    expect(hrefFor("/legal/privacy", "zh")).toBe("/zh/legal/privacy/");
+    expect(hrefFor("/pricing", "en")).toBe("/pricing/");
+    expect(() => hrefFor("/legal/cookies", "en")).toThrow();
   });
 });
